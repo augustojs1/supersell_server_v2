@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  supersell_database:
+    image: 'mysql:8.0'
+    restart: always
+    ports:
+      - ${PORT}
+    networks:
+      - supersell_network
+    environment:
+      MYSQL_DATABASE: ${DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+    env_file:
+      - path: ./docker.env
+
+  # supersell_server:
+  #   build: .
+  #   container_name: supersell_server
+  #   restart: always
+  #   ports:
+  #     - 3333:3333
+  #   networks:
+  #     - kira-network
+  #   depends_on:
+  #     - supersell_database
+  #   volumes:
+  #     - /usr/app
+
+networks:
+  supersell_network:
+    driver: bridge
