@@ -5,10 +5,6 @@ import { UsersModule } from './modules/users/users.module';
 import { DrizzleModule } from './infra/database/orm/drizzle/drizzle.module';
 import { configuration } from './infra/config/configuration';
 
-console.log(
-  `${process.cwd()}/src/infra/config/env/${process.env.NODE_ENV}.env`,
-);
-
 @Module({
   imports: [
     ConfigModule.forRoot({
