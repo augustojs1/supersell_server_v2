@@ -6,6 +6,7 @@ import { ulid } from 'ulid';
 import * as schema from '../../infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from 'src/infra/database/orm/drizzle/drizzle.module';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UserEntity } from './types';
 
 @Injectable()
 export class UsersRepository {
@@ -14,21 +15,30 @@ export class UsersRepository {
     private readonly drizzle: MySql2Database<typeof schema>,
   ) {}
 
-  public async create(user: CreateUserDto): Promise<any> {
-    const createdUser = await this.drizzle.insert(schema.users).values({
+  public async create(user: CreateUserDto): Promise<UserEntity> {
+    await this.drizzle.insert(schema.users).values({
       id: ulid(),
       ...user,
     });
 
-    return createdUser;
+    return this.findUserByEmail(user.email);
   }
 
-  public async findUserByEmail(email: string): Promise<any[]> {
-    const user = await this.drizzle
+  public async findUserByEmail(email: string): Promise<UserEntity | null> {
+    const users = await this.drizzle
       .select()
       .from(schema.users)
       .where(eq(schema.users.email, email));
 
-    return user;
+    return users[0] ?? null;
+  }
+
+  public async findById(id: string): Promise<UserEntity | null> {
+    const users = await this.drizzle
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.id, id));
+
+    return users[0] ?? null;
   }
 }

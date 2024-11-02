@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './modules/users/users.module';
 import { DrizzleModule } from './infra/database/orm/drizzle/drizzle.module';
 import { configuration } from './infra/config/configuration';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { configuration } from './infra/config/configuration';
     }),
     DrizzleModule,
     UsersModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

@@ -3,6 +3,7 @@
     "*.module.ts": "nest",
     "*.service.ts": "nest-service",
     "*.use-case.ts": "nest-service",
-    "*.controller.ts": "nest-controller"
+    "*.controller.ts": "nest-controller",
+    "*.guard.ts": "nest-guard"
   }
 }

@@ -9,4 +9,8 @@ export const configuration = () => ({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
   },
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    expire_time: process.env.JWT_EXPIRE_TIME,
+  },
 });
