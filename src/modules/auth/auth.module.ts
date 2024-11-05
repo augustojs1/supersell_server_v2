@@ -1,5 +1,5 @@
 import { JwtModule } from '@nestjs/jwt';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -15,7 +15,7 @@ import { AccessTokenGuard } from './guards';
       secret: configuration().jwt.secret,
       signOptions: { expiresIn: configuration().jwt.expire_time },
     }),
-    UsersModule,
+    forwardRef(() => UsersModule),
   ],
   providers: [AccessTokenGuard, AuthService, HashProvider, AccessTokenStrategy],
   controllers: [AuthController],

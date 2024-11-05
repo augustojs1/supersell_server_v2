@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service';
 import { HashProvider } from './providers/hash.providers';
 import { Token } from './types/token.type';
 import { SignInDto, SignUpDto } from './dto';
+import { UserProfileDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -88,9 +89,7 @@ export class AuthService {
     return token;
   }
 
-  public async getMe(userId: string): Promise<string> {
-    const user = await this.usersService.findById(userId);
-
-    return user.id;
+  public async getMe(userId: string): Promise<UserProfileDto> {
+    return await this.usersService.findUserProfile(userId);
   }
 }

@@ -1,7 +1,7 @@
 import { Controller, Body, Post, UseGuards, Get } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import { SignUpDto, SignInDto, SignInSuccesDto } from './dto';
+import { SignUpDto, SignInDto, SignInSuccesDto, UserProfileDto } from './dto';
 import { AccessTokenGuard } from './guards';
 import { GetCurrentUserDecorator } from './decorators';
 import { CurrentUser } from './types';
@@ -26,9 +26,9 @@ export class AuthController {
 
   @UseGuards(AccessTokenGuard)
   @Get('local/me')
-  public async getMe(@GetCurrentUserDecorator() user: CurrentUser) {
-    console.log('user::', user);
-
-    return true;
+  public async getMe(
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ): Promise<UserProfileDto> {
+    return await this.authService.getMe(user.sub);
   }
 }

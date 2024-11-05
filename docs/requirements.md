@@ -36,8 +36,8 @@
 
 ### #Authentication
 
-- [ ] Users should be able to sign up.
-- [ ] Users should be able to sign in.
+- [x] Users should be able to sign up.
+- [x] Users should be able to sign in.
 - [ ] Users should be able to reset their password trough email.
 
 ### #Departments

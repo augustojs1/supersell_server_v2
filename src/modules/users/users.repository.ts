@@ -7,6 +7,8 @@ import * as schema from '../../infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from 'src/infra/database/orm/drizzle/drizzle.module';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './types';
+import { UserProfileDto } from '../auth/dto';
+import { UpdateUserProfileDto } from './dto';
 
 @Injectable()
 export class UsersRepository {
@@ -16,12 +18,21 @@ export class UsersRepository {
   ) {}
 
   public async create(user: CreateUserDto): Promise<UserEntity> {
+    const id = ulid();
+
     await this.drizzle.insert(schema.users).values({
-      id: ulid(),
+      id: id,
       ...user,
     });
 
     return this.findUserByEmail(user.email);
+  }
+
+  public async createProfile(user_id: string): Promise<void> {
+    await this.drizzle.insert(schema.profiles).values({
+      id: ulid(),
+      user_id: user_id,
+    });
   }
 
   public async findUserByEmail(email: string): Promise<UserEntity | null> {
@@ -40,5 +51,37 @@ export class UsersRepository {
       .where(eq(schema.users.id, id));
 
     return users[0] ?? null;
+  }
+
+  public async findUserWithProfile(id: string): Promise<UserProfileDto | null> {
+    const userProfile = await this.drizzle
+      .select({
+        id: schema.users.id,
+        first_name: schema.users.first_name,
+        last_name: schema.users.last_name,
+        email: schema.users.email,
+        average_rating: schema.profiles.average_rating,
+        avatar_url: schema.profiles.avatar_url,
+        phone_number: schema.profiles.phone_number,
+        created_at: schema.users.created_at,
+        updated_at: schema.users.updated_at,
+      })
+      .from(schema.users)
+      .innerJoin(schema.profiles, eq(schema.users.id, schema.profiles.user_id))
+      .where(eq(schema.profiles.user_id, id));
+
+    return userProfile[0] || null;
+  }
+
+  public async updateProfile(
+    id: string,
+    data: UpdateUserProfileDto,
+  ): Promise<void> {
+    await this.drizzle
+      .update(schema.profiles)
+      .set({
+        phone_number: data.phone_number,
+      } as any)
+      .where(eq(schema.profiles.user_id, id));
   }
 }

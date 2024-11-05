@@ -3,6 +3,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './types';
+import { UserProfileDto } from '../auth/dto';
+import { UpdateUserProfileDto } from './dto';
 
 @Injectable()
 export class UsersService {
@@ -20,6 +22,8 @@ export class UsersService {
 
     const createdUser = await this.usersRepository.create(createUserDto);
 
+    await this.usersRepository.createProfile(createdUser.id);
+
     return createdUser;
   }
 
@@ -33,5 +37,16 @@ export class UsersService {
     const user = await this.usersRepository.findById(id);
 
     return user;
+  }
+
+  public async findUserProfile(id: string): Promise<UserProfileDto | null> {
+    return await this.usersRepository.findUserWithProfile(id);
+  }
+
+  public async updateProfile(
+    id: string,
+    data: UpdateUserProfileDto,
+  ): Promise<void> {
+    return this.usersRepository.updateProfile(id, data);
   }
 }
