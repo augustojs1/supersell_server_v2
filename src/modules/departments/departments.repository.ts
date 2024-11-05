@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq } from 'drizzle-orm';
+import { eq, isNull } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as entities from '@/infra/database/orm/drizzle/schema';
@@ -18,6 +18,9 @@ export class DepartmentsRepository {
   public async create(
     data: CreateDepartmentDto,
   ): Promise<DepartmentEntity | null> {
+    // INSERT INTO departments (id, parent_department_id, name, description)
+    // VALUES (`data.id`, `data.parent_department_id`, `data.name`, `data.description`);
+
     const id = ulid();
 
     await this.drizzle.insert(entities.departments).values({
@@ -31,6 +34,8 @@ export class DepartmentsRepository {
   }
 
   public async findByName(name: string): Promise<DepartmentEntity | null> {
+    // SELECT * FROM departments AS d WHERE d.name = `name`;
+
     const department = await this.drizzle
       .select()
       .from(entities.departments)
@@ -40,11 +45,33 @@ export class DepartmentsRepository {
   }
 
   public async findById(id: string): Promise<DepartmentEntity | null> {
+    // SELECT * FROM departments AS d WHERE d.id = `id`;
+
     const department: DepartmentEntity[] = await this.drizzle
       .select()
       .from(entities.departments)
       .where(eq(entities.departments.id, id));
 
     return department[0] ?? null;
+  }
+
+  public async findParentDepartments(): Promise<DepartmentEntity[]> {
+    // SELECT * FROM departments AS d WHERE d.parent_department_id IS NULL;
+
+    return await this.drizzle
+      .select()
+      .from(entities.departments)
+      .where(isNull(entities.departments.parent_department_id));
+  }
+
+  public async findChildrenDepartments(
+    parent_id: string,
+  ): Promise<DepartmentEntity[]> {
+    // SELECT * FROM departments AS d WHERE d.parent_department_id = `parent_id`;
+
+    return await this.drizzle
+      .select()
+      .from(entities.departments)
+      .where(eq(entities.departments.parent_department_id, parent_id));
   }
 }

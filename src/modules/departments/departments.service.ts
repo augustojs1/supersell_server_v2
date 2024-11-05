@@ -30,8 +30,35 @@ export class DepartmentsService {
           HttpStatus.BAD_REQUEST,
         );
       }
+
+      if (data.parent_department_id && parentDepartment.parent_department_id) {
+        throw new HttpException(
+          'This department already have a parent!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
 
     return await this.departmentsRepository.create(data);
+  }
+
+  public async findParentDepartments(): Promise<DepartmentEntity[]> {
+    return await this.departmentsRepository.findParentDepartments();
+  }
+
+  public async findChildrenDepartments(
+    parent_id: string,
+  ): Promise<DepartmentEntity[]> {
+    const parentDepartment =
+      await this.departmentsRepository.findById(parent_id);
+
+    if (!parentDepartment) {
+      throw new HttpException(
+        'Parent department with this id does not exists!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.departmentsRepository.findChildrenDepartments(parent_id);
   }
 }
