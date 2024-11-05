@@ -1,11 +1,22 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 
 import { DepartmentsService } from './departments.service';
 import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
-import { CreateDepartmentDto } from './dtos';
+import {
+  CreateDepartmentDto,
+  DepartmentDto,
+  UpdateDepartmentDto,
+} from './dtos';
 import { AccessTokenGuard } from '../auth/guards';
-import { DepartmentEntity } from './types';
 
 @UseGuards(AccessTokenGuard)
 @Controller('departments')
@@ -18,7 +29,7 @@ export class DepartmentsController {
   }
 
   @Get()
-  public async getParentDepartments(): Promise<DepartmentEntity[]> {
+  public async getParentDepartments(): Promise<DepartmentDto[]> {
     return await this.departmentsService.findParentDepartments();
   }
 
@@ -26,7 +37,15 @@ export class DepartmentsController {
   public async getChildrenDepartments(
     @GetCurrentUserDecorator() user: CurrentUser,
     @Param('parent_id') parent_id: string,
-  ): Promise<DepartmentEntity[]> {
+  ): Promise<DepartmentDto[]> {
     return await this.departmentsService.findChildrenDepartments(parent_id);
+  }
+
+  @Patch(':id')
+  public async update(
+    @Param('id') id: string,
+    @Body() data: UpdateDepartmentDto,
+  ): Promise<void> {
+    return await this.departmentsService.update(id, data);
   }
 }

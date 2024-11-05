@@ -1,7 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
-import { CreateDepartmentDto } from './dtos';
 import { DepartmentsRepository } from './departments.repository';
+import {
+  CreateDepartmentDto,
+  DepartmentDto,
+  UpdateDepartmentDto,
+} from './dtos';
 import { DepartmentEntity } from './types';
 
 @Injectable()
@@ -42,13 +46,13 @@ export class DepartmentsService {
     return await this.departmentsRepository.create(data);
   }
 
-  public async findParentDepartments(): Promise<DepartmentEntity[]> {
+  public async findParentDepartments(): Promise<DepartmentDto[]> {
     return await this.departmentsRepository.findParentDepartments();
   }
 
   public async findChildrenDepartments(
     parent_id: string,
-  ): Promise<DepartmentEntity[]> {
+  ): Promise<DepartmentDto[]> {
     const parentDepartment =
       await this.departmentsRepository.findById(parent_id);
 
@@ -60,5 +64,31 @@ export class DepartmentsService {
     }
 
     return await this.departmentsRepository.findChildrenDepartments(parent_id);
+  }
+
+  public async update(id: string, data: UpdateDepartmentDto): Promise<void> {
+    const departmentToUpdate = await this.departmentsRepository.findById(id);
+
+    if (!departmentToUpdate) {
+      throw new HttpException(
+        'Department with this id does not exists!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (data.parent_department_id) {
+      const parentDepartment = await this.departmentsRepository.findById(
+        data.parent_department_id,
+      );
+
+      if (!parentDepartment) {
+        throw new HttpException(
+          'Parent department with this id does not exists!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+    return await this.departmentsRepository.update(id, data);
   }
 }

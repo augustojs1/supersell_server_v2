@@ -4,7 +4,7 @@ import { eq, isNull } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as entities from '@/infra/database/orm/drizzle/schema';
-import { CreateDepartmentDto } from './dtos';
+import { CreateDepartmentDto, UpdateDepartmentDto } from './dtos';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { DepartmentEntity } from './types';
 
@@ -73,5 +73,23 @@ export class DepartmentsRepository {
       .select()
       .from(entities.departments)
       .where(eq(entities.departments.parent_department_id, parent_id));
+  }
+
+  public async update(id: string, data: UpdateDepartmentDto): Promise<void> {
+    // UPDATE departments AS d
+    // SET
+    //   d.parent_department_id = `data.parent_department_id`,
+    //   d.name = `data.name`
+    // WHERE
+    //   d.id = `id`;
+
+    await this.drizzle
+      .update(entities.departments)
+      .set({
+        name: data.name,
+        description: data.description ?? null,
+        parent_department_id: data.parent_department_id ?? null,
+      } as DepartmentEntity)
+      .where(eq(entities.departments.id, id));
   }
 }
