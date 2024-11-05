@@ -6,7 +6,7 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { HashProvider } from './providers/hash.providers';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
-import { configuration } from 'src/infra/config/configuration';
+import { configuration } from '@/infra/config/configuration';
 import { AccessTokenGuard } from './guards';
 
 @Module({

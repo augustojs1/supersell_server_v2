@@ -3,8 +3,8 @@ import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
-import * as schema from '../../infra/database/orm/drizzle/schema';
-import { DATABASE_TAG } from 'src/infra/database/orm/drizzle/drizzle.module';
+import * as schema from '@/infra/database/orm/drizzle/schema';
+import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './types';
 import { UserProfileDto } from '../auth/dto';
