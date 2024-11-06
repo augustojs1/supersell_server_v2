@@ -17,9 +17,9 @@ import {
   DepartmentDto,
   UpdateDepartmentDto,
 } from './dtos';
-import { AccessTokenGuard } from '../auth/guards';
+import { AccessTokenGuard, AdminGuard } from '../auth/guards';
 
-@UseGuards(AccessTokenGuard)
+@UseGuards(AccessTokenGuard, AdminGuard)
 @Controller('departments')
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}

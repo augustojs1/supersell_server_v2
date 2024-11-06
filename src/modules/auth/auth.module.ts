@@ -7,7 +7,7 @@ import { UsersModule } from '../users/users.module';
 import { HashProvider } from './providers/hash.providers';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { configuration } from '@/infra/config/configuration';
-import { AccessTokenGuard } from './guards';
+import { AccessTokenGuard, AdminGuard } from './guards';
 
 @Module({
   imports: [
@@ -17,8 +17,14 @@ import { AccessTokenGuard } from './guards';
     }),
     forwardRef(() => UsersModule),
   ],
-  providers: [AccessTokenGuard, AuthService, HashProvider, AccessTokenStrategy],
+  providers: [
+    AccessTokenGuard,
+    AdminGuard,
+    AuthService,
+    HashProvider,
+    AccessTokenStrategy,
+  ],
   controllers: [AuthController],
-  exports: [JwtModule, AccessTokenGuard],
+  exports: [JwtModule, AccessTokenGuard, AdminGuard],
 })
 export class AuthModule {}
