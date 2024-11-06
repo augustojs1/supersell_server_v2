@@ -16,7 +16,7 @@ services:
     env_file:
       - path: ./docker.env
 
-  # supersell_server:
+  # supersell_server_v2:
   #   build: .
   #   container_name: supersell_server
   #   restart: always

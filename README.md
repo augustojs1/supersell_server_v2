@@ -1,85 +1,125 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🏬 SuperSell Server
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+SuperSell is a marketplace inspired by eBay and Aliexpress where users can sell, buy, create their own store, add reviews to products, create wishlists and shopping carts. Supersell Server is a REST API created with Node.js, Nest.js, Drizzle, MySQL, Kafka and Docker.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- [Table of Content](#table-of-content)
+- [Non-Functional Requirements](#non-func-features)
+- [Functional Requirements](#func-features)
+- [How To Run](#how-to-run)
+  - [Requirements](#requirements)
+  - [Running SuperSell Server](#rodando-o-matricula-instituicao)
+- [Tests](#tests)
 
-## Description
+### Non-Functional Requirements
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- [ ] SuperSell Server should be developed using the following technologies: Node.js, Nest.js, TypeScript, MySQL, Drizzle and Docker.
+- [ ] Supersell External Services should be a microservice responsible for dealing with emailing, payment and delivery logistics.
+- [ ] Supersell Server should comunicate with Supersell External Services via Event Driven Architecture pattern.
+- [ ] Supersell Server should use Kafka localy as message broker.
+- [ ] REST API should use prefix: '/api/v1/'
+- [ ] Should feature a seeder for data.
+- [ ] Docker container for the database.
+- [ ] Docker container for the application.
+- [ ] Docker container for Kafka locally.
+- [ ] Create Github documentation.
+- [ ] Create Swagger REST API documentation.
+- [ ] Implement security configuration: SQL Injection, XSS Protection, Security Headers, Rate limiting, HPP & CORS etc.
+- [ ] Should include unit and integration tests.
+- [ ] Implement server configuration: Nginx, SSL, Domain, PM2 etc.
+- [ ] Create basic CI/CD and Github Actions pipeline.
+- [ ] Server should be deployed in production to Amazon AWS EC2 and later to AWS ECS.
+- [ ] Database should be deployed in production to AWS RDS.
+- [ ] Server should use in production AWS S3 to store static files such as images and etc.
+- [ ] Server should use in production AWS SQS as a message broker.
+- [ ] Server should use in production AWS SES as an emailing service.
+- [ ] Database trigger to calculate product and user rating.
+- [ ] Should feature a log system.
+- [ ] Should use REDIS as a cache system.\*
 
-## Project setup
+### Functional Requirements
+
+[Requirements documentation](docs/requirements.md)
+
+### Requirements
+
+Before you start, you should have installed in your machine the following tools:
+[Git](https://git-scm.com), [Node.js](https://nodejs.org/en/) and [Docker](https://www.docker.com/). Preferably Node.js version >= v18.
+To edit the code you can use a code editor like [VSCode](https://code.visualstudio.com/).
+
+### 🔥 Running SuperSell Server
+
+- Clone this repository
 
 ```bash
-$ pnpm install
+git clone git@github.com:augustojs1/supersell_server_v2.git
 ```
 
-## Compile and run the project
+- Cd into the project directory
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+cd supersell_server_v2
 ```
 
-## Run tests
+- Create a new .env file
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+touch .env
 ```
 
-## Resources
+- Fill in the keys in .env with values
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+# Database
+# Dev
+DATABASE_URL=
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- Create new development.env environment variable file inside the configuration folder
 
-## Support
+```bash
+touch infra/config/env/development.env
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- Fill in the keys in development.env with values
 
-## Stay in touch
+```bash
+# Port
+PORT=
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Database
+DATABASE_URL=
 
-## License
+# JWT
+JWT_SECRET=
+JWT_EXPIRES_IN=
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Install the project dependencies
+
+```bash
+npm install
+```
+
+- Start the Docker container
+
+```bash
+docker-compose up -d
+```
+
+- Push the tables to database
+
+- Run the project
+
+```bash
+npm run start:dev
+```
+
+- Project runs locally on: http://localhost:PORT
+
+### 👨‍🔬 Tests
+
+- Run the application tests
+
+```bash
+npm run test
+```
