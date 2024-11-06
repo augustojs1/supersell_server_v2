@@ -42,12 +42,11 @@
 
 ### #Departments
 
-- [ ] Departments can have a parent department.
-- [ ] Server admin should be able to create a new product department.
-- [ ] Server admin and users should be able to read all the existent department.
-- [ ] Server admin should be able to read a department with their id.
-- [ ] Server admin should be able to update an existent department.
-- [ ] Server admin should be able to delete an existent department.
+- [x] Departments can have a parent department.
+- [x] Server admin should be able to create a new product department.
+- [x] Server admin and users should be able to read all the existent department.
+- [x] Server admin should be able to update an existent department.
+- [x] Server admin should be able to delete an existent department.
 
 ### #Products
 
@@ -65,7 +64,9 @@
 
 ### #Users
 
-- [ ] Create role based permission for admins and user.
+- [x] Create role based permission for admins and user.
+- [x] User should be able to update their profile info.
+- [ ] User should be able to update their profile avatar.
 - [ ] Users should be able to read all their published product.
 - [ ] Users should be able to filter their publish product by sold and not sold.
 - [ ] Users should be able to see other users profile.

@@ -53,6 +53,7 @@ export class AuthService {
     const newUser = await this.usersService.create({
       first_name: signUpDto.first_name,
       last_name: signUpDto.last_name,
+      username: signUpDto.username,
       email: signUpDto.email,
       password: hashedPassword,
     });
