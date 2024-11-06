@@ -24,7 +24,7 @@ export class DepartmentsService {
       );
     }
 
-    if (data.parent_department_id) {
+    if (data.parent_department_id || !!!data.parent_department_id) {
       const parentDepartment: DepartmentEntity =
         await this.departmentsRepository.findById(data.parent_department_id);
 
@@ -76,7 +76,7 @@ export class DepartmentsService {
       );
     }
 
-    if (data.parent_department_id) {
+    if (data.parent_department_id || !!!data.parent_department_id) {
       const parentDepartment = await this.departmentsRepository.findById(
         data.parent_department_id,
       );
@@ -90,5 +90,18 @@ export class DepartmentsService {
     }
 
     return await this.departmentsRepository.update(id, data);
+  }
+
+  public async delete(id: string): Promise<void> {
+    const departmentToDelete = await this.departmentsRepository.findById(id);
+
+    if (!departmentToDelete) {
+      throw new HttpException(
+        'Department with this id does not exists!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.departmentsRepository.delete(id);
   }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -47,5 +48,10 @@ export class DepartmentsController {
     @Body() data: UpdateDepartmentDto,
   ): Promise<void> {
     return await this.departmentsService.update(id, data);
+  }
+
+  @Delete(':id')
+  public async delete(@Param('id') id: string): Promise<void> {
+    return await this.departmentsService.delete(id);
   }
 }

@@ -92,4 +92,12 @@ export class DepartmentsRepository {
       } as DepartmentEntity)
       .where(eq(entities.departments.id, id));
   }
+
+  public async delete(id: string): Promise<void> {
+    // DELETE FROM departments AS d WHERE d.id = `id`;
+
+    await this.drizzle
+      .delete(entities.departments)
+      .where(eq(entities.departments.id, id));
+  }
 }
