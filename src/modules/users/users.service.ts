@@ -1,10 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { UsersRepository } from './users.repository';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/request/create-user.dto';
 import { UserEntity } from './types';
 import { UserProfileDto } from '../auth/dto';
 import { UpdateUserProfileDto } from './dto';
+import { UpdateAvatarDto } from './dto/request/update-avatar.dto';
+import { File } from '@nest-lab/fastify-multer';
 
 @Injectable()
 export class UsersService {
@@ -48,5 +50,9 @@ export class UsersService {
     data: UpdateUserProfileDto,
   ): Promise<void> {
     return this.usersRepository.updateProfile(id, data);
+  }
+
+  public async updateAvatar(id: string, avatar_file: File): Promise<void> {
+    return this.usersRepository.updateAvatar(id, avatar_file.path);
   }
 }

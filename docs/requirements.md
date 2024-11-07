@@ -66,18 +66,13 @@
 
 - [x] Create role based permission for admins and user.
 - [x] User should be able to update their profile info.
-- [ ] User should be able to update their profile avatar.
+- [x] User should be able to update their profile avatar.
+- [ ] User should be able to update thier profile avatar to AWS.
 - [ ] Users should be able to read all their published product.
 - [ ] Users should be able to filter their publish product by sold and not sold.
 - [ ] Users should be able to see other users profile.
 - [ ] User rating should be the average of their products rating.
 - [ ] Users should be able to see their sales balance of sold products.
-
-### #Files
-
-- [ ] Users should be able to upload images of their products when is going to publish them.
-- [ ] Users should be able to delete images of their published products.
-- [ ] Users should be able to upload an avatar.
 
 ### #Wishlists
 

@@ -5,8 +5,8 @@ import { ulid } from 'ulid';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UserEntity } from './types';
+import { CreateUserDto } from './dto/request/create-user.dto';
+import { ProfileEntity, UserEntity } from './types';
 import { UserProfileDto } from '../auth/dto';
 import { UpdateUserProfileDto } from './dto';
 
@@ -82,6 +82,15 @@ export class UsersRepository {
       .set({
         phone_number: data.phone_number,
       } as any)
+      .where(eq(schema.profiles.user_id, id));
+  }
+
+  public async updateAvatar(id: string, url: string): Promise<void> {
+    await this.drizzle
+      .update(schema.profiles)
+      .set({
+        avatar_url: url,
+      } as ProfileEntity)
       .where(eq(schema.profiles.user_id, id));
   }
 }
