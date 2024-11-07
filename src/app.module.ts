@@ -6,6 +6,7 @@ import { DrizzleModule } from './infra/database/orm/drizzle/drizzle.module';
 import { configuration } from './infra/config/configuration';
 import { AuthModule } from './modules/auth/auth.module';
 import { DepartmentsModule } from './modules/departments/departments.module';
+import { ProductsModule } from './modules/products/products.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { DepartmentsModule } from './modules/departments/departments.module';
     UsersModule,
     AuthModule,
     DepartmentsModule,
+    ProductsModule,
   ],
 })
 export class AppModule {}

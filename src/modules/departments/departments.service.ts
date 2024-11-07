@@ -24,7 +24,7 @@ export class DepartmentsService {
       );
     }
 
-    if (data.parent_department_id || !!!data.parent_department_id) {
+    if (data.parent_department_id) {
       const parentDepartment: DepartmentEntity =
         await this.departmentsRepository.findById(data.parent_department_id);
 
