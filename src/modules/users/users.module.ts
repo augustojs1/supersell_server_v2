@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { FastifyMulterModule } from '@nest-lab/fastify-multer';
 
