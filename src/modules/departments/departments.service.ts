@@ -46,6 +46,10 @@ export class DepartmentsService {
     return await this.departmentsRepository.create(data);
   }
 
+  public async findById(id: string): Promise<DepartmentEntity | null> {
+    return await this.departmentsRepository.findById(id);
+  }
+
   public async findParentDepartments(): Promise<DepartmentDto[]> {
     return await this.departmentsRepository.findParentDepartments();
   }

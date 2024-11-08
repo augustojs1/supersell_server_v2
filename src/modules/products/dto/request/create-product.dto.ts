@@ -24,12 +24,12 @@ export class CreateProductDto {
   description: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
   price: number;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 0 })
   @IsPositive()
   quantity: number;
 

@@ -1,10 +1,10 @@
-import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
+import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { CreateProductDto } from './dto';
 import { ProductEntity } from './types';
 
@@ -40,6 +40,15 @@ export class ProductsRepository {
       .select()
       .from(schema.products)
       .where(eq(schema.products.id, id));
+
+    return product[0] ?? null;
+  }
+
+  public async findByName(name: string): Promise<ProductEntity | null> {
+    const product = await this.drizzle
+      .select()
+      .from(schema.products)
+      .where(eq(schema.products.name, name));
 
     return product[0] ?? null;
   }
