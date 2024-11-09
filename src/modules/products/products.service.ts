@@ -1,9 +1,15 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UseGuards,
+} from '@nestjs/common';
 
 import { ProductsRepository } from './products.repository';
 import { CreateProductDto } from './dto';
 import { ProductEntity } from './types';
 import { DepartmentsService } from '../departments/departments.service';
+import { AccessTokenGuard } from '../auth/guards';
 
 @Injectable()
 export class ProductsService {
@@ -12,6 +18,7 @@ export class ProductsService {
     private readonly departmentsService: DepartmentsService,
   ) {}
 
+  @UseGuards(AccessTokenGuard)
   public async create(
     user_id: string,
     data: CreateProductDto,
@@ -52,5 +59,26 @@ export class ProductsService {
     }
 
     return await this.productsRepository.create(user_id, data);
+  }
+
+  public async findByDepartmentId(
+    department_id: string,
+  ): Promise<ProductEntity[]> {
+    const department = await this.departmentsService.findById(department_id);
+
+    if (!department) {
+      throw new HttpException(
+        'Department with this id does not exists',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (!department.parent_department_id) {
+      return await this.productsRepository.findByParentDepartmentId(
+        department_id,
+      );
+    }
+
+    return await this.productsRepository.findByDepartmentId(department_id);
   }
 }

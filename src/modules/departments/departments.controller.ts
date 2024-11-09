@@ -18,12 +18,17 @@ import {
   UpdateDepartmentDto,
 } from './dtos';
 import { AccessTokenGuard, AdminGuard } from '../auth/guards';
+import { ProductsService } from '../products/products.service';
+import { ProductEntity } from '../products/types';
 
-@UseGuards(AccessTokenGuard, AdminGuard)
 @Controller('departments')
 export class DepartmentsController {
-  constructor(private readonly departmentsService: DepartmentsService) {}
+  constructor(
+    private readonly departmentsService: DepartmentsService,
+    private readonly productsService: ProductsService,
+  ) {}
 
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Post()
   public async create(@Body() data: CreateDepartmentDto) {
     return await this.departmentsService.create(data);
@@ -42,6 +47,7 @@ export class DepartmentsController {
     return await this.departmentsService.findChildrenDepartments(parent_id);
   }
 
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Patch(':id')
   public async update(
     @Param('id') id: string,
@@ -50,8 +56,16 @@ export class DepartmentsController {
     return await this.departmentsService.update(id, data);
   }
 
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Delete(':id')
   public async delete(@Param('id') id: string): Promise<void> {
     return await this.departmentsService.delete(id);
+  }
+
+  @Get(':department_id/products')
+  public async getProductByDepartmentId(
+    @Param('department_id') department_id: string,
+  ): Promise<ProductEntity[]> {
+    return await this.productsService.findByDepartmentId(department_id);
   }
 }
