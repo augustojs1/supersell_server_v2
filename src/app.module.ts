@@ -7,6 +7,7 @@ import { configuration } from './infra/config/configuration';
 import { AuthModule } from './modules/auth/auth.module';
 import { DepartmentsModule } from './modules/departments/departments.module';
 import { ProductsModule } from './modules/products/products.module';
+import { ProductsImagesModule } from './modules/products_images/products_images.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ProductsModule } from './modules/products/products.module';
     AuthModule,
     DepartmentsModule,
     ProductsModule,
+    ProductsImagesModule,
   ],
 })
 export class AppModule {}

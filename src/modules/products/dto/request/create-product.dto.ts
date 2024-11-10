@@ -1,3 +1,5 @@
+import { Transform } from 'class-transformer';
+
 import {
   IsBoolean,
   IsNotEmpty,
@@ -24,16 +26,19 @@ export class CreateProductDto {
   description: string;
 
   @IsNotEmpty()
+  @Transform(({ value }) => parseFloat(value))
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
-  price: number;
+  price: string;
 
   @IsNotEmpty()
+  @Transform(({ value }) => parseInt(value, 10))
   @IsNumber({ maxDecimalPlaces: 0 })
   @IsPositive()
-  quantity: number;
+  quantity: string;
 
-  @IsBoolean()
   @IsNotEmpty()
-  is_used: boolean;
+  @Transform(({ value }) => value === 'true')
+  @IsBoolean()
+  is_used: string;
 }

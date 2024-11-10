@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
@@ -18,7 +18,7 @@ export class ProductsRepository {
   public async create(
     user_id: string,
     data: CreateProductDto,
-  ): Promise<ProductEntity | null> {
+  ): Promise<ProductEntity> {
     const id = ulid();
 
     await this.drizzle.insert(schema.products).values({
@@ -27,9 +27,9 @@ export class ProductsRepository {
       user_id: user_id,
       name: data.name,
       description: data.description,
-      price: data.price,
-      is_used: data.is_used,
-      quantity: data.quantity,
+      price: parseFloat(data.price),
+      is_used: data.is_used === 'true' ? true : false,
+      quantity: parseInt(data.quantity),
     });
 
     return this.findById(id);
@@ -54,12 +54,30 @@ export class ProductsRepository {
   }
 
   public async findByParentDepartmentId(id: string): Promise<ProductEntity[]> {
-    // SELECT * FROM
-    //   products AS p
+    //     SELECT
+    //     p.id,
+    //     p.user_id,
+    //     p.department_id,
+    //     p.name,
+    //     p.description,
+    //     p.price,
+    //     p.quantity,
+    //     p.is_in_stock,
+    //     p.average_rating,
+    //     p.is_used,
+    //     p.created_at,
+    //     p.updated_at,
+    //     JSON_ARRAYAGG(JSON_OBJECT('url', pi.url)) AS images
+    // FROM
+    //     products AS p
     // INNER JOIN
-    //   departments AS d ON p.department_id = d.id
+    //     departments AS d ON p.department_id = d.id
+    // LEFT JOIN
+    //     products_images AS pi ON pi.product_id = p.id
     // WHERE
-    //   d.parent_department_id = '01JC4CFKTNACVAKM1AHZGB991B';
+    //     d.parent_department_id = `id`
+    // GROUP BY
+    //     p.id;
 
     return await this.drizzle
       .select({
@@ -75,22 +93,51 @@ export class ProductsRepository {
         is_used: schema.products.is_used,
         created_at: schema.products.created_at,
         updated_at: schema.products.updated_at,
+        images:
+          sql<JSON>`JSON_ARRAYAGG(JSON_OBJECT('url', ${schema.products_images.url}))`.as(
+            'images',
+          ),
       })
       .from(schema.products)
       .innerJoin(
         schema.departments,
         eq(schema.products.department_id, schema.departments.id),
       )
-      .where(eq(schema.departments.parent_department_id, id));
+      .leftJoin(
+        schema.products_images,
+        eq(schema.products_images.product_id, schema.products.id),
+      )
+      .where(eq(schema.departments.parent_department_id, id))
+      .groupBy(schema.products.id);
   }
 
   public async findByDepartmentId(id: string) {
-    // SELECT * FROM
-    //   products AS p
+    //     SELECT
+    // 	p.id,
+    //   p.user_id,
+    //   p.name,
+    //   p.description,
+    //   p.quantity,
+    //   p.is_in_stock,
+    //   p.average_rating,
+    //   p.is_used,
+    //   p.updated_at,
+    //   p.created_at,
+    //   JSON_ARRAYAGG(JSON_OBJECT('url', pi.url)) AS images
+    // FROM
+    // 	products AS p
     // INNER JOIN
-    //   departments AS d ON p.department_id = d.id
+    // 	departments AS d
+    // ON
+    // 	p.department_id = d.id
+    // LEFT JOIN
+    // 	products_images AS pi
+    // ON
+    // 	pi.product_id = p.id
     // WHERE
-    //   p.department_id = '01JC7092CJT6RXJW3YPDGMK6Y7';
+    // 	d.id = ´id´
+    // GROUP BY
+    // 	p.id;
 
     return await this.drizzle
       .select({
@@ -106,12 +153,21 @@ export class ProductsRepository {
         is_used: schema.products.is_used,
         created_at: schema.products.created_at,
         updated_at: schema.products.updated_at,
+        images:
+          sql<JSON>`JSON_ARRAYAGG(JSON_OBJECT('url', ${schema.products_images.url}))`.as(
+            'images',
+          ),
       })
       .from(schema.products)
       .innerJoin(
         schema.departments,
         eq(schema.products.department_id, schema.departments.id),
       )
-      .where(eq(schema.departments.id, id));
+      .leftJoin(
+        schema.products_images,
+        eq(schema.products_images.product_id, schema.products.id),
+      )
+      .where(eq(schema.departments.id, id))
+      .groupBy(schema.products.id);
   }
 }

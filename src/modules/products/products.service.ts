@@ -4,17 +4,20 @@ import {
   Injectable,
   UseGuards,
 } from '@nestjs/common';
+import { File } from '@nest-lab/fastify-multer';
 
 import { ProductsRepository } from './products.repository';
 import { CreateProductDto } from './dto';
 import { ProductEntity } from './types';
 import { DepartmentsService } from '../departments/departments.service';
 import { AccessTokenGuard } from '../auth/guards';
+import { ProductsImagesService } from '../products_images/products_images.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     private readonly productsRepository: ProductsRepository,
+    private readonly productImagesService: ProductsImagesService,
     private readonly departmentsService: DepartmentsService,
   ) {}
 
@@ -22,6 +25,7 @@ export class ProductsService {
   public async create(
     user_id: string,
     data: CreateProductDto,
+    product_images: File[],
   ): Promise<ProductEntity> {
     const product = await this.productsRepository.findByName(data.name);
 
@@ -50,15 +54,11 @@ export class ProductsService {
       );
     }
 
-    if (data.quantity === 0) {
-      throw new HttpException('Quantity can not be 0!', HttpStatus.BAD_REQUEST);
-    }
+    const createdProduct = await this.productsRepository.create(user_id, data);
 
-    if (data.price === 0) {
-      throw new HttpException('Price can not be 0!', HttpStatus.BAD_REQUEST);
-    }
+    await this.productImagesService.create(createdProduct.id, product_images);
 
-    return await this.productsRepository.create(user_id, data);
+    return createdProduct;
   }
 
   public async findByDepartmentId(
