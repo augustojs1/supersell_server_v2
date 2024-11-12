@@ -85,4 +85,42 @@ export class ProductsService {
   public async findById(id: string): Promise<ProductEntity | null> {
     return await this.productsRepository.findById(id);
   }
+
+  public async checkProductOwnershipElseThrow(
+    user_id: string,
+    product_id: string,
+  ): Promise<void> {
+    const product = await this.findByIdElseThrow(product_id);
+
+    if (product.user_id !== user_id) {
+      throw new HttpException('Action not allowed', HttpStatus.FORBIDDEN);
+    }
+  }
+
+  public async findByIdElseThrow(id: string) {
+    const product = await this.findById(id);
+
+    if (!product) {
+      throw new HttpException(
+        'Product with this id does not exists!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return product;
+  }
+
+  public async addImages(
+    user_id: string,
+    product_id: string,
+    images: File[],
+  ): Promise<File[]> {
+    const product = await this.findByIdElseThrow(product_id);
+
+    await this.checkProductOwnershipElseThrow(user_id, product.id);
+
+    await this.productImagesService.create(product_id, images);
+
+    return images;
+  }
 }

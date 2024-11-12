@@ -50,4 +50,24 @@ export class ProductsController {
   ): Promise<void> {
     await this.productsImagesService.delete(user.sub, product_image_id);
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Post(':product_id/images')
+  @UseInterceptors(FilesInterceptor('image'))
+  public async uploadImages(
+    @Param('product_id') product_id: string,
+    @GetCurrentUserDecorator() user: CurrentUser,
+    @UploadedFiles(
+      new ParseFilePipeBuilder().build({
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+      }),
+    )
+    product_images: File[],
+  ): Promise<File[]> {
+    return await this.productsService.addImages(
+      user.sub,
+      product_id,
+      product_images,
+    );
+  }
 }
