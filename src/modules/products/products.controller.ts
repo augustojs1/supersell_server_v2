@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpStatus,
+  Param,
   ParseFilePipeBuilder,
   Post,
   UploadedFiles,
@@ -15,10 +17,14 @@ import { CreateProductDto } from './dto';
 import { AccessTokenGuard } from '../auth/guards';
 import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
+import { ProductsImagesService } from '../products_images/products_images.service';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly productsImagesService: ProductsImagesService,
+  ) {}
 
   @UseGuards(AccessTokenGuard)
   @Post()
@@ -34,5 +40,14 @@ export class ProductsController {
     product_images: File[],
   ): Promise<any> {
     return await this.productsService.create(user.sub, data, product_images);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete('/product-image/:product_image_id')
+  public async deleteProductImage(
+    @Param('product_image_id') product_image_id: string,
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ): Promise<void> {
+    await this.productsImagesService.delete(user.sub, product_image_id);
   }
 }

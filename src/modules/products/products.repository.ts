@@ -170,4 +170,16 @@ export class ProductsRepository {
       .where(eq(schema.departments.id, id))
       .groupBy(schema.products.id);
   }
+
+  public async findProductByImageId(
+    product_id: string,
+  ): Promise<ProductEntity | null> {
+    // SELECT * FROM products WHERE id = `product_id`;
+    const product = await this.drizzle
+      .select()
+      .from(schema.products)
+      .where(eq(schema.products.id, product_id));
+
+    return product[0] ?? null;
+  }
 }

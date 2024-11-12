@@ -81,4 +81,8 @@ export class ProductsService {
 
     return await this.productsRepository.findByDepartmentId(department_id);
   }
+
+  public async findById(id: string): Promise<ProductEntity | null> {
+    return await this.productsRepository.findById(id);
+  }
 }

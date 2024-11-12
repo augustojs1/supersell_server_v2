@@ -19,7 +19,7 @@ const DISK_STORAGE_PATH = './.temp/uploads/products';
     FastifyMulterModule.register({
       storage: new DiskStorageService(DISK_STORAGE_PATH),
     }),
-    ProductsImagesModule,
+    forwardRef(() => ProductsImagesModule),
   ],
   providers: [ProductsService, ProductsRepository],
   exports: [ProductsService, ProductsRepository],
