@@ -50,15 +50,14 @@
 
 ### #Products
 
-- [ ] Users should be able to publish a product to sell.
-- [ ] Users should be able to update their products.
+- [x] Users should be able to publish a product to sell.
+- [x] Users should be able to update their products.
 - [ ] Users should be able to delete their products.
 - [ ] Users should be able to read information about a given product.
 - [ ] Users should be able to read all products in a category and paginate trough the results.
 - [ ] Users should be able to search a product by their name.
 - [ ] User should be able to see the first photo of a product and the product rating when returning a product list.
 - [ ] User should be able to see all the product photos and rating when fetching a single product.
-- [ ] Users should be able to see the first photo of the product when listing all products.
 - [ ] Users should be able to sort the products by their price by ascending and descending order.
 - [ ] Users should be able to see products sorted by: Best ratings, most sales, recent added...
 

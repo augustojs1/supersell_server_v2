@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Param,
   ParseFilePipeBuilder,
+  Patch,
   Post,
   UploadedFiles,
   UseGuards,
@@ -13,7 +14,7 @@ import {
 import { File, FilesInterceptor } from '@nest-lab/fastify-multer';
 
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto';
+import { CreateProductDto, UpdateProductDto } from './dto';
 import { AccessTokenGuard } from '../auth/guards';
 import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
@@ -69,5 +70,15 @@ export class ProductsController {
       product_id,
       product_images,
     );
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch(':product_id')
+  public async updateProduct(
+    @Param('product_id') product_id: string,
+    @GetCurrentUserDecorator() user: CurrentUser,
+    @Body() data: UpdateProductDto,
+  ) {
+    return await this.productsService.updateProduct(user.sub, product_id, data);
   }
 }

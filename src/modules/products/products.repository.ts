@@ -5,7 +5,7 @@ import { ulid } from 'ulid';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
-import { CreateProductDto } from './dto';
+import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductEntity } from './types';
 
 @Injectable()
@@ -236,5 +236,24 @@ export class ProductsRepository {
       .groupBy(schema.products.id);
 
     return products;
+  }
+
+  public async updateProduct(
+    product_id: string,
+    data: UpdateProductDto,
+  ): Promise<void> {
+    // UPDATE
+    //     products AS p
+    // SET
+    //   p.quantity = 95,
+    //   p.average_rating = 5
+    // WHERE p.id = '01JC711XQZMBTJ4XCW42QM8RM8';
+
+    await this.drizzle
+      .update(schema.products)
+      .set({
+        ...data,
+      })
+      .where(eq(schema.products.id, product_id));
   }
 }

@@ -7,7 +7,7 @@ import {
 import { File } from '@nest-lab/fastify-multer';
 
 import { ProductsRepository } from './products.repository';
-import { CreateProductDto } from './dto';
+import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductEntity } from './types';
 import { DepartmentsService } from '../departments/departments.service';
 import { AccessTokenGuard } from '../auth/guards';
@@ -112,6 +112,18 @@ export class ProductsService {
     }
 
     return product;
+  }
+
+  public async updateProduct(
+    user_id: string,
+    product_id: string,
+    data: UpdateProductDto,
+  ): Promise<void> {
+    const product = await this.findByIdElseThrow(product_id);
+
+    await this.checkProductOwnershipElseThrow(user_id, product.id);
+
+    await this.productsRepository.updateProduct(product.id, data);
   }
 
   public async addImages(
