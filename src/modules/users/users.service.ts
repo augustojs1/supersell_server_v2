@@ -55,4 +55,15 @@ export class UsersService {
   public async updateAvatar(id: string, avatar_file: File): Promise<void> {
     return this.usersRepository.updateAvatar(id, avatar_file.path);
   }
+
+  public async findUserByIdElseThrow(user_id: string): Promise<void> {
+    const user = await this.usersRepository.findById(user_id);
+
+    if (!user) {
+      throw new HttpException(
+        'User with this id does no exists!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
 }

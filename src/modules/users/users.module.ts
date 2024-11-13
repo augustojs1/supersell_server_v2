@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { FastifyMulterModule } from '@nest-lab/fastify-multer';
 
 import { UsersController } from './users.controller';
@@ -7,12 +7,14 @@ import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 import { AuthModule } from '../auth/auth.module';
 import { DiskStorageService } from '@/infra/storage/disk-storage.service';
+import { ProductsModule } from '../products/products.module';
 
 const DISK_STORAGE_PATH = './.temp/uploads/avatar';
 
 @Module({
   imports: [
     DrizzleModule,
+    forwardRef(() => ProductsModule),
     AuthModule,
     FastifyMulterModule.register({
       storage: new DiskStorageService(DISK_STORAGE_PATH),

@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
+  Param,
   ParseFilePipeBuilder,
   Patch,
   UploadedFile,
@@ -15,11 +17,16 @@ import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
 import { UpdateUserProfileDto } from './dto';
 import { AccessTokenGuard } from '../auth/guards';
-@UseGuards(AccessTokenGuard)
+import { ProductsService } from '../products/products.service';
+import { ProductEntity } from '../products/types';
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly productsService: ProductsService,
+  ) {}
 
+  @UseGuards(AccessTokenGuard)
   @Patch('profile')
   public async updateProfile(
     @GetCurrentUserDecorator() user: CurrentUser,
@@ -45,5 +52,14 @@ export class UsersController {
     avatar_file: File,
   ): Promise<void> {
     return this.usersService.updateAvatar(user.sub, avatar_file);
+  }
+
+  @Get(':user_id/products')
+  public async findUserProducts(
+    @Param('user_id') user_id: string,
+  ): Promise<ProductEntity[]> {
+    await this.usersService.findUserByIdElseThrow(user_id);
+
+    return await this.productsService.findUserProducts(user_id);
   }
 }

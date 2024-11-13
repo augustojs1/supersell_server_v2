@@ -182,4 +182,59 @@ export class ProductsRepository {
 
     return product[0] ?? null;
   }
+
+  public async findByUserId(user_id: string): Promise<ProductEntity[]> {
+    //     SELECT
+    // 	p.id,
+    // 	p.user_id,
+    //   p.department_id,
+    // 	p.name,
+    //   p.description,
+    //   p.quantity,
+    //   p.is_in_stock,
+    //   p.average_rating,
+    // 	p.is_used,
+    //   p.updated_at,
+    //   p.created_at,
+    //   JSON_ARRAYAGG(JSON_OBJECT('url', pi.url)) AS images
+    // FROM
+    // 	products AS p
+    // LEFT JOIN
+    // 	products_images AS pi
+    // ON
+    // 	p.id = pi.product_id
+    // WHERE
+    // 	p.user_id = '01JC1W9JBSBNSHH7Z5TP12B6X2'
+    // GROUP BY
+    // 	p.id;
+
+    const products = await this.drizzle
+      .select({
+        id: schema.products.id,
+        user_id: schema.products.user_id,
+        department_id: schema.products.department_id,
+        name: schema.products.name,
+        description: schema.products.description,
+        price: schema.products.price,
+        quantity: schema.products.quantity,
+        is_in_stock: schema.products.is_in_stock,
+        average_rating: schema.products.average_rating,
+        is_used: schema.products.is_used,
+        created_at: schema.products.created_at,
+        updated_at: schema.products.updated_at,
+        images:
+          sql<JSON>`JSON_ARRAYAGG(JSON_OBJECT('url', ${schema.products_images.url}))`.as(
+            'images',
+          ),
+      })
+      .from(schema.products)
+      .leftJoin(
+        schema.products_images,
+        eq(schema.products.id, schema.products_images.product_id),
+      )
+      .where(eq(schema.products.user_id, user_id))
+      .groupBy(schema.products.id);
+
+    return products;
+  }
 }

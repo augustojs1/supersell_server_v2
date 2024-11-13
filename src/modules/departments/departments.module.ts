@@ -14,7 +14,7 @@ import { ProductsModule } from '../products/products.module';
   imports: [
     DrizzleModule,
     AuthModule,
-    UsersModule,
+    forwardRef(() => UsersModule),
     forwardRef(() => ProductsModule),
   ],
   exports: [DepartmentsService],
