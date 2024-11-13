@@ -256,4 +256,15 @@ export class ProductsRepository {
       })
       .where(eq(schema.products.id, product_id));
   }
+
+  public async deleteProduct(product_id: string): Promise<void> {
+    // DELETE FROM
+    //   products AS p
+    // WHERE
+    //   p.id = `product_id`;
+
+    await this.drizzle
+      .delete(schema.products)
+      .where(eq(schema.products.id, product_id));
+  }
 }

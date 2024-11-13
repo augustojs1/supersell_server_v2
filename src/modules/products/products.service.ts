@@ -126,6 +126,14 @@ export class ProductsService {
     await this.productsRepository.updateProduct(product.id, data);
   }
 
+  public async delete(user_id: string, product_id: string): Promise<void> {
+    const product = await this.findByIdElseThrow(product_id);
+
+    await this.checkProductOwnershipElseThrow(user_id, product.id);
+
+    await this.productsRepository.deleteProduct(product_id);
+  }
+
   public async addImages(
     user_id: string,
     product_id: string,

@@ -81,4 +81,13 @@ export class ProductsController {
   ) {
     return await this.productsService.updateProduct(user.sub, product_id, data);
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete(':product_id')
+  public async delete(
+    @Param('product_id') product_id: string,
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ) {
+    return await this.productsService.delete(user.sub, product_id);
+  }
 }
