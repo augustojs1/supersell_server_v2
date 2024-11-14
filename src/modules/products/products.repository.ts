@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, sql } from 'drizzle-orm';
+import { eq, like, sql } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
@@ -266,5 +266,22 @@ export class ProductsRepository {
     await this.drizzle
       .delete(schema.products)
       .where(eq(schema.products.id, product_id));
+  }
+
+  public async findAllByName(name: string): Promise<ProductEntity[]> {
+    // SELECT
+    //   *
+    // FROM
+    //   products AS p
+    // WHERE
+    //   p.name
+    // LIKE
+    //   '%endi%';
+    //
+
+    return await this.drizzle
+      .select()
+      .from(schema.products)
+      .where(like(schema.products.name, `%${name}%`));
   }
 }

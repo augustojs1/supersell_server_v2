@@ -147,4 +147,8 @@ export class ProductsService {
 
     return images;
   }
+
+  public async findByName(name: string) {
+    return await this.productsRepository.findAllByName(name);
+  }
 }

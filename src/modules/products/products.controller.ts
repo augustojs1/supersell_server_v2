@@ -2,11 +2,13 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpStatus,
   Param,
   ParseFilePipeBuilder,
   Patch,
   Post,
+  Query,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -89,5 +91,10 @@ export class ProductsController {
     @GetCurrentUserDecorator() user: CurrentUser,
   ) {
     return await this.productsService.delete(user.sub, product_id);
+  }
+
+  @Get()
+  public async getProductByName(@Query('name') name: string) {
+    return await this.productsService.findByName(name);
   }
 }
