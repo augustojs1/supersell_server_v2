@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { DepartmentsModule } from './modules/departments/departments.module';
 import { ProductsModule } from './modules/products/products.module';
 import { ProductsImagesModule } from './modules/products_images/products_images.module';
+import { WishlistsModule } from './modules/wishlists/wishlists.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ProductsImagesModule } from './modules/products_images/products_images.
     DepartmentsModule,
     ProductsModule,
     ProductsImagesModule,
+    WishlistsModule,
   ],
 })
 export class AppModule {}
