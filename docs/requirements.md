@@ -75,9 +75,9 @@
 
 ### #Wishlists
 
-- [ ] Users should be able to add a product to their wishlist.
-- [ ] Users should be able to read the products on their wishlist.
-- [ ] Users should be able to remove a product from their wishlist.
+- [x] Users should be able to add a product to their wishlist.
+- [x] Users should be able to read the products on their wishlist.
+- [x] Users should be able to remove a product from their wishlist.
 
 ### #Shopping Carts
 
@@ -108,8 +108,8 @@
 
 ### #Reviews
 
-- [ ] Users should be able to create a review for a product.
-- [ ] User should not be able to add more than one review to a product.
+- [x] Users should be able to create a review for a product.
+- [x] User should not be able to add more than one review to a product.
 - [ ] Users should be able to delete a review for a product.
 - [ ] Users should be able to see all the reviews for a product.
 - [ ] Product rating should be the average of the reviews for that product.
