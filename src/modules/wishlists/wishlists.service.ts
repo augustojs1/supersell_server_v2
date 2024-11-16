@@ -4,6 +4,7 @@ import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { WishlistsRepository } from '@/modules/wishlists/wishlists.repository';
 import { ProductsService } from '../products/products.service';
 import { WishlistEntity } from './types';
+import { ProductEntity } from '../products/types';
 
 @Injectable()
 export class WishlistsService {
@@ -65,8 +66,8 @@ export class WishlistsService {
     await this.wishlistsRepository.create(user_id, data.product_id);
   }
 
-  public async findAll() {
-    return `This action returns all wishlists`;
+  public async findAll(user_id: string): Promise<ProductEntity[]> {
+    return await this.wishlistsRepository.findAllByUserId(user_id);
   }
 
   public async remove(user_id: string, product_id: string): Promise<void> {

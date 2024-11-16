@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { WishlistEntity } from './types';
+import { ProductEntity } from '../products/types';
 
 @Injectable()
 export class WishlistsRepository {
@@ -23,6 +24,50 @@ export class WishlistsRepository {
       user_id,
       product_id,
     });
+  }
+
+  public async findAllByUserId(user_id: string): Promise<ProductEntity[]> {
+    // SELECT
+    //   p.name
+    // FROM
+    //   wishlists w
+    // INNER JOIN
+    //   products p
+    // ON
+    //   w.product_id = p.id
+    // WHERE
+    //   w.user_id = `user_id`;
+
+    return await this.drizzle
+      .select({
+        id: schema.products.id,
+        user_id: schema.products.user_id,
+        department_id: schema.products.department_id,
+        name: schema.products.name,
+        description: schema.products.description,
+        price: schema.products.price,
+        quantity: schema.products.quantity,
+        is_in_stock: schema.products.is_in_stock,
+        average_rating: schema.products.average_rating,
+        is_used: schema.products.is_used,
+        created_at: schema.products.created_at,
+        updated_at: schema.products.updated_at,
+        images:
+          sql<JSON>`JSON_ARRAYAGG(JSON_OBJECT('url', ${schema.products_images.url}))`.as(
+            'images',
+          ),
+      })
+      .from(schema.wishlists)
+      .innerJoin(
+        schema.products,
+        eq(schema.wishlists.product_id, schema.products.id),
+      )
+      .leftJoin(
+        schema.products_images,
+        eq(schema.products_images.id, schema.products.id),
+      )
+      .where(eq(schema.wishlists.user_id, user_id))
+      .groupBy(schema.products.id);
   }
 
   public async findByUserIdAndProductId(

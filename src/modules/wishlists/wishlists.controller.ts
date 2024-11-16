@@ -27,17 +27,18 @@ export class WishlistsController {
     return this.wishlistsService.create(user.sub, createWishlistDto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Get()
-  findAll() {
-    return this.wishlistsService.findAll();
+  public async findAll(@GetCurrentUserDecorator() user: CurrentUser) {
+    return this.wishlistsService.findAll(user.sub);
   }
 
   @UseGuards(AccessTokenGuard)
   @Delete('products/:product_id')
-  remove(
+  public async remove(
     @Param('product_id') product_id: string,
     @GetCurrentUserDecorator() user: CurrentUser,
   ): Promise<void> {
-    return this.wishlistsService.remove(user.sub, product_id);
+    return await this.wishlistsService.remove(user.sub, product_id);
   }
 }
