@@ -48,6 +48,15 @@ export class ReviewsRepository {
     user_id: string,
     product_id: string,
   ): Promise<ReviewsEntity[]> {
+    // SELECT
+    //   *
+    // FROM
+    //   reviews r
+    // WHERE
+    //   r.user_id = `user_id`
+    // AND
+    //   r.product_id = `product_id`;
+
     return await this.drizzle
       .select()
       .from(schemas.reviews)
@@ -57,5 +66,20 @@ export class ReviewsRepository {
           eq(schemas.reviews.product_id, product_id),
         ),
       );
+  }
+
+  public async findAllByProductId(
+    product_id: string,
+  ): Promise<ReviewsEntity[]> {
+    // SELECT
+    //   *
+    // FROM
+    //   reviews r
+    // WHERE
+    //   r.product_id = '01JC71B8DBV6F6AT6A902RYWDR';
+    return await this.drizzle
+      .select()
+      .from(schemas.reviews)
+      .where(eq(schemas.reviews.product_id, product_id));
   }
 }

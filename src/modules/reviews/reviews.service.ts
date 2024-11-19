@@ -42,16 +42,10 @@ export class ReviewsService {
     return await this.reviewsRepository.create(user_id, data);
   }
 
-  findAll() {
-    return `This action returns all reviews`;
-  }
+  public async findAll(product_id: string): Promise<ReviewsEntityDto[]> {
+    await this.productsService.findByIdElseThrow(product_id);
 
-  findOne(id: number) {
-    return `This action returns a #${id} review`;
-  }
-
-  update(id: number) {
-    return `This action updates a #${id} review`;
+    return await this.reviewsRepository.findAllByProductId(product_id);
   }
 
   remove(id: number) {

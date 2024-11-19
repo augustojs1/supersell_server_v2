@@ -111,9 +111,9 @@
 - [x] Users should be able to create a review for a product.
 - [x] User should not be able to add more than one review to a product.
 - [ ] Users should be able to delete a review for a product.
-- [ ] Users should be able to see all the reviews for a product.
-- [ ] Product rating should be the average of the reviews for that product.
-- [ ] User rating should be the average of the reviews of his products.
+- [x] Users should be able to see all the reviews for a product.
+- [x] Product rating should be the average of the reviews for that product.
+- [ ] User rating should be the average of the reviews of their products.
 
 ### #Emails
 

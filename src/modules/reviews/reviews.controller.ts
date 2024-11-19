@@ -28,14 +28,11 @@ export class ReviewsController {
     return await this.reviewsService.create(user.sub, data);
   }
 
-  @Get()
-  findAll() {
-    return this.reviewsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reviewsService.findOne(+id);
+  @Get('products/:product_id')
+  public async findAll(
+    @Param('product_id') product_id: string,
+  ): Promise<ReviewsEntityDto[]> {
+    return await this.reviewsService.findAll(product_id);
   }
 
   @Delete(':id')
