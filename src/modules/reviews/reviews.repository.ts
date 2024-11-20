@@ -82,4 +82,11 @@ export class ReviewsRepository {
       .from(schemas.reviews)
       .where(eq(schemas.reviews.product_id, product_id));
   }
+
+  public async delete(id: string): Promise<void> {
+    // DELETE FROM reviews r WHERE r.id = 'id';
+    await this.drizzle
+      .delete(schemas.reviews)
+      .where(eq(schemas.reviews.id, id));
+  }
 }

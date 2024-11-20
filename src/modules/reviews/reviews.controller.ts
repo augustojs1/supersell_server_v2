@@ -35,8 +35,12 @@ export class ReviewsController {
     return await this.reviewsService.findAll(product_id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reviewsService.remove(+id);
+  @UseGuards(AccessTokenGuard)
+  @Delete(':review_id')
+  public async remove(
+    @Param('review_id') review_id: string,
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ): Promise<void> {
+    return await this.reviewsService.remove(user.sub, review_id);
   }
 }

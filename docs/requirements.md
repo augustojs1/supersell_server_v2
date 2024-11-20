@@ -84,6 +84,8 @@
 - [ ] Users should be able to add a product to their shopping cart.
 - [ ] Users should be able to delete a product from their shopping cart.
 - [ ] Users should be able to read the products from their shopping cart.
+- [ ] Users should be able to edit the shopping cart item quantity.
+- [ ] User should be able to checkout from their shopping cart.
 
 ### #OrderItem
 
@@ -110,13 +112,12 @@
 
 - [x] Users should be able to create a review for a product.
 - [x] User should not be able to add more than one review to a product.
-- [ ] Users should be able to delete a review for a product.
+- [x] Users should be able to delete a review for a product.
 - [x] Users should be able to see all the reviews for a product.
 - [x] Product rating should be the average of the reviews for that product.
 - [ ] User rating should be the average of the reviews of their products.
 
 ### #Emails
 
-- [ ] Users should confirm their account trough email.
 - [ ] Users should reset their password trough email.
 - [ ] Users should receive email for every status their order get.
