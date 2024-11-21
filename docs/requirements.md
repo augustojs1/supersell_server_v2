@@ -81,8 +81,10 @@
 
 ### #Shopping Carts
 
-- [ ] Users should be able to add a product to their shopping cart.
-- [ ] Users should be able to delete a product from their shopping cart.
+- [x] Users should be able to add a product to their shopping cart.
+- [x] User shopping cart total should be the total of value of it's items.
+- [x] Users should be able to delete a product from their shopping cart.
+  - [x] Shopping cart item price should be deducted from shopping cart total price.
 - [ ] Users should be able to read the products from their shopping cart.
 - [ ] Users should be able to edit the shopping cart item quantity.
 - [ ] User should be able to checkout from their shopping cart.
