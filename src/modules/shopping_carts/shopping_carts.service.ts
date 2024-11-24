@@ -3,7 +3,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ProductsService } from '../products/products.service';
 import { ShoppingCartsRepository } from './shopping-carts.repository';
 import { ShoppingCartEntity } from './types';
-// import { UpdateShoppingCartDto } from './dto/update-shopping_cart.dto';
 
 @Injectable()
 export class ShoppingCartsService {
@@ -76,7 +75,7 @@ export class ShoppingCartsService {
       );
     }
 
-    // MAYBE TRANSACTION
+    // TRANSACTION ?!
     await this.shoppingCartRepository.createShoppingCartItem({
       shopping_cart_id: shoppingCart.id,
       product_id: product.id,
@@ -97,8 +96,42 @@ export class ShoppingCartsService {
     // return all shopping cart items products from user shopping cart
   }
 
-  public async update() {
-    // return `This action updates a #${id} shoppingCart`;
+  public async update(user_id: string, product_id: string, quantity: number) {
+    const shoppingCartItem =
+      await this.shoppingCartRepository.findShoppingCartItemByUserIdAndProductId(
+        user_id,
+        product_id,
+      );
+
+    if (!shoppingCartItem) {
+      throw new HttpException(
+        'Product with this id not found on user shopping cart!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const shoppingCart = await this.findByUserIdElseThrow(user_id);
+
+    // TRANSACTION ?!
+    // UPDATE SHOPPING CART ITEM QUANTITY
+    await this.shoppingCartRepository.updateShoppingCartItemQuantiy(
+      product_id,
+      quantity,
+    );
+
+    const newProductCartValue =
+      Number(shoppingCart.total_price) -
+      shoppingCartItem.shopping_cart_item.quantity *
+        Number(shoppingCartItem.shopping_cart_item.price);
+
+    const updatedTotalPrice =
+      Number(newProductCartValue) +
+      Number(quantity) * Number(shoppingCartItem.shopping_cart_item.price);
+
+    await this.shoppingCartRepository.updateTotalPriceByUserId(
+      user_id,
+      updatedTotalPrice,
+    );
   }
 
   public async remove(user_id: string, product_id: string): Promise<any> {
@@ -120,7 +153,7 @@ export class ShoppingCartsService {
       Number(shoppingCartItem.shopping_cart_item.price) *
         Number(shoppingCartItem.shopping_cart_item.quantity);
 
-    // MAYBE TRANSACTION
+    // TRANSACTION ?!
     await this.shoppingCartRepository.delete(
       shoppingCartItem.shopping_cart_item.id,
     );

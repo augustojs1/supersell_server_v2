@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -12,8 +13,7 @@ import { ShoppingCartsService } from './shopping_carts.service';
 import { AccessTokenGuard } from '../auth/guards';
 import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
-import { CreateShoppingCartItemDto } from './dto';
-// import { UpdateShoppingCartDto } from './dto/update-shopping_cart.dto';
+import { CreateShoppingCartItemDto, UpdateItemQuantityDTO } from './dto';
 
 @Controller('shopping-carts')
 export class ShoppingCartsController {
@@ -44,10 +44,19 @@ export class ShoppingCartsController {
     return this.shoppingCartsService.findAll();
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateShoppingCartDto: UpdateShoppingCartDto) {
-  //   return this.shoppingCartsService.update(+id, updateShoppingCartDto);
-  // }
+  @UseGuards(AccessTokenGuard)
+  @Patch('/item/product/:product_id')
+  update(
+    @Param('product_id') product_id: string,
+    @GetCurrentUserDecorator() user: CurrentUser,
+    @Body() data: UpdateItemQuantityDTO,
+  ) {
+    return this.shoppingCartsService.update(
+      user.sub,
+      product_id,
+      data.quantity,
+    );
+  }
 
   @UseGuards(AccessTokenGuard)
   @Delete('/item/product/:product_id')

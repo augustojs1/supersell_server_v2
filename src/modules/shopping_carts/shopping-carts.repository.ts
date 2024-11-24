@@ -65,9 +65,10 @@ export class ShoppingCartsRepository {
     // UPDATE
     // 	shopping_carts sc
     // SET
-    // 	sc.total_price = 500.00
+    // 	sc.total_price = `total_price`
     // WHERE
     // 	sc.user_id = 'user_id';
+
     await this.drizzle
       .update(schemas.shopping_carts)
       .set({
@@ -126,6 +127,24 @@ export class ShoppingCartsRepository {
       );
 
     return shoppingCartItem[0] ?? null;
+  }
+
+  public async updateShoppingCartItemQuantiy(
+    product_id: string,
+    quantity: number,
+  ): Promise<void> {
+    // UPDATE
+    //   shopping_cart_item AS sci
+    // SET
+    //   sci.quantity = `quantity`
+    // WHERE
+    //   sci.product_id = `product_id`;
+    await this.drizzle
+      .update(schemas.shopping_cart_item)
+      .set({
+        quantity: quantity,
+      })
+      .where(eq(schemas.shopping_cart_item.product_id, product_id));
   }
 
   public async delete(id: string): Promise<void> {
