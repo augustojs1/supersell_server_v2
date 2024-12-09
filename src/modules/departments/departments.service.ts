@@ -102,7 +102,7 @@ export class DepartmentsService {
     if (!departmentToDelete) {
       throw new HttpException(
         'Department with this id does not exists!',
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.NOT_FOUND,
       );
     }
 
