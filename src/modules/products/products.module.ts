@@ -14,7 +14,7 @@ const DISK_STORAGE_PATH = './.temp/uploads/products';
 @Module({
   controllers: [ProductsController],
   imports: [
-    AuthModule,
+    forwardRef(() => AuthModule),
     forwardRef(() => DepartmentsModule),
     FastifyMulterModule.register({
       storage: new DiskStorageService(DISK_STORAGE_PATH),

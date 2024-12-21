@@ -13,7 +13,7 @@ import { ProductsModule } from '../products/products.module';
   providers: [DepartmentsService, DepartmentsRepository],
   imports: [
     DrizzleModule,
-    AuthModule,
+    forwardRef(() => AuthModule),
     forwardRef(() => UsersModule),
     forwardRef(() => ProductsModule),
   ],

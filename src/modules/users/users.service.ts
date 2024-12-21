@@ -1,12 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { File } from '@nest-lab/fastify-multer';
 
 import { UsersRepository } from './users.repository';
 import { CreateUserDto } from './dto/request/create-user.dto';
 import { UserEntity } from './types';
 import { UserProfileDto } from '../auth/dto';
 import { UpdateUserProfileDto } from './dto';
-import { UpdateAvatarDto } from './dto/request/update-avatar.dto';
-import { File } from '@nest-lab/fastify-multer';
 
 @Injectable()
 export class UsersService {

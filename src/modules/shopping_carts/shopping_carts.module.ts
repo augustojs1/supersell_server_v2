@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ShoppingCartsService } from './shopping_carts.service';
 import { ShoppingCartsController } from './shopping_carts.controller';
 import { ShoppingCartsRepository } from './shopping-carts.repository';
@@ -8,6 +8,7 @@ import { ProductsModule } from '../products/products.module';
 @Module({
   controllers: [ShoppingCartsController],
   providers: [ShoppingCartsService, ShoppingCartsRepository],
-  imports: [AuthModule, ProductsModule],
+  imports: [forwardRef(() => AuthModule), ProductsModule],
+  exports: [ShoppingCartsService],
 })
 export class ShoppingCartsModule {}

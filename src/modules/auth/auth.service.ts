@@ -7,6 +7,7 @@ import { HashProvider } from './providers/hash.providers';
 import { Token } from './types/token.type';
 import { SignInDto, SignUpDto } from './dto';
 import { UserProfileDto } from './dto';
+import { ShoppingCartsService } from '../shopping_carts/shopping_carts.service';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +16,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
     private readonly hashProvider: HashProvider,
+    private readonly shoppingCartsService: ShoppingCartsService,
   ) {}
 
   private async hashData(data: string): Promise<string> {
@@ -59,6 +61,8 @@ export class AuthService {
     });
 
     const token = await this.getToken(newUser.id, newUser.email);
+
+    await this.shoppingCartsService.create(newUser.id);
 
     return token;
   }

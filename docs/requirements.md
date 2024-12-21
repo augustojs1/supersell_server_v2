@@ -55,7 +55,7 @@
 - [x] Users should be able to delete their products.
 - [ ] Users should be able to read information about a given product.
 - [ ] Users should be able to read all products in a category and paginate trough the results.
-- [x] Users should be able to search a product by their name.
+- [ ] Users should be able to search a product by their name. (MELHORAR PERF.)
 - [ ] User should be able to see the first photo of a product and the product rating when returning a product list.
 - [ ] User should be able to see all the product photos and rating when fetching a single product.
 - [ ] Users should be able to sort the products by their price by ascending and descending order.
@@ -92,6 +92,8 @@
 ### #OrderItem
 
 - [ ] Users should be able to add a product and their quantity as order items.
+- [ ] Order item should have a delivery address.
+- [ ] Order item should have a billing address.
 
 ### #Orders
 
@@ -99,11 +101,13 @@
 - [ ] Users should be able to read all the products they have an order.
 - [ ] Users should be able to filter their orders based on if it is paid or not.
 - [ ] Server admin should be able to change the status of a order.
-- [ ] Order should have status of: PENDING_PAYMENT, PAID, CONFIRMED, SENT, ON_DELIVERY, DELIVERED.
+- [ ] Order should have status of: PENDING_PAYMENT, FAILED_PAYMENT, PAID, SENT, ON_DELIVERY, DELIVERED.
 
-### #DeliveryAdress
+### #Address
 
 - [ ] Users should inform a delivery address with country, distric/region, neighborhood, street, house number and complement.
+- [ ] Address should have 3 different types: PERSONAL_ADDRESS, DELIVERY_ADDRESS, BILLING_ADDRESS
+- [ ] Address alias
 
 ### #Payments
 

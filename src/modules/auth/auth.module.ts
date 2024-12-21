@@ -8,6 +8,7 @@ import { HashProvider } from './providers/hash.providers';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { configuration } from '@/infra/config/configuration';
 import { AccessTokenGuard, AdminGuard } from './guards';
+import { ShoppingCartsModule } from '../shopping_carts/shopping_carts.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AccessTokenGuard, AdminGuard } from './guards';
       signOptions: { expiresIn: configuration().jwt.expire_time },
     }),
     forwardRef(() => UsersModule),
+    forwardRef(() => ShoppingCartsModule),
   ],
   providers: [
     AccessTokenGuard,
