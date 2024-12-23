@@ -60,9 +60,9 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const token = await this.getToken(newUser.id, newUser.email);
-
     await this.shoppingCartsService.create(newUser.id);
+
+    const token = await this.getToken(newUser.id, newUser.email);
 
     return token;
   }
