@@ -5,7 +5,11 @@ import { ulid } from 'ulid';
 
 import * as schemas from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
-import { ShoppingCartEntity, ShoppingCartItemEntity } from './types';
+import {
+  ShoppingCartEntity,
+  ShoppingCartItemEntity,
+  ShoppingCartItemUpdate,
+} from './types';
 import { CreateShoppingCartItemDataType } from './types/create-shopping-cart-item-data.type';
 
 @Injectable()
@@ -151,5 +155,34 @@ export class ShoppingCartsRepository {
     await this.drizzle
       .delete(schemas.shopping_cart_item)
       .where(eq(schemas.shopping_cart_item.id, id));
+  }
+
+  public async createItemAndUpdateShoppingCartValueTrx(
+    data: ShoppingCartItemUpdate,
+  ): Promise<void> {
+    await this.drizzle.transaction(async (tx) => {
+      try {
+        const id = ulid();
+
+        // First operation
+        await tx.insert(schemas.shopping_cart_item).values({
+          id,
+          shopping_cart_id: data.shopping_cart_id,
+          product_id: data.product_id,
+          price: data.price,
+          quantity: data.quantity,
+        });
+
+        // Second operation
+        await tx
+          .update(schemas.shopping_carts)
+          .set({
+            total_price: data.updatedTotalPrice,
+          } as ShoppingCartEntity)
+          .where(eq(schemas.shopping_carts.user_id, data.user_id));
+      } catch (error) {
+        throw error;
+      }
+    });
   }
 }

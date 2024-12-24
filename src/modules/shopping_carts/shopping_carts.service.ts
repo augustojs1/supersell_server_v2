@@ -75,21 +75,17 @@ export class ShoppingCartsService {
       );
     }
 
-    // TRANSACTION ?!
-    await this.shoppingCartRepository.createShoppingCartItem({
+    const updatedTotalPrice =
+      Number(shoppingCart.total_price) + Number(product.price);
+
+    await this.shoppingCartRepository.createItemAndUpdateShoppingCartValueTrx({
       shopping_cart_id: shoppingCart.id,
       product_id: product.id,
       price: product.price,
       quantity: 1,
-    });
-
-    const updatedTotalPrice =
-      Number(shoppingCart.total_price) + Number(product.price);
-
-    await this.shoppingCartRepository.updateTotalPriceByUserId(
       user_id,
       updatedTotalPrice,
-    );
+    });
   }
 
   public async findAll() {
@@ -112,17 +108,17 @@ export class ShoppingCartsService {
 
     const shoppingCart = await this.findByUserIdElseThrow(user_id);
 
-    // TRANSACTION ?!
-    // UPDATE SHOPPING CART ITEM QUANTITY
-    await this.shoppingCartRepository.updateShoppingCartItemQuantiy(
-      product_id,
-      quantity,
-    );
-
     const newProductCartValue =
       Number(shoppingCart.total_price) -
       shoppingCartItem.shopping_cart_item.quantity *
         Number(shoppingCartItem.shopping_cart_item.price);
+
+    // UPDATE SHOPPING CART ITEM QUANTITY
+    // START TRANSACTION
+    await this.shoppingCartRepository.updateShoppingCartItemQuantiy(
+      product_id,
+      quantity,
+    );
 
     const updatedTotalPrice =
       Number(newProductCartValue) +
@@ -132,6 +128,7 @@ export class ShoppingCartsService {
       user_id,
       updatedTotalPrice,
     );
+    // END TRANSACTION
   }
 
   public async remove(user_id: string, product_id: string): Promise<any> {
@@ -153,7 +150,7 @@ export class ShoppingCartsService {
       Number(shoppingCartItem.shopping_cart_item.price) *
         Number(shoppingCartItem.shopping_cart_item.quantity);
 
-    // TRANSACTION ?!
+    // START TRANSACTION
     await this.shoppingCartRepository.delete(
       shoppingCartItem.shopping_cart_item.id,
     );
@@ -162,5 +159,6 @@ export class ShoppingCartsService {
       user_id,
       updatedTotalPrice,
     );
+    // END TRANSACTION
   }
 }
