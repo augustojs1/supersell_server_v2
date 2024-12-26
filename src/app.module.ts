@@ -11,6 +11,7 @@ import { ProductsImagesModule } from './modules/products_images/products_images.
 import { WishlistsModule } from './modules/wishlists/wishlists.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { ShoppingCartsModule } from './modules/shopping_carts/shopping_carts.module';
+import { AddressModule } from './modules/address/address.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ShoppingCartsModule } from './modules/shopping_carts/shopping_carts.mod
     WishlistsModule,
     ReviewsModule,
     ShoppingCartsModule,
+    AddressModule,
   ],
 })
 export class AppModule {}

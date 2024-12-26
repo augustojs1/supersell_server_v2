@@ -106,7 +106,7 @@
 ### #Address
 
 - [ ] Users should inform a delivery address with country, distric/region, neighborhood, street, house number and complement.
-- [ ] Address should have 3 different types: PERSONAL_ADDRESS, DELIVERY_ADDRESS, BILLING_ADDRESS
+- [ ] Address should have 4 different types: PERSONAL_ADDRESS, DELIVERY_ADDRESS, BILLING_ADDRESS and DELIVERY_AND_BILLING_ADDRESS
 - [ ] Address alias
 
 ### #Payments
@@ -121,7 +121,7 @@
 - [x] Users should be able to delete a review for a product.
 - [x] Users should be able to see all the reviews for a product.
 - [x] Product rating should be the average of the reviews for that product.
-- [ ] User rating should be the average of the reviews of their products.
+- [x] User rating should be the average of the reviews of their products.
 
 ### #Emails
 
