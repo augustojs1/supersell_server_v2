@@ -9,6 +9,7 @@ import {
   ShoppingCartEntity,
   ShoppingCartItemEntity,
   ShoppingCartItemUpdate,
+  UpdateQuantityAndTotalPriceData,
 } from './types';
 import { CreateShoppingCartItemDataType } from './types/create-shopping-cart-item-data.type';
 
@@ -172,6 +173,32 @@ export class ShoppingCartsRepository {
           price: data.price,
           quantity: data.quantity,
         });
+
+        // Second operation
+        await tx
+          .update(schemas.shopping_carts)
+          .set({
+            total_price: data.updatedTotalPrice,
+          } as ShoppingCartEntity)
+          .where(eq(schemas.shopping_carts.user_id, data.user_id));
+      } catch (error) {
+        throw error;
+      }
+    });
+  }
+
+  public async updateQuantityAndTotalPriceTrx(
+    data: UpdateQuantityAndTotalPriceData,
+  ): Promise<void> {
+    await this.drizzle.transaction(async (tx) => {
+      try {
+        // First operation
+        await tx
+          .update(schemas.shopping_cart_item)
+          .set({
+            quantity: data.quantity,
+          })
+          .where(eq(schemas.shopping_cart_item.product_id, data.product_id));
 
         // Second operation
         await tx

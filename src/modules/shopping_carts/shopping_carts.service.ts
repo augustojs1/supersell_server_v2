@@ -113,22 +113,16 @@ export class ShoppingCartsService {
       shoppingCartItem.shopping_cart_item.quantity *
         Number(shoppingCartItem.shopping_cart_item.price);
 
-    // UPDATE SHOPPING CART ITEM QUANTITY
-    // START TRANSACTION
-    await this.shoppingCartRepository.updateShoppingCartItemQuantiy(
-      product_id,
-      quantity,
-    );
-
     const updatedTotalPrice =
       Number(newProductCartValue) +
       Number(quantity) * Number(shoppingCartItem.shopping_cart_item.price);
 
-    await this.shoppingCartRepository.updateTotalPriceByUserId(
-      user_id,
+    this.shoppingCartRepository.updateQuantityAndTotalPriceTrx({
+      product_id,
+      quantity,
       updatedTotalPrice,
-    );
-    // END TRANSACTION
+      user_id,
+    });
   }
 
   public async remove(user_id: string, product_id: string): Promise<any> {
