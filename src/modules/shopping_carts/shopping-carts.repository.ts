@@ -6,6 +6,7 @@ import { ulid } from 'ulid';
 import * as schemas from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import {
+  RemoveAndUpdatePriceData,
   ShoppingCartEntity,
   ShoppingCartItemEntity,
   ShoppingCartItemUpdate,
@@ -205,6 +206,28 @@ export class ShoppingCartsRepository {
           .update(schemas.shopping_carts)
           .set({
             total_price: data.updatedTotalPrice,
+          } as ShoppingCartEntity)
+          .where(eq(schemas.shopping_carts.user_id, data.user_id));
+      } catch (error) {
+        throw error;
+      }
+    });
+  }
+
+  public async removeItemAndUpdateTotalPriceTrx(
+    data: RemoveAndUpdatePriceData,
+  ) {
+    await this.drizzle.transaction(async (tx) => {
+      try {
+        // First operation
+        tx.delete(schemas.shopping_cart_item).where(
+          eq(schemas.shopping_cart_item.id, data.shopping_cart_item_id),
+        );
+
+        // Second operation
+        tx.update(schemas.shopping_carts)
+          .set({
+            total_price: data.total_price,
           } as ShoppingCartEntity)
           .where(eq(schemas.shopping_carts.user_id, data.user_id));
       } catch (error) {

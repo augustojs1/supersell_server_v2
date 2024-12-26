@@ -144,15 +144,10 @@ export class ShoppingCartsService {
       Number(shoppingCartItem.shopping_cart_item.price) *
         Number(shoppingCartItem.shopping_cart_item.quantity);
 
-    // START TRANSACTION
-    await this.shoppingCartRepository.delete(
-      shoppingCartItem.shopping_cart_item.id,
-    );
-
-    await this.shoppingCartRepository.updateTotalPriceByUserId(
+    this.shoppingCartRepository.removeItemAndUpdateTotalPriceTrx({
+      shopping_cart_item_id: shoppingCartItem.shopping_cart_item.id,
       user_id,
-      updatedTotalPrice,
-    );
-    // END TRANSACTION
+      total_price: updatedTotalPrice,
+    });
   }
 }
