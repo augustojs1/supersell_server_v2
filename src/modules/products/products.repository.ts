@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, like, sql } from 'drizzle-orm';
+import { and, eq, like, sql } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
@@ -27,6 +27,7 @@ export class ProductsRepository {
       user_id: user_id,
       name: data.name,
       description: data.description,
+      sku: data.sku,
       price: parseFloat(data.price),
       is_used: data.is_used === 'true' ? true : false,
       quantity: parseInt(data.quantity),
@@ -42,6 +43,28 @@ export class ProductsRepository {
       .where(eq(schema.products.id, id));
 
     return product[0] ?? null;
+  }
+
+  public async findBySkuAndUserId(
+    sku: string,
+    user_id: string,
+  ): Promise<ProductEntity | null> {
+    //     SELECT
+    // 	*
+    // FROM
+    // 	products p
+    // WHERE
+    // 	p.sku = ''
+    // AND
+    // 	p.user_id = '';
+    const result = await this.drizzle
+      .select()
+      .from(schema.products)
+      .where(
+        and(eq(schema.products.sku, sku), eq(schema.products.user_id, user_id)),
+      );
+
+    return result[0] ?? null;
   }
 
   public async findByName(name: string): Promise<ProductEntity | null> {

@@ -26,6 +26,12 @@ export class CreateProductDto {
   description: string;
 
   @IsNotEmpty()
+  @IsString()
+  @MinLength(6)
+  @MaxLength(50)
+  sku: string;
+
+  @IsNotEmpty()
   @Transform(({ value }) => parseFloat(value))
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()

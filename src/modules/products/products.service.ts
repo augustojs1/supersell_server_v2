@@ -36,6 +36,18 @@ export class ProductsService {
       );
     }
 
+    const productSku = await this.productsRepository.findBySkuAndUserId(
+      data.sku,
+      user_id,
+    );
+
+    if (productSku) {
+      throw new HttpException(
+        'Product with this SKU already exists!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const department = await this.departmentsService.findById(
       data.department_id,
     );

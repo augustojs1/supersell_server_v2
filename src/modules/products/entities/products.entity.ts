@@ -10,8 +10,8 @@ import {
   double,
 } from 'drizzle-orm/mysql-core';
 
-import { users as userEntity } from '../../users/entities/user.entity';
-import { departments as departmentEntity } from '../../departments/entities/departments.entity';
+import { users as userEntity } from '@/modules/users/entities/user.entity';
+import { departments as departmentEntity } from '@/modules/departments/entities/departments.entity';
 
 export const products = mysqlTable('products', {
   id: char({ length: 26 }).primaryKey().notNull(),
@@ -23,6 +23,7 @@ export const products = mysqlTable('products', {
     .references((): AnyMySqlColumn => departmentEntity.id),
   name: varchar({ length: 50 }).unique().notNull(),
   description: text().notNull(),
+  sku: varchar({ length: 50 }).notNull(),
   price: double({ precision: 13, scale: 2 }).notNull(),
   quantity: int().notNull(),
   is_in_stock: boolean().$default(() => true),
