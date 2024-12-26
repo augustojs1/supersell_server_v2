@@ -6,3 +6,4 @@ export * from '@/modules/products_images/entities';
 export * from '@/modules/wishlists/entities';
 export * from '@/modules/reviews/entities';
 export * from '@/modules/shopping_carts/entities';
+export * from '@/modules/address/entities';

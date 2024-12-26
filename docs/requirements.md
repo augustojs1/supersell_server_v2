@@ -105,14 +105,17 @@
 
 ### #Address
 
-- [ ] Users should inform a delivery address with country, distric/region, neighborhood, street, house number and complement.
+- [ ] Users should inform a delivery address with country, distric/region, neighborhood, street, house number, alias and complement.
 - [ ] Address should have 4 different types: PERSONAL_ADDRESS, DELIVERY_ADDRESS, BILLING_ADDRESS and DELIVERY_AND_BILLING_ADDRESS
-- [ ] Address alias
+- [ ] User should only have one personall address.
+- [ ] User should be able to update an existing address.
+- [ ] User should be able to delete an address.
 
 ### #Payments
 
 - [ ] Users should be able to pay for a order.
 - [ ] Payment info should be stored in database.
+- [ ] Increment sales ammount after successfully payment for a order.
 
 ### #Reviews
 
