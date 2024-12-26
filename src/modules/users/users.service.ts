@@ -65,4 +65,12 @@ export class UsersService {
       );
     }
   }
+
+  public async createUserAndShoppingCart(
+    user: CreateUserDto,
+  ): Promise<UserEntity> {
+    await this.usersRepository.createUserAndShoppingCartTrx(user);
+
+    return await this.findUserByEmail(user.email);
+  }
 }

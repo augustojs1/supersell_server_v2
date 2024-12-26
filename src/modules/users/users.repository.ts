@@ -93,4 +93,30 @@ export class UsersRepository {
       } as ProfileEntity)
       .where(eq(schema.profiles.user_id, id));
   }
+
+  public async createUserAndShoppingCartTrx(
+    user: CreateUserDto,
+  ): Promise<void> {
+    await this.drizzle.transaction(async (tx) => {
+      try {
+        // First operation
+        const userId = ulid();
+
+        await tx.insert(schema.users).values({
+          id: userId,
+          ...user,
+        });
+
+        // Second operation
+        const shoppingCartId = ulid();
+
+        await tx.insert(schema.shopping_carts).values({
+          id: shoppingCartId,
+          user_id: userId,
+        });
+      } catch (error) {
+        throw error;
+      }
+    });
+  }
 }

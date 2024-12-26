@@ -25,7 +25,7 @@ export class ShoppingCartsRepository {
     //     INSERT INTO
     // 	shopping_carts (id, user_id)
     //     VALUES
-    // 	('user_id');
+    // 	('id','user_id');
     const id = ulid();
 
     await this.drizzle.insert(schemas.shopping_carts).values({

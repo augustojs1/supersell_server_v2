@@ -52,17 +52,13 @@ export class AuthService {
 
     const hashedPassword = await this.hashData(signUpDto.password);
 
-    // START TRANSACTION
-    const newUser = await this.usersService.create({
+    const newUser = await this.usersService.createUserAndShoppingCart({
       first_name: signUpDto.first_name,
       last_name: signUpDto.last_name,
       username: signUpDto.username,
       email: signUpDto.email,
       password: hashedPassword,
     });
-
-    await this.shoppingCartsService.create(newUser.id);
-    // END TRANSACTION
 
     const token = await this.getToken(newUser.id, newUser.email);
 
