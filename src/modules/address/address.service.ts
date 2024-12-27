@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 
-import { CreateAddressDto } from './dto';
+import { CreateAddressDto, UpdateAddressDto } from './dto';
 import { AddressRepository } from './address.repository';
 import { CountriesRepository } from './countries.repository';
 import { AddressType } from './enums';
@@ -67,18 +67,37 @@ export class AddressService {
     return address;
   }
 
-  private async checkUserIsOwnerElseThrow(
+  private checkUserIsOwnerElseThrow(
     address_user_id: string,
     user_id: string,
-  ): Promise<void> {
+  ): void {
     if (address_user_id !== user_id) {
       throw new ForbiddenException();
     }
   }
 
-  // update(id: number, updateAddressDto: UpdateAddressDto) {
-  //   return `This action updates a #${id} address`;
-  // }
+  public async update(
+    id: string,
+    user_id: string,
+    data: UpdateAddressDto,
+  ): Promise<void> {
+    const address = await this.findByIdElseThrow(id);
+
+    const country = await this.countriesRepository.findByCode(
+      data.country_code,
+    );
+
+    if (!country) {
+      throw new HttpException(
+        'Country with this code does not exists!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    this.checkUserIsOwnerElseThrow(address.user_id, user_id);
+
+    await this.addressRepository.update(address.id, data);
+  }
 
   public async remove(id: string, user_id: string): Promise<void> {
     const address = await this.findByIdElseThrow(id);

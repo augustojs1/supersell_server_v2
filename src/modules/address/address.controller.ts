@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 
 import { AddressService } from './address.service';
-import { AddressDTO, CreateAddressDto } from './dto';
+import { AddressDTO, CreateAddressDto, UpdateAddressDto } from './dto';
 import { AccessTokenGuard } from '../auth/guards';
 import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
@@ -36,10 +36,15 @@ export class AddressController {
     return await this.addressService.findAll(user.sub);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateAddressDto: UpdateAddressDto) {
-  //   return this.addressService.update(+id, updateAddressDto);
-  // }
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id')
+  public async update(
+    @Param('id') id: string,
+    @Body() updateAddressDto: UpdateAddressDto,
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ): Promise<void> {
+    await this.addressService.update(id, user.sub, updateAddressDto);
+  }
 
   @UseGuards(AccessTokenGuard)
   @Delete(':id')

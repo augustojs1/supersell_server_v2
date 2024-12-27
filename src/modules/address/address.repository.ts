@@ -5,7 +5,7 @@ import { ulid } from 'ulid';
 
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import * as schema from '@/infra/database/orm/drizzle/schema';
-import { CreateAddressDto } from './dto';
+import { CreateAddressDto, UpdateAddressDto } from './dto';
 import { AddressEntity } from './types';
 import { AddressType } from './enums';
 
@@ -102,5 +102,21 @@ export class AddressRepository {
       .where(
         and(eq(schema.address.id, id), eq(schema.address.user_id, user_id)),
       );
+  }
+
+  public async update(id: string, data: UpdateAddressDto): Promise<void> {
+    // UPDATE
+    // 	address AS a
+    // SET
+    // 	a.alias = 'teste',
+    // 	a.complement = 'teste'
+    // WHERE
+    // 	a.id = 'teste';
+    await this.drizzle
+      .update(schema.address)
+      .set({
+        ...data,
+      })
+      .where(eq(schema.address.id, id));
   }
 }
