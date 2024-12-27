@@ -6,28 +6,34 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 
 import { AddressService } from './address.service';
-import { CreateAddressDto } from './dto';
+import { AddressDTO, CreateAddressDto } from './dto';
+import { AccessTokenGuard } from '../auth/guards';
+import { GetCurrentUserDecorator } from '../auth/decorators';
+import { CurrentUser } from '../auth/types';
 
 @Controller('address')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
+  @UseGuards(AccessTokenGuard)
   @Post()
-  create(@Body() createAddressDto: CreateAddressDto) {
-    return this.addressService.create(createAddressDto);
+  public async create(
+    @Body() createAddressDto: CreateAddressDto,
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ): Promise<AddressDTO> {
+    return await this.addressService.create(createAddressDto, user.sub);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Get()
-  findAll() {
-    return this.addressService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.addressService.findOne(+id);
+  public async findAll(
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ): Promise<AddressDTO[]> {
+    return await this.addressService.findAll(user.sub);
   }
 
   // @Patch(':id')
@@ -35,8 +41,12 @@ export class AddressController {
   //   return this.addressService.update(+id, updateAddressDto);
   // }
 
+  @UseGuards(AccessTokenGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.addressService.remove(+id);
+  public async remove(
+    @Param('id') id: string,
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ): Promise<void> {
+    return await this.addressService.remove(id, user.sub);
   }
 }

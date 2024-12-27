@@ -53,7 +53,7 @@ export class AddressRepository {
     return result[0] ?? null;
   }
 
-  public async findAllByUserId(user_id: string): Promise<AddressEntity | null> {
+  public async findAllByUserId(user_id: string): Promise<AddressEntity[]> {
     // SELECT
     // 	*
     // FROM
@@ -65,7 +65,7 @@ export class AddressRepository {
       .from(schema.address)
       .where(eq(schema.address.user_id, user_id));
 
-    return result[0] ?? null;
+    return result;
   }
 
   public async findAllByUserIdAndType(
@@ -88,5 +88,19 @@ export class AddressRepository {
       );
 
     return result;
+  }
+
+  public async delete(id: string, user_id: string): Promise<void> {
+    //  DELETE FROM
+    // 	address a
+    // WHERE
+    // 	a.id = '123'
+    // AND
+    //  a.user_id = 'adasa';
+    await this.drizzle
+      .delete(schema.address)
+      .where(
+        and(eq(schema.address.id, id), eq(schema.address.user_id, user_id)),
+      );
   }
 }
