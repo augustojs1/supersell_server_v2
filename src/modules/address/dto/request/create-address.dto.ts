@@ -1,6 +1,6 @@
 import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
-import { AddressType } from '../enums';
+import { AddressType } from '../../enums';
 
 export class CreateAddressDto {
   @IsNotEmpty()
