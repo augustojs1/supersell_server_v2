@@ -105,11 +105,11 @@
 
 ### #Address
 
-- [ ] Users should inform a delivery address with country, distric/region, neighborhood, street, house number, alias and complement.
-- [ ] Address should have 4 different types: PERSONAL_ADDRESS, DELIVERY_ADDRESS, BILLING_ADDRESS and DELIVERY_AND_BILLING_ADDRESS
-- [ ] User should only have one personall address.
-- [ ] User should be able to update an existing address.
-- [ ] User should be able to delete an address.
+- [x] Users should inform a delivery address with country, distric/region, neighborhood, street, house number, alias and complement.
+- [x] Address should have 4 different types: PERSONAL_ADDRESS, DELIVERY_ADDRESS, BILLING_ADDRESS and DELIVERY_AND_BILLING_ADDRESS
+- [x] User should only have one personall address.
+- [x] User should be able to update an existing address.
+- [x] User should be able to delete an address.
 
 ### #Payments
 

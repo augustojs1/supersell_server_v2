@@ -39,9 +39,10 @@ export class ShoppingCartsController {
     );
   }
 
+  @UseGuards(AccessTokenGuard)
   @Get()
-  public async findAll() {
-    return this.shoppingCartsService.findAll();
+  public async findAll(@GetCurrentUserDecorator() user: CurrentUser) {
+    return await this.shoppingCartsService.findAll(user.sub);
   }
 
   @UseGuards(AccessTokenGuard)

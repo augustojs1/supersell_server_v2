@@ -88,8 +88,8 @@ export class ShoppingCartsService {
     });
   }
 
-  public async findAll() {
-    // return all shopping cart items products from user shopping cart
+  public async findAll(user_id: string) {
+    return await this.shoppingCartRepository.findAll(user_id);
   }
 
   public async update(user_id: string, product_id: string, quantity: number) {

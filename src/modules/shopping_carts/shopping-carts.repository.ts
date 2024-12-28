@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schemas from '@/infra/database/orm/drizzle/schema';
@@ -50,6 +50,59 @@ export class ShoppingCartsRepository {
       price: data.price,
       quantity: data.quantity,
     });
+  }
+
+  public async findAll(user_id: string) {
+    //     SELECT
+    // 	sc.total_price,
+    // 	sci.price,
+    // 	sci.quantity,
+    // 	p.id,
+    // 	p.name,
+    // 	p.description,
+    // 	pi2.url
+    // FROM
+    // 	shopping_carts sc
+    // INNER JOIN
+    // 	shopping_cart_item sci
+    // ON
+    // 	sc.id = sci.shopping_cart_id
+    // INNER JOIN
+    // 	products p
+    // ON
+    // 	sci.product_id = p.id
+    // WHERE
+    // 	sc.user_id = 'user_id';
+    return await this.drizzle
+      .select({
+        shopping_cart: {
+          id: schemas.shopping_carts.id,
+          total_price: schemas.shopping_carts.total_price,
+        },
+        items: sql<JSON>`JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'product_id', ${schemas.products.id},
+            'product_name', ${schemas.products.name},
+            'product_description', ${schemas.products.description},
+            'item_price', ${schemas.shopping_cart_item.price},
+            'item_quantity', ${schemas.shopping_cart_item.quantity}
+          )
+        )`.as('items'),
+      })
+      .from(schemas.shopping_carts)
+      .innerJoin(
+        schemas.shopping_cart_item,
+        eq(
+          schemas.shopping_carts.id,
+          schemas.shopping_cart_item.shopping_cart_id,
+        ),
+      )
+      .innerJoin(
+        schemas.products,
+        eq(schemas.shopping_cart_item.product_id, schemas.products.id),
+      )
+      .where(eq(schemas.shopping_carts.user_id, user_id))
+      .groupBy(schemas.shopping_carts.id);
   }
 
   public async findByUserId(user_id: string): Promise<ShoppingCartEntity> {
