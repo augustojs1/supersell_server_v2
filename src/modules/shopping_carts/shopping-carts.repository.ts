@@ -53,30 +53,9 @@ export class ShoppingCartsRepository {
   }
 
   public async findAll(user_id: string): Promise<any> {
-    //     SELECT
-    // 	sc.total_price,
-    // 	sci.price,
-    // 	sci.quantity,
-    // 	p.id,
-    // 	p.name,
-    // 	p.description,
-    // 	pi2.url
-    // FROM
-    // 	shopping_carts sc
-    // INNER JOIN
-    // 	shopping_cart_item sci
-    // ON
-    // 	sc.id = sci.shopping_cart_id
-    // INNER JOIN
-    // 	products p
-    // ON
-    // 	sci.product_id = p.id
-    // WHERE
-    // 	sc.user_id = 'user_id';
     return await this.drizzle
       .select({
         shopping_cart: {
-          id: schemas.shopping_carts.id,
           total_price: schemas.shopping_carts.total_price,
         },
         items: sql<JSON>`JSON_ARRAYAGG(
@@ -84,8 +63,12 @@ export class ShoppingCartsRepository {
             'product_id', ${schemas.products.id},
             'product_name', ${schemas.products.name},
             'product_description', ${schemas.products.description},
-            'item_price', ${schemas.shopping_cart_item.price},
-            'item_quantity', ${schemas.shopping_cart_item.quantity}
+            'product_seller_id', ${schemas.products.user_id},
+            'product_seller_username', ${schemas.users.username},
+            'product_thumbnail_image_url', ${schemas.products.thumbnail_image_url},
+            'product_price', ${schemas.shopping_cart_item.price},
+            'quantity', ${schemas.shopping_cart_item.quantity},
+            'subtotal_price', ${schemas.shopping_cart_item.price} * ${schemas.shopping_cart_item.quantity}
           )
         )`.as('items'),
       })
@@ -101,8 +84,9 @@ export class ShoppingCartsRepository {
         schemas.products,
         eq(schemas.shopping_cart_item.product_id, schemas.products.id),
       )
+      .innerJoin(schemas.users, eq(schemas.products.user_id, schemas.users.id))
       .where(eq(schemas.shopping_carts.user_id, user_id))
-      .groupBy(schemas.shopping_carts.id);
+      .groupBy(schemas.shopping_carts.id, schemas.users.id);
   }
 
   public async findByUserId(user_id: string): Promise<ShoppingCartEntity> {

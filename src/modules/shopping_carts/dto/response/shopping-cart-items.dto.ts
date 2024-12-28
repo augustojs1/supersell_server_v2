@@ -1,13 +1,20 @@
+class ShoppingCart {
+  total_price: string;
+}
+
+class ProductItem {
+  quantity: number;
+  product_id: string;
+  product_name: string;
+  product_price: number;
+  subtotal_price: number;
+  product_seller_id: string;
+  product_description: string;
+  product_seller_username: string;
+  product_thumbnail_image_url: string;
+}
+
 export class ShoppingCartItemsDTO {
-  shopping_cart: {
-    id: string;
-    total_price: string;
-  };
-  items: {
-    item_price: number;
-    product_id: string;
-    product_name: string;
-    item_quantity: number;
-    product_description: string;
-  }[];
+  shopping_cart: ShoppingCart;
+  items: ProductItem[];
 }
