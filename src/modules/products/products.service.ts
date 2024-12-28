@@ -12,6 +12,7 @@ import { ProductEntity } from './types';
 import { DepartmentsService } from '../departments/departments.service';
 import { AccessTokenGuard } from '../auth/guards';
 import { ProductsImagesService } from '../products_images/products_images.service';
+import { ProductImages } from './types/product-images.type';
 
 @Injectable()
 export class ProductsService {
@@ -25,7 +26,7 @@ export class ProductsService {
   public async create(
     user_id: string,
     data: CreateProductDto,
-    product_images: File[],
+    product_images: ProductImages,
   ): Promise<ProductEntity> {
     const product = await this.productsRepository.findByName(data.name);
 
@@ -66,9 +67,16 @@ export class ProductsService {
       );
     }
 
-    const createdProduct = await this.productsRepository.create(user_id, data);
+    const createdProduct = await this.productsRepository.create(
+      user_id,
+      data,
+      product_images.thumbnail_image[0].path,
+    );
 
-    await this.productImagesService.create(createdProduct.id, product_images);
+    await this.productImagesService.create(
+      createdProduct.id,
+      product_images.images,
+    );
 
     return createdProduct;
   }

@@ -9,6 +9,8 @@ export class ProductEntity {
   is_in_stock: boolean;
   average_rating: number;
   is_used: boolean;
+  sales: number;
+  thumbnail_image_url: string;
   created_at: Date;
   updated_at: Date;
 }

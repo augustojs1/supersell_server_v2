@@ -18,6 +18,7 @@ export class ProductsRepository {
   public async create(
     user_id: string,
     data: CreateProductDto,
+    thumbnail_image_url: string,
   ): Promise<ProductEntity> {
     const id = ulid();
 
@@ -28,6 +29,7 @@ export class ProductsRepository {
       name: data.name,
       description: data.description,
       sku: data.sku,
+      thumbnail_image_url: thumbnail_image_url,
       price: parseFloat(data.price),
       is_used: data.is_used === 'true' ? true : false,
       quantity: parseInt(data.quantity),
@@ -113,6 +115,8 @@ export class ProductsRepository {
         quantity: schema.products.quantity,
         is_in_stock: schema.products.is_in_stock,
         average_rating: schema.products.average_rating,
+        sales: schema.products.sales,
+        thumbnail_image_url: schema.products.thumbnail_image_url,
         is_used: schema.products.is_used,
         created_at: schema.products.created_at,
         updated_at: schema.products.updated_at,
@@ -174,6 +178,8 @@ export class ProductsRepository {
         is_in_stock: schema.products.is_in_stock,
         average_rating: schema.products.average_rating,
         is_used: schema.products.is_used,
+        sales: schema.products.sales,
+        thumbnail_image_url: schema.products.thumbnail_image_url,
         created_at: schema.products.created_at,
         updated_at: schema.products.updated_at,
         images:
@@ -243,6 +249,8 @@ export class ProductsRepository {
         is_in_stock: schema.products.is_in_stock,
         average_rating: schema.products.average_rating,
         is_used: schema.products.is_used,
+        sales: schema.products.sales,
+        thumbnail_image_url: schema.products.thumbnail_image_url,
         created_at: schema.products.created_at,
         updated_at: schema.products.updated_at,
         images:

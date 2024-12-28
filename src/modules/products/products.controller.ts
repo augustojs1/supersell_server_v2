@@ -13,7 +13,11 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { File, FilesInterceptor } from '@nest-lab/fastify-multer';
+import {
+  File,
+  FileFieldsInterceptor,
+  FilesInterceptor,
+} from '@nest-lab/fastify-multer';
 
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto } from './dto';
@@ -21,6 +25,7 @@ import { AccessTokenGuard } from '../auth/guards';
 import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
 import { ProductsImagesService } from '../products_images/products_images.service';
+import { ProductImages } from './types/product-images.type';
 
 @Controller('products')
 export class ProductsController {
@@ -31,7 +36,12 @@ export class ProductsController {
 
   @UseGuards(AccessTokenGuard)
   @Post()
-  @UseInterceptors(FilesInterceptor('image'))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'thumbnail_image', maxCount: 1 },
+      { name: 'images', maxCount: 8 },
+    ]),
+  )
   public async create(
     @Body() data: CreateProductDto,
     @GetCurrentUserDecorator() user: CurrentUser,
@@ -40,9 +50,9 @@ export class ProductsController {
         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       }),
     )
-    product_images: File[],
+    files: ProductImages,
   ): Promise<any> {
-    return await this.productsService.create(user.sub, data, product_images);
+    return await this.productsService.create(user.sub, data, files);
   }
 
   @UseGuards(AccessTokenGuard)

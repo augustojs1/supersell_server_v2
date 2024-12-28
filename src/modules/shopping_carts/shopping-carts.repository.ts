@@ -52,7 +52,7 @@ export class ShoppingCartsRepository {
     });
   }
 
-  public async findAll(user_id: string) {
+  public async findAll(user_id: string): Promise<any> {
     //     SELECT
     // 	sc.total_price,
     // 	sci.price,

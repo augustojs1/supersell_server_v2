@@ -13,7 +13,11 @@ import { ShoppingCartsService } from './shopping_carts.service';
 import { AccessTokenGuard } from '../auth/guards';
 import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
-import { CreateShoppingCartItemDto, UpdateItemQuantityDTO } from './dto';
+import {
+  CreateShoppingCartItemDto,
+  ShoppingCartItemsDTO,
+  UpdateItemQuantityDTO,
+} from './dto';
 
 @Controller('shopping-carts')
 export class ShoppingCartsController {
@@ -41,7 +45,9 @@ export class ShoppingCartsController {
 
   @UseGuards(AccessTokenGuard)
   @Get()
-  public async findAll(@GetCurrentUserDecorator() user: CurrentUser) {
+  public async findAll(
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ): Promise<ShoppingCartItemsDTO> {
     return await this.shoppingCartsService.findAll(user.sub);
   }
 

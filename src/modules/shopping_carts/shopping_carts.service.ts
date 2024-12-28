@@ -3,6 +3,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ProductsService } from '../products/products.service';
 import { ShoppingCartsRepository } from './shopping-carts.repository';
 import { ShoppingCartEntity } from './types';
+import { ShoppingCartItemsDTO } from './dto';
 
 @Injectable()
 export class ShoppingCartsService {
@@ -88,7 +89,7 @@ export class ShoppingCartsService {
     });
   }
 
-  public async findAll(user_id: string) {
+  public async findAll(user_id: string): Promise<ShoppingCartItemsDTO> {
     return await this.shoppingCartRepository.findAll(user_id);
   }
 
