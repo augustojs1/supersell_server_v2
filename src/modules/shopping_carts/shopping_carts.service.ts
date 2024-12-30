@@ -170,7 +170,17 @@ export class ShoppingCartsService {
         total_price: orderTotalPrice,
       };
 
-      await this.orderService.create(orderData);
+      const orderId = await this.orderService.create(orderData);
+
+      order.items.forEach(async (item) => {
+        await this.orderService.createItem({
+          order_id: orderId,
+          price: item.product_price,
+          product_id: item.product_id,
+          quantity: item.quantity,
+          subtotal_price: item.subtotal_price,
+        });
+      });
     });
   }
 
