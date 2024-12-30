@@ -12,6 +12,7 @@ import { WishlistsModule } from './modules/wishlists/wishlists.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { ShoppingCartsModule } from './modules/shopping_carts/shopping_carts.module';
 import { AddressModule } from './modules/address/address.module';
+import { OrderModule } from './modules/order/order.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { AddressModule } from './modules/address/address.module';
     ReviewsModule,
     ShoppingCartsModule,
     AddressModule,
+    OrderModule,
   ],
 })
 export class AppModule {}
