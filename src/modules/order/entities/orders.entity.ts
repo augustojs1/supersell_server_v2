@@ -19,7 +19,7 @@ export const orders = mysqlTable('orders', {
   seller_id: char({ length: 26 }).references(
     (): AnyMySqlColumn => userEntity.id,
   ),
-  delivery_address: char({ length: 26 }).references(
+  delivery_address_id: char({ length: 26 }).references(
     (): AnyMySqlColumn => addressEntity.id,
   ),
   status: mysqlEnum(
