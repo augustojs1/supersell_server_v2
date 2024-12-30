@@ -14,7 +14,7 @@ export class OrderRepository {
     private readonly drizzle: MySql2Database<typeof schemas>,
   ) {}
 
-  public async create(data: CreateOrderData): Promise<OrderEntity> {
+  public async create(data: CreateOrderData): Promise<string> {
     const id = ulid();
 
     await this.drizzle.insert(schemas.orders).values({
@@ -22,7 +22,7 @@ export class OrderRepository {
       ...data,
     });
 
-    return this.findById(id);
+    return id;
   }
 
   public async findById(id: string): Promise<OrderEntity | null> {

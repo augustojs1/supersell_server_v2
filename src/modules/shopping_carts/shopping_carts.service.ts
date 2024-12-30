@@ -2,14 +2,18 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { ProductsService } from '../products/products.service';
 import { ShoppingCartsRepository } from './shopping-carts.repository';
-import { ShoppingCartEntity } from './types';
-import { ShoppingCartItemsDTO } from './dto';
+import { ProductItem, ShoppingCartEntity } from './types';
+import { CheckoutOrderDTO, ShoppingCartItemsDTO } from './dto';
+import { OrderService } from '../order/order.service';
+import { CreateOrderData } from '../order/types';
+import { OrderStatus } from '../order/enums';
 
 @Injectable()
 export class ShoppingCartsService {
   constructor(
     private readonly shoppingCartRepository: ShoppingCartsRepository,
     private readonly productsService: ProductsService,
+    private readonly orderService: OrderService,
   ) {}
 
   public async findByUserIdIfThrow(user_id: string) {
@@ -89,7 +93,7 @@ export class ShoppingCartsService {
     });
   }
 
-  public async findAll(user_id: string): Promise<ShoppingCartItemsDTO> {
+  public async findAll(user_id: string): Promise<ShoppingCartItemsDTO[]> {
     return await this.shoppingCartRepository.findAll(user_id);
   }
 
@@ -150,5 +154,29 @@ export class ShoppingCartsService {
       user_id,
       total_price: updatedTotalPrice,
     });
+  }
+
+  public async checkout(id: string, data: CheckoutOrderDTO) {
+    const shoppingCartItems = await this.findAll(id);
+
+    shoppingCartItems.forEach(async (order) => {
+      const orderTotalPrice = this.getOrderTotalPrice(order.items);
+
+      const orderData: CreateOrderData = {
+        customer_id: id,
+        seller_id: order.items[0].product_seller_id,
+        delivery_address_id: data.delivery_address_id,
+        status: OrderStatus.PENDING_PAYMENT,
+        total_price: orderTotalPrice,
+      };
+
+      await this.orderService.create(orderData);
+    });
+  }
+
+  public getOrderTotalPrice(items: ProductItem[]): number {
+    return items.reduce((acc, item) => {
+      return acc + item.subtotal_price;
+    }, 0);
   }
 }
