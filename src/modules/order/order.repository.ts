@@ -1,11 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schemas from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { CreateOrderData, OrderEntity } from './types';
+import { OrderSalesDTO, OrdersDTO } from './dto';
 
 @Injectable()
 export class OrderRepository {
@@ -34,7 +35,9 @@ export class OrderRepository {
     return result[0] ?? null;
   }
 
-  public async findOrderByCustomerId(customer_id: string) {
+  public async findOrderByCustomerId(
+    customer_id: string,
+  ): Promise<OrdersDTO[]> {
     // SELECT
     // 	p.name,
     // 	p.description,
@@ -57,16 +60,20 @@ export class OrderRepository {
     // 	o.customer_id = 'customer_id';
     return await this.drizzle
       .select({
-        name: schemas.products.name,
-        description: schemas.products.description,
-        thumbnail_image_url: schemas.products.thumbnail_image_url,
-        quantity: schemas.order_items.quantity,
-        price: schemas.order_items.price,
-        subtotal_price: schemas.order_items.subtotal_price,
         seller_id: schemas.users.id,
-        seller_username: schemas.users.username,
-        order_status: schemas.orders.status,
-        order_total_price: schemas.orders.total_price,
+        seller_name: schemas.users.username,
+        order: sql<JSON>`JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'name', ${schemas.products.name},
+            'description', ${schemas.products.description},
+            'thumbnail_image_url', ${schemas.products.thumbnail_image_url},
+            'quantity', ${schemas.order_items.quantity},
+            'price', ${schemas.order_items.price},
+            'subtotal_price', ${schemas.order_items.subtotal_price},
+            'order_status', ${schemas.users.id},
+            'order_total_price', ${schemas.orders.total_price}
+          )
+        )`.as('order'),
       })
       .from(schemas.orders)
       .innerJoin(
@@ -78,10 +85,13 @@ export class OrderRepository {
         schemas.products,
         eq(schemas.products.id, schemas.order_items.product_id),
       )
-      .where(eq(schemas.orders.customer_id, customer_id));
+      .where(eq(schemas.orders.customer_id, customer_id))
+      .groupBy(schemas.orders.seller_id);
   }
 
-  public async findOrderBySellerId(seller_id: string) {
+  public async findOrderBySellerId(
+    seller_id: string,
+  ): Promise<OrderSalesDTO[]> {
     // SELECT
     // 	p.name,
     // 	p.description,
