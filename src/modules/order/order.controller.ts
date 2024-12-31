@@ -1,17 +1,23 @@
-import { Controller, Get, Param } from '@nestjs/common';
-import { OrderService } from './order.service';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 
-@Controller('order')
+import { OrderService } from './order.service';
+import { AccessTokenGuard } from '../auth/guards';
+import { GetCurrentUserDecorator } from '../auth/decorators';
+import { CurrentUser } from '../auth/types';
+
+@Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  @UseGuards(AccessTokenGuard)
   @Get()
-  findAll() {
-    return this.orderService.findAll();
+  public async findOrders(@GetCurrentUserDecorator() user: CurrentUser) {
+    return await this.orderService.findOrderByCustomerId(user.sub);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
+  @UseGuards(AccessTokenGuard)
+  @Get('/sales')
+  public async findSales(@GetCurrentUserDecorator() user: CurrentUser) {
+    return await this.orderService.findOrderBySellerId(user.sub);
   }
 }

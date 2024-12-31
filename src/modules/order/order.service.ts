@@ -19,11 +19,11 @@ export class OrderService {
     await this.orderItemRepository.create(data);
   }
 
-  findAll() {
-    return `This action returns all order`;
+  public async findOrderByCustomerId(customer_id: string) {
+    return await this.orderRepository.findOrderByCustomerId(customer_id);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  public async findOrderBySellerId(seller_id: string) {
+    return await this.orderRepository.findOrderBySellerId(seller_id);
   }
 }

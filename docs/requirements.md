@@ -85,23 +85,26 @@
 - [x] User shopping cart total should be the total of value of it's items.
 - [x] Users should be able to delete a product from their shopping cart.
   - [x] Shopping cart item price should be deducted from shopping cart total price.
-- [ ] Users should be able to read the products from their shopping cart.
+- [x] Users should be able to read the products from their shopping cart.
 - [x] Users should be able to edit the shopping cart item quantity.
-- [ ] User should be able to checkout from their shopping cart.
+- [x] User should be able to checkout from their shopping cart.
 
 ### #OrderItem
 
-- [ ] Users should be able to add a product and their quantity as order items.
-- [ ] Order item should have a delivery address.
-- [ ] Order item should have a billing address.
+- [x] Users should be able to add a product and their quantity as order items.
+- [x] Order item should have a delivery address.
+- [x] Order item should have a billing address.
 
 ### #Orders
 
-- [ ] Users should be able to create an order with a product.
-- [ ] Users should be able to read all the products they have an order.
-- [ ] Users should be able to filter their orders based on if it is paid or not.
+- [x] Users should be able to create an order with a product.
+- [x] Users should be able to read all the products they have an order.
+- [x] Users should be able to read orders for all of their products.
 - [ ] Server admin should be able to change the status of a order.
-- [ ] Order should have status of: PENDING_PAYMENT, FAILED_PAYMENT, PAID, SENT, ON_DELIVERY, DELIVERED.
+- [x] Order should have status of: PENDING_PAYMENT, FAILED_PAYMENT, PAID, SENT, ON_DELIVERY, DELIVERED.
+- [ ] Users should be able to filter their orders by status.
+- [ ] Users should be able to filter their sales by status.
+- [ ] Users should be able to read full details of a order.
 
 ### #Address
 
