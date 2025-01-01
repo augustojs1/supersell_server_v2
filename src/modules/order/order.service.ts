@@ -4,6 +4,7 @@ import { CreateOrderData, CreateOrderItemData } from './types';
 import { OrderRepository } from './order.repository';
 import { OrderItemRepository } from './order-item.repository';
 import { OrderSalesDTO, OrdersDTO } from './dto';
+import { OrderStatus } from './enums';
 
 @Injectable()
 export class OrderService {
@@ -22,13 +23,18 @@ export class OrderService {
 
   public async findOrderByCustomerId(
     customer_id: string,
+    status: OrderStatus | undefined,
   ): Promise<OrdersDTO[]> {
-    return await this.orderRepository.findOrderByCustomerId(customer_id);
+    return await this.orderRepository.findOrderByCustomerId(
+      customer_id,
+      status,
+    );
   }
 
   public async findOrderBySellerId(
     seller_id: string,
+    status: OrderStatus | undefined,
   ): Promise<OrderSalesDTO[]> {
-    return await this.orderRepository.findOrderBySellerId(seller_id);
+    return await this.orderRepository.findOrderBySellerId(seller_id, status);
   }
 }

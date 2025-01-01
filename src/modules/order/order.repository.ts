@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schemas from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { CreateOrderData, OrderEntity } from './types';
 import { OrderSalesDTO, OrdersDTO } from './dto';
+import { OrderStatus } from './enums';
 
 @Injectable()
 export class OrderRepository {
@@ -37,7 +38,8 @@ export class OrderRepository {
 
   public async findOrderByCustomerId(
     customer_id: string,
-  ): Promise<OrdersDTO[]> {
+    status: OrderStatus | undefined,
+  ): Promise<any[]> {
     // SELECT
     // 	p.name,
     // 	p.description,
@@ -58,6 +60,42 @@ export class OrderRepository {
     // 	p.id = oi.product_id
     // WHERE
     // 	o.customer_id = 'customer_id';
+
+    if (!status) {
+      return await this.drizzle
+        .select({
+          seller_id: schemas.users.id,
+          seller_name: schemas.users.username,
+          order: sql<JSON>`JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'name', ${schemas.products.name},
+            'description', ${schemas.products.description},
+            'thumbnail_image_url', ${schemas.products.thumbnail_image_url},
+            'quantity', ${schemas.order_items.quantity},
+            'price', ${schemas.order_items.price},
+            'subtotal_price', ${schemas.order_items.subtotal_price},
+            'order_status', ${schemas.orders.status},
+            'order_total_price', ${schemas.orders.total_price}
+          )
+        )`.as('order'),
+        })
+        .from(schemas.orders)
+        .innerJoin(
+          schemas.order_items,
+          eq(schemas.orders.id, schemas.order_items.order_id),
+        )
+        .innerJoin(
+          schemas.users,
+          eq(schemas.orders.seller_id, schemas.users.id),
+        )
+        .innerJoin(
+          schemas.products,
+          eq(schemas.products.id, schemas.order_items.product_id),
+        )
+        .where(eq(schemas.orders.customer_id, customer_id))
+        .groupBy(schemas.orders.seller_id);
+    }
+
     return await this.drizzle
       .select({
         seller_id: schemas.users.id,
@@ -70,7 +108,7 @@ export class OrderRepository {
             'quantity', ${schemas.order_items.quantity},
             'price', ${schemas.order_items.price},
             'subtotal_price', ${schemas.order_items.subtotal_price},
-            'order_status', ${schemas.users.id},
+            'order_status', ${schemas.orders.status},
             'order_total_price', ${schemas.orders.total_price}
           )
         )`.as('order'),
@@ -85,12 +123,18 @@ export class OrderRepository {
         schemas.products,
         eq(schemas.products.id, schemas.order_items.product_id),
       )
-      .where(eq(schemas.orders.customer_id, customer_id))
+      .where(
+        and(
+          eq(schemas.orders.customer_id, customer_id),
+          eq(schemas.orders.status, status),
+        ),
+      )
       .groupBy(schemas.orders.seller_id);
   }
 
   public async findOrderBySellerId(
     seller_id: string,
+    status: OrderStatus | undefined,
   ): Promise<OrderSalesDTO[]> {
     // SELECT
     // 	p.name,
@@ -112,6 +156,30 @@ export class OrderRepository {
     // 	p.id = oi.product_id
     // WHERE
     // 	o.seller_id = 'seller_id';
+    if (!status) {
+      return await this.drizzle
+        .select({
+          name: schemas.products.name,
+          description: schemas.products.description,
+          thumbnail_image_url: schemas.products.thumbnail_image_url,
+          quantity: schemas.order_items.quantity,
+          price: schemas.order_items.price,
+          subtotal_price: schemas.order_items.subtotal_price,
+          order_status: schemas.orders.status,
+          order_total_price: schemas.orders.total_price,
+        })
+        .from(schemas.orders)
+        .innerJoin(
+          schemas.order_items,
+          eq(schemas.orders.id, schemas.order_items.order_id),
+        )
+        .innerJoin(
+          schemas.products,
+          eq(schemas.products.id, schemas.order_items.product_id),
+        )
+        .where(eq(schemas.orders.seller_id, seller_id));
+    }
+
     return await this.drizzle
       .select({
         name: schemas.products.name,
@@ -132,6 +200,11 @@ export class OrderRepository {
         schemas.products,
         eq(schemas.products.id, schemas.order_items.product_id),
       )
-      .where(eq(schemas.orders.seller_id, seller_id));
+      .where(
+        and(
+          eq(schemas.orders.seller_id, seller_id),
+          eq(schemas.orders.status, status),
+        ),
+      );
   }
 }

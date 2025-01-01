@@ -68,7 +68,6 @@
 - [x] User should be able to update their profile avatar.
 - [ ] User should be able to update thier profile avatar to AWS.
 - [ ] Users should be able to read all their published product.
-- [ ] Users should be able to filter their publish product by sold and not sold.
 - [ ] Users should be able to see other users profile.
 - [ ] User rating should be the average of their products rating.
 - [ ] Users should be able to see their sales balance of sold products.
@@ -102,8 +101,8 @@
 - [x] Users should be able to read orders for all of their products.
 - [ ] Server admin should be able to change the status of a order.
 - [x] Order should have status of: PENDING_PAYMENT, FAILED_PAYMENT, PAID, SENT, ON_DELIVERY, DELIVERED.
-- [ ] Users should be able to filter their orders by status.
-- [ ] Users should be able to filter their sales by status.
+- [x] Users should be able to filter their orders by status.
+- [x] Users should be able to filter their sales by status.
 - [ ] Users should be able to read full details of a order.
 
 ### #Address
