@@ -13,6 +13,7 @@ import { DepartmentsService } from '../departments/departments.service';
 import { AccessTokenGuard } from '../auth/guards';
 import { ProductsImagesService } from '../products_images/products_images.service';
 import { ProductImages } from './types/product-images.type';
+import { PaginationParamsDto } from '@/common/dto';
 
 @Injectable()
 export class ProductsService {
@@ -83,6 +84,7 @@ export class ProductsService {
 
   public async findByDepartmentId(
     department_id: string,
+    paginationParams: PaginationParamsDto,
   ): Promise<ProductEntity[]> {
     const department = await this.departmentsService.findById(department_id);
 
@@ -96,6 +98,7 @@ export class ProductsService {
     if (!department.parent_department_id) {
       return await this.productsRepository.findByParentDepartmentId(
         department_id,
+        paginationParams,
       );
     }
 

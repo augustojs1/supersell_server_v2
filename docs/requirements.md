@@ -10,7 +10,7 @@
 - [ ] Supersell External Services should be a microservice responsible for dealing with emailing, payment and delivery logistics.
 - [ ] Supersell Server should comunicate with Supersell External Services via Event Driven Architecture pattern.
 - [ ] Supersell Server should use Kafka localy as message broker.
-- [ ] REST API should use prefix: '/api/v1/'
+- [x] REST API should use prefix: '/api/v1/'
 - [ ] Should feature a seeder for data.
 - [ ] Docker container for the database.
 - [ ] Docker container for the application.
@@ -26,9 +26,8 @@
 - [ ] Server should use in production AWS S3 to store static files such as images and etc.
 - [ ] Server should use in production AWS SQS as a message broker.
 - [ ] Server should use in production AWS SES as an emailing service.
-- [ ] Database trigger to calculate product and user rating.
+- [x] Database trigger to calculate product and user rating.
 - [ ] Should feature a log system.
-- [ ] Should use REDIS as a cache system.\*
 
 <h3 align="center"> 
 	Functional Requirements
@@ -66,7 +65,7 @@
 - [x] Create role based permission for admins and user.
 - [x] User should be able to update their profile info.
 - [x] User should be able to update their profile avatar.
-- [ ] User should be able to update thier profile avatar to AWS.
+- [ ] User should be able to update their profile avatar to AWS.
 - [ ] Users should be able to read all their published product.
 - [ ] Users should be able to see other users profile.
 - [ ] User rating should be the average of their products rating.
@@ -87,6 +86,8 @@
 - [x] Users should be able to read the products from their shopping cart.
 - [x] Users should be able to edit the shopping cart item quantity.
 - [x] User should be able to checkout from their shopping cart.
+- [ ] User can not add product to shopping cart if quantity surpassess the product quantity ammount.
+- [ ] Product quantity should decrease when successfully checkout.
 
 ### #OrderItem
 
@@ -103,7 +104,6 @@
 - [x] Order should have status of: PENDING_PAYMENT, FAILED_PAYMENT, PAID, SENT, ON_DELIVERY, DELIVERED.
 - [x] Users should be able to filter their orders by status.
 - [x] Users should be able to filter their sales by status.
-- [ ] Users should be able to read full details of a order.
 
 ### #Address
 

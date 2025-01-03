@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, like, sql } from 'drizzle-orm';
+import { and, asc, count, eq, like, sql } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductEntity } from './types';
+import { PaginationParamsDto } from '@/common/dto';
 
 @Injectable()
 export class ProductsRepository {
@@ -78,7 +79,10 @@ export class ProductsRepository {
     return product[0] ?? null;
   }
 
-  public async findByParentDepartmentId(id: string): Promise<ProductEntity[]> {
+  public async findByParentDepartmentId(
+    id: string,
+    pagination: PaginationParamsDto,
+  ): Promise<any> {
     //     SELECT
     //     p.id,
     //     p.user_id,
@@ -103,8 +107,24 @@ export class ProductsRepository {
     //     d.parent_department_id = `id`
     // GROUP BY
     //     p.id;
+    const productsCountResult = await this.drizzle
+      .select({
+        productsCount: count(),
+      })
+      .from(schema.products)
+      .innerJoin(
+        schema.departments,
+        eq(schema.products.department_id, schema.departments.id),
+      )
+      .where(eq(schema.departments.parent_department_id, id));
 
-    return await this.drizzle
+    const productsCount = productsCountResult.pop();
+
+    const pageSize = pagination.size ? Number(pagination.size) : 20;
+    const skip = pagination.page ? (pagination.page - 1) * pageSize : 1;
+    const currentPage = pagination.page ? pagination.page : 1;
+
+    const productsQuery = this.drizzle
       .select({
         id: schema.products.id,
         user_id: schema.products.user_id,
@@ -120,22 +140,32 @@ export class ProductsRepository {
         is_used: schema.products.is_used,
         created_at: schema.products.created_at,
         updated_at: schema.products.updated_at,
-        images:
-          sql<JSON>`JSON_ARRAYAGG(JSON_OBJECT('url', ${schema.products_images.url}))`.as(
-            'images',
-          ),
       })
       .from(schema.products)
       .innerJoin(
         schema.departments,
         eq(schema.products.department_id, schema.departments.id),
       )
-      .leftJoin(
-        schema.products_images,
-        eq(schema.products_images.product_id, schema.products.id),
-      )
       .where(eq(schema.departments.parent_department_id, id))
-      .groupBy(schema.products.id);
+      .orderBy(asc(schema.products.name))
+      .limit(pageSize);
+
+    if (pagination.page) {
+      productsQuery.offset(skip);
+    }
+
+    return {
+      data: await productsQuery,
+      meta: {
+        page: currentPage,
+        size:
+          pageSize > productsCount.productsCount
+            ? productsCount.productsCount
+            : pageSize,
+        count: productsCount.productsCount,
+        numberOfPages: Math.ceil(productsCount.productsCount / pageSize),
+      },
+    };
   }
 
   public async findByDepartmentId(id: string) {

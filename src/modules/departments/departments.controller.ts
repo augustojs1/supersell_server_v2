@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 
@@ -20,6 +21,7 @@ import {
 import { AccessTokenGuard, AdminGuard } from '../auth/guards';
 import { ProductsService } from '../products/products.service';
 import { ProductEntity } from '../products/types';
+import { PaginationParamsDto } from '@/common/dto';
 
 @Controller('departments')
 export class DepartmentsController {
@@ -65,7 +67,13 @@ export class DepartmentsController {
   @Get(':department_id/products')
   public async getProductByDepartmentId(
     @Param('department_id') department_id: string,
+    @Query() paginationParams: PaginationParamsDto,
   ): Promise<ProductEntity[]> {
-    return await this.productsService.findByDepartmentId(department_id);
+    const { page, size } = paginationParams;
+
+    return await this.productsService.findByDepartmentId(department_id, {
+      page: Number(page),
+      size: Number(size),
+    });
   }
 }
