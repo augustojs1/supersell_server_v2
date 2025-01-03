@@ -1,5 +1,6 @@
-import { IsInt, IsNumber, IsOptional, Min } from 'class-validator';
+import { IsEnum, IsInt, IsNumber, IsOptional, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { OrderByOptionsEnum } from '../enums/order-by-options.enum';
 
 export class PaginationParamsDto {
   @IsOptional()
@@ -14,4 +15,8 @@ export class PaginationParamsDto {
   @Min(1)
   @IsInt()
   size: number;
+
+  @IsOptional()
+  @IsEnum(OrderByOptionsEnum)
+  orderBy: string;
 }

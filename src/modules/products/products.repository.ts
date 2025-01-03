@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, asc, count, eq, like, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, like, sql } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
@@ -8,12 +8,14 @@ import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductEntity } from './types';
 import { PaginationParamsDto } from '@/common/dto';
+import { PaginationService } from '@/common/services/pagination.service';
 
 @Injectable()
 export class ProductsRepository {
   constructor(
     @Inject(DATABASE_TAG)
     private readonly drizzle: MySql2Database<typeof schema>,
+    private readonly paginationService: PaginationService,
   ) {}
 
   public async create(
@@ -120,10 +122,6 @@ export class ProductsRepository {
 
     const productsCount = productsCountResult.pop();
 
-    const pageSize = pagination.size ? Number(pagination.size) : 20;
-    const skip = pagination.page ? (pagination.page - 1) * pageSize : 1;
-    const currentPage = pagination.page ? pagination.page : 1;
-
     const productsQuery = this.drizzle
       .select({
         id: schema.products.id,
@@ -146,26 +144,13 @@ export class ProductsRepository {
         schema.departments,
         eq(schema.products.department_id, schema.departments.id),
       )
-      .where(eq(schema.departments.parent_department_id, id))
-      .orderBy(asc(schema.products.name))
-      .limit(pageSize);
+      .where(eq(schema.departments.parent_department_id, id));
 
-    if (pagination.page) {
-      productsQuery.offset(skip);
-    }
-
-    return {
-      data: await productsQuery,
-      meta: {
-        page: currentPage,
-        size:
-          pageSize > productsCount.productsCount
-            ? productsCount.productsCount
-            : pageSize,
-        count: productsCount.productsCount,
-        numberOfPages: Math.ceil(productsCount.productsCount / pageSize),
-      },
-    };
+    return this.paginationService.paginateProducts(
+      productsCount.productsCount,
+      pagination,
+      productsQuery,
+    );
   }
 
   public async findByDepartmentId(id: string) {

@@ -69,11 +69,12 @@ export class DepartmentsController {
     @Param('department_id') department_id: string,
     @Query() paginationParams: PaginationParamsDto,
   ): Promise<ProductEntity[]> {
-    const { page, size } = paginationParams;
+    const { page, size, orderBy } = paginationParams;
 
     return await this.productsService.findByDepartmentId(department_id, {
       page: Number(page),
       size: Number(size),
+      orderBy,
     });
   }
 }

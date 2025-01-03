@@ -13,6 +13,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
 import { ShoppingCartsModule } from './modules/shopping_carts/shopping_carts.module';
 import { AddressModule } from './modules/address/address.module';
 import { OrderModule } from './modules/order/order.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { OrderModule } from './modules/order/order.module';
     ShoppingCartsModule,
     AddressModule,
     OrderModule,
+    CommonModule,
   ],
 })
 export class AppModule {}
