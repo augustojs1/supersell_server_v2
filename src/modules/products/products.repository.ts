@@ -1,14 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, asc, count, desc, eq, like, sql } from 'drizzle-orm';
+import { and, count, eq, like, sql } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductEntity } from './types';
-import { PaginationParamsDto } from '@/common/dto';
-import { PaginationService } from '@/common/services/pagination.service';
+import { PaginationParamsSortableDto } from '@/modules/common/dto';
+import { PaginationService } from '@/modules/common/services/pagination.service';
 
 @Injectable()
 export class ProductsRepository {
@@ -83,7 +83,7 @@ export class ProductsRepository {
 
   public async findByParentDepartmentId(
     id: string,
-    pagination: PaginationParamsDto,
+    pagination: PaginationParamsSortableDto,
   ): Promise<any> {
     //     SELECT
     //     p.id,
@@ -153,9 +153,12 @@ export class ProductsRepository {
     );
   }
 
-  public async findByDepartmentId(id: string) {
-    //     SELECT
-    // 	p.id,
+  public async findByDepartmentId(
+    id: string,
+    pagination: PaginationParamsSortableDto,
+  ) {
+    // SELECT
+    // 	 p.id,
     //   p.user_id,
     //   p.name,
     //   p.description,
@@ -165,23 +168,30 @@ export class ProductsRepository {
     //   p.is_used,
     //   p.updated_at,
     //   p.created_at,
-    //   JSON_ARRAYAGG(JSON_OBJECT('url', pi.url)) AS images
     // FROM
     // 	products AS p
     // INNER JOIN
     // 	departments AS d
     // ON
     // 	p.department_id = d.id
-    // LEFT JOIN
-    // 	products_images AS pi
-    // ON
-    // 	pi.product_id = p.id
     // WHERE
     // 	d.id = ´id´
     // GROUP BY
     // 	p.id;
+    const productsCountResult = await this.drizzle
+      .select({
+        productsCount: count(),
+      })
+      .from(schema.products)
+      .innerJoin(
+        schema.departments,
+        eq(schema.products.department_id, schema.departments.id),
+      )
+      .where(eq(schema.departments.id, id));
 
-    return await this.drizzle
+    const productsCount = productsCountResult.pop();
+
+    const productsQuery = this.drizzle
       .select({
         id: schema.products.id,
         user_id: schema.products.user_id,
@@ -197,22 +207,19 @@ export class ProductsRepository {
         thumbnail_image_url: schema.products.thumbnail_image_url,
         created_at: schema.products.created_at,
         updated_at: schema.products.updated_at,
-        images:
-          sql<JSON>`JSON_ARRAYAGG(JSON_OBJECT('url', ${schema.products_images.url}))`.as(
-            'images',
-          ),
       })
       .from(schema.products)
       .innerJoin(
         schema.departments,
         eq(schema.products.department_id, schema.departments.id),
       )
-      .leftJoin(
-        schema.products_images,
-        eq(schema.products_images.product_id, schema.products.id),
-      )
-      .where(eq(schema.departments.id, id))
-      .groupBy(schema.products.id);
+      .where(eq(schema.departments.id, id));
+
+    return this.paginationService.paginateProducts(
+      productsCount.productsCount,
+      pagination,
+      productsQuery,
+    );
   }
 
   public async findProductByImageId(

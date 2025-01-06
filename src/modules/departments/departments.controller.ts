@@ -20,8 +20,8 @@ import {
 } from './dtos';
 import { AccessTokenGuard, AdminGuard } from '../auth/guards';
 import { ProductsService } from '../products/products.service';
-import { ProductEntity } from '../products/types';
-import { PaginationParamsDto } from '@/common/dto';
+import { PaginationParamsSortableDto } from '@/modules/common/dto';
+import { DepartmentProductsDTO } from '../products/dto';
 
 @Controller('departments')
 export class DepartmentsController {
@@ -67,8 +67,8 @@ export class DepartmentsController {
   @Get(':department_id/products')
   public async getProductByDepartmentId(
     @Param('department_id') department_id: string,
-    @Query() paginationParams: PaginationParamsDto,
-  ): Promise<ProductEntity[]> {
+    @Query() paginationParams: PaginationParamsSortableDto,
+  ): Promise<DepartmentProductsDTO> {
     const { page, size, orderBy } = paginationParams;
 
     return await this.productsService.findByDepartmentId(department_id, {

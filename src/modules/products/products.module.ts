@@ -8,7 +8,7 @@ import { AuthModule } from '../auth/auth.module';
 import { DepartmentsModule } from '../departments/departments.module';
 import { DiskStorageService } from '@/infra/storage/disk-storage.service';
 import { ProductsImagesModule } from '../products_images/products_images.module';
-import { CommonModule } from '@/common/common.module';
+import { CommonModule } from '@/modules/common/common.module';
 
 const DISK_STORAGE_PATH = './.temp/uploads/products';
 

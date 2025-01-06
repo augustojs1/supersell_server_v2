@@ -13,7 +13,7 @@ import { DepartmentsService } from '../departments/departments.service';
 import { AccessTokenGuard } from '../auth/guards';
 import { ProductsImagesService } from '../products_images/products_images.service';
 import { ProductImages } from './types/product-images.type';
-import { PaginationParamsDto } from '@/common/dto';
+import { PaginationParamsSortableDto } from '@/modules/common/dto';
 
 @Injectable()
 export class ProductsService {
@@ -84,8 +84,8 @@ export class ProductsService {
 
   public async findByDepartmentId(
     department_id: string,
-    paginationParams: PaginationParamsDto,
-  ): Promise<ProductEntity[]> {
+    paginationParams: PaginationParamsSortableDto,
+  ): Promise<any> {
     const department = await this.departmentsService.findById(department_id);
 
     if (!department) {
@@ -102,7 +102,10 @@ export class ProductsService {
       );
     }
 
-    return await this.productsRepository.findByDepartmentId(department_id);
+    return await this.productsRepository.findByDepartmentId(
+      department_id,
+      paginationParams,
+    );
   }
 
   public async findUserProducts(user_id: string): Promise<ProductEntity[]> {

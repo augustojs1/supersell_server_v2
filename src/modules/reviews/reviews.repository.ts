@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, count, desc, eq } from 'drizzle-orm';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { ulid } from 'ulid';
 
@@ -7,12 +7,16 @@ import * as schemas from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { CreateReviewDto } from './dto';
 import { ReviewsEntity } from './types';
+import { PaginationService } from '../common/services/pagination.service';
+import { PaginationParamsDto } from '../common/dto';
+import { ReviewsPaginatedDto } from './dto/response/reviews-paginated.dto';
 
 @Injectable()
 export class ReviewsRepository {
   constructor(
     @Inject(DATABASE_TAG)
     private readonly drizzle: MySql2Database<typeof schemas>,
+    private readonly paginationService: PaginationService,
   ) {}
 
   public async create(
@@ -70,17 +74,27 @@ export class ReviewsRepository {
 
   public async findAllByProductId(
     product_id: string,
-  ): Promise<ReviewsEntity[]> {
+    paginationParams: PaginationParamsDto,
+  ): Promise<ReviewsPaginatedDto> {
     // SELECT
     //   *
     // FROM
     //   reviews r
     // WHERE
     //   r.product_id = '01JC71B8DBV6F6AT6A902RYWDR';
-    return await this.drizzle
+    const count = await this.count(product_id);
+
+    const query = this.drizzle
       .select()
       .from(schemas.reviews)
-      .where(eq(schemas.reviews.product_id, product_id));
+      .where(eq(schemas.reviews.product_id, product_id))
+      .orderBy(desc(schemas.reviews.created_at));
+
+    return await this.paginationService.paginate(
+      count,
+      paginationParams,
+      query,
+    );
   }
 
   public async delete(id: string): Promise<void> {
@@ -88,5 +102,16 @@ export class ReviewsRepository {
     await this.drizzle
       .delete(schemas.reviews)
       .where(eq(schemas.reviews.id, id));
+  }
+
+  public async count(product_id: string): Promise<number> {
+    const reviewsCountResult = await this.drizzle
+      .select({
+        reviewsCount: count(),
+      })
+      .from(schemas.reviews)
+      .where(eq(schemas.reviews.product_id, product_id));
+
+    return reviewsCountResult.pop().reviewsCount;
   }
 }

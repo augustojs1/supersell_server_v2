@@ -5,6 +5,8 @@ import { ReviewsRepository } from './reviews.repository';
 import { ReviewsEntityDto } from './dto';
 import { ProductsService } from '../products/products.service';
 import { ReviewsEntity } from './types';
+import { PaginationParamsDto } from '../common/dto';
+import { ReviewsPaginatedDto } from './dto/response/reviews-paginated.dto';
 
 @Injectable()
 export class ReviewsService {
@@ -56,10 +58,16 @@ export class ReviewsService {
     return review;
   }
 
-  public async findAll(product_id: string): Promise<ReviewsEntityDto[]> {
+  public async findAll(
+    product_id: string,
+    paginationParams: PaginationParamsDto,
+  ): Promise<ReviewsPaginatedDto> {
     await this.productsService.findByIdElseThrow(product_id);
 
-    return await this.reviewsRepository.findAllByProductId(product_id);
+    return await this.reviewsRepository.findAllByProductId(
+      product_id,
+      paginationParams,
+    );
   }
 
   public async remove(user_id: string, id: string): Promise<void> {

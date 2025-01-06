@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 
 import { ReviewsService } from './reviews.service';
@@ -14,6 +15,8 @@ import { AccessTokenGuard } from '../auth/guards';
 import { ReviewsEntityDto } from './dto';
 import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
+import { PaginationParamsSortableDto } from '../common/dto';
+import { ReviewsPaginatedDto } from './dto/response/reviews-paginated.dto';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -31,8 +34,9 @@ export class ReviewsController {
   @Get('products/:product_id')
   public async findAll(
     @Param('product_id') product_id: string,
-  ): Promise<ReviewsEntityDto[]> {
-    return await this.reviewsService.findAll(product_id);
+    @Query() paginationParams: PaginationParamsSortableDto,
+  ): Promise<ReviewsPaginatedDto> {
+    return await this.reviewsService.findAll(product_id, paginationParams);
   }
 
   @UseGuards(AccessTokenGuard)
