@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, count, eq, like } from 'drizzle-orm';
+import { and, count, eq, like, sql } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
@@ -342,5 +342,38 @@ export class ProductsRepository {
       .select()
       .from(schema.products)
       .where(like(schema.products.name, `%${name}%`));
+  }
+
+  public async findByIdWithImages(id: string): Promise<any> {
+    const products = await this.drizzle
+      .select({
+        id: schema.products.id,
+        user_id: schema.products.user_id,
+        department_id: schema.products.department_id,
+        name: schema.products.name,
+        description: schema.products.description,
+        price: schema.products.price,
+        quantity: schema.products.quantity,
+        is_in_stock: schema.products.is_in_stock,
+        average_rating: schema.products.average_rating,
+        is_used: schema.products.is_used,
+        sales: schema.products.sales,
+        thumbnail_image_url: schema.products.thumbnail_image_url,
+        created_at: schema.products.created_at,
+        updated_at: schema.products.updated_at,
+        images:
+          sql<JSON>`JSON_ARRAYAGG(JSON_OBJECT('url', ${schema.products_images.url}))`.as(
+            'images',
+          ),
+      })
+      .from(schema.products)
+      .leftJoin(
+        schema.products_images,
+        eq(schema.products_images.product_id, schema.products.id),
+      )
+      .where(eq(schema.products.id, id))
+      .groupBy(schema.products.id);
+
+    return products[0] ?? null;
   }
 }

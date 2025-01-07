@@ -55,7 +55,7 @@
 - [x] Users should be able to read all products in a category and paginate trough the results.
 - [ ] Users should be able to search a product by their name. (MELHORAR PERF.)
 - [x] User should be able to see the first photo of a product and the product rating when returning a product list.
-- [ ] User should be able to see all the product photos and rating when fetching a single product.
+- [x] User should be able to read all the product photos and rating when fetching a single product.
 - [x] Users should be able to sort the products by their price by ascending and descending order.
 - [x] Users should be able to see products sorted by: Best ratings, most sales, recent added...
 
@@ -67,7 +67,7 @@
 - [ ] User should be able to update their profile avatar to AWS.
 - [x] Users should be able to read all their published product.
 - [x] User should be able to read all published products from another user.
-- [ ] Users should be able to see other users profile.
+- [x] Users should be able to see other users profile.
 - [x] User rating should be the average of their products rating.
 
 ### #Wishlists
@@ -112,12 +112,6 @@
 - [x] User should be able to update an existing address.
 - [x] User should be able to delete an address.
 
-### #Payments
-
-- [ ] Users should be able to pay for a order.
-- [ ] Payment info should be stored in database.
-- [ ] Increment sales ammount after successfully payment for a order.
-
 ### #Reviews
 
 - [x] Users should be able to create a review for a product.
@@ -126,6 +120,12 @@
 - [x] Users should be able to see all the reviews for a product.
 - [x] Product rating should be the average of the reviews for that product.
 - [x] User rating should be the average of the reviews of their products.
+
+### #Payments
+
+- [ ] Users should be able to pay for a order.
+- [ ] Payment info should be stored in database.
+- [ ] Increment sales ammount after successfully payment for a order.
 
 ### #Emails
 

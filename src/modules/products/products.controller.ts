@@ -20,7 +20,7 @@ import {
 } from '@nest-lab/fastify-multer';
 
 import { ProductsService } from './products.service';
-import { CreateProductDto, UpdateProductDto } from './dto';
+import { CreateProductDto, ProductDTO, UpdateProductDto } from './dto';
 import { AccessTokenGuard } from '../auth/guards';
 import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
@@ -106,5 +106,12 @@ export class ProductsController {
   @Get()
   public async getProductByName(@Query('name') name: string) {
     return await this.productsService.findByName(name);
+  }
+
+  @Get(':product_id')
+  public async getById(
+    @Param('product_id') product_id: string,
+  ): Promise<ProductDTO> {
+    return await this.productsService.findByIdWithImages(product_id);
   }
 }

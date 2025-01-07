@@ -10,6 +10,7 @@ import { ProductsRepository } from './products.repository';
 import {
   CreateProductDto,
   DepartmentProductsDTO,
+  ProductDTO,
   UpdateProductDto,
 } from './dto';
 import { ProductEntity } from './types';
@@ -189,5 +190,11 @@ export class ProductsService {
 
   public async findByName(name: string) {
     return await this.productsRepository.findAllByName(name);
+  }
+
+  public async findByIdWithImages(product_id: string): Promise<ProductDTO> {
+    await this.findByIdElseThrow(product_id);
+
+    return await this.productsRepository.findByIdWithImages(product_id);
   }
 }
