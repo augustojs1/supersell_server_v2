@@ -21,6 +21,7 @@ import { AccessTokenGuard } from '../auth/guards';
 import { ProductsService } from '../products/products.service';
 import { PaginationParamsDto } from '../common/dto';
 import { DepartmentProductsDTO } from '../products/dto';
+import { UserProfileDto } from '../auth/dto';
 
 @Controller('users')
 export class UsersController {
@@ -68,5 +69,12 @@ export class UsersController {
       user_id,
       paginationParams,
     );
+  }
+
+  @Get(':user_id/profile')
+  public async getProfile(
+    @Param('user_id') user_id: string,
+  ): Promise<UserProfileDto> {
+    return await this.usersService.findUserProfile(user_id);
   }
 }
