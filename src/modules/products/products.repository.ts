@@ -1,13 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, count, eq, like, sql } from 'drizzle-orm';
+import { and, count, eq, like } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
-import { CreateProductDto, UpdateProductDto } from './dto';
+import {
+  CreateProductDto,
+  DepartmentProductsDTO,
+  UpdateProductDto,
+} from './dto';
 import { ProductEntity } from './types';
-import { PaginationParamsSortableDto } from '@/modules/common/dto';
+import {
+  PaginationParamsDto,
+  PaginationParamsSortableDto,
+} from '@/modules/common/dto';
 import { PaginationService } from '@/modules/common/services/pagination.service';
 
 @Injectable()
@@ -234,7 +241,10 @@ export class ProductsRepository {
     return product[0] ?? null;
   }
 
-  public async findByUserId(user_id: string): Promise<ProductEntity[]> {
+  public async findByUserId(
+    user_id: string,
+    paginationParams: PaginationParamsDto,
+  ): Promise<DepartmentProductsDTO> {
     //     SELECT
     // 	p.id,
     // 	p.user_id,
@@ -247,19 +257,20 @@ export class ProductsRepository {
     // 	p.is_used,
     //   p.updated_at,
     //   p.created_at,
-    //   JSON_ARRAYAGG(JSON_OBJECT('url', pi.url)) AS images
     // FROM
     // 	products AS p
-    // LEFT JOIN
-    // 	products_images AS pi
-    // ON
-    // 	p.id = pi.product_id
     // WHERE
-    // 	p.user_id = '01JC1W9JBSBNSHH7Z5TP12B6X2'
-    // GROUP BY
-    // 	p.id;
+    // 	p.user_id = '01JC1W9JBSBNSHH7Z5TP12B6X2';
+    const productsCountResult = await this.drizzle
+      .select({
+        productsCount: count(),
+      })
+      .from(schema.products)
+      .where(eq(schema.products.user_id, user_id));
 
-    const products = await this.drizzle
+    const productsCount = productsCountResult.pop();
+
+    const productsQuery = this.drizzle
       .select({
         id: schema.products.id,
         user_id: schema.products.user_id,
@@ -275,20 +286,15 @@ export class ProductsRepository {
         thumbnail_image_url: schema.products.thumbnail_image_url,
         created_at: schema.products.created_at,
         updated_at: schema.products.updated_at,
-        images:
-          sql<JSON>`JSON_ARRAYAGG(JSON_OBJECT('url', ${schema.products_images.url}))`.as(
-            'images',
-          ),
       })
       .from(schema.products)
-      .leftJoin(
-        schema.products_images,
-        eq(schema.products.id, schema.products_images.product_id),
-      )
-      .where(eq(schema.products.user_id, user_id))
-      .groupBy(schema.products.id);
+      .where(eq(schema.products.user_id, user_id));
 
-    return products;
+    return await this.paginationService.paginate(
+      productsCount.productsCount,
+      paginationParams,
+      productsQuery,
+    );
   }
 
   public async updateProduct(

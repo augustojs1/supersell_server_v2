@@ -6,6 +6,7 @@ import {
   Param,
   ParseFilePipeBuilder,
   Patch,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -18,7 +19,9 @@ import { CurrentUser } from '../auth/types';
 import { UpdateUserProfileDto } from './dto';
 import { AccessTokenGuard } from '../auth/guards';
 import { ProductsService } from '../products/products.service';
-import { ProductEntity } from '../products/types';
+import { PaginationParamsDto } from '../common/dto';
+import { DepartmentProductsDTO } from '../products/dto';
+
 @Controller('users')
 export class UsersController {
   constructor(
@@ -57,9 +60,13 @@ export class UsersController {
   @Get(':user_id/products')
   public async findUserProducts(
     @Param('user_id') user_id: string,
-  ): Promise<ProductEntity[]> {
+    @Query() paginationParams: PaginationParamsDto,
+  ): Promise<DepartmentProductsDTO> {
     await this.usersService.findUserByIdElseThrow(user_id);
 
-    return await this.productsService.findUserProducts(user_id);
+    return await this.productsService.findUserProducts(
+      user_id,
+      paginationParams,
+    );
   }
 }

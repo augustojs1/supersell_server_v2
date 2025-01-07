@@ -8,6 +8,7 @@ import { UsersService } from './users.service';
 import { AuthModule } from '../auth/auth.module';
 import { DiskStorageService } from '@/infra/storage/disk-storage.service';
 import { ProductsModule } from '../products/products.module';
+import { CommonModule } from '../common/common.module';
 
 const DISK_STORAGE_PATH = './.temp/uploads/avatar';
 
@@ -19,6 +20,7 @@ const DISK_STORAGE_PATH = './.temp/uploads/avatar';
     FastifyMulterModule.register({
       storage: new DiskStorageService(DISK_STORAGE_PATH),
     }),
+    CommonModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository],

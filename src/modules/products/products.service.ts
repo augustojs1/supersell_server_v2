@@ -7,13 +7,20 @@ import {
 import { File } from '@nest-lab/fastify-multer';
 
 import { ProductsRepository } from './products.repository';
-import { CreateProductDto, UpdateProductDto } from './dto';
+import {
+  CreateProductDto,
+  DepartmentProductsDTO,
+  UpdateProductDto,
+} from './dto';
 import { ProductEntity } from './types';
 import { DepartmentsService } from '../departments/departments.service';
 import { AccessTokenGuard } from '../auth/guards';
 import { ProductsImagesService } from '../products_images/products_images.service';
 import { ProductImages } from './types/product-images.type';
-import { PaginationParamsSortableDto } from '@/modules/common/dto';
+import {
+  PaginationParamsDto,
+  PaginationParamsSortableDto,
+} from '@/modules/common/dto';
 
 @Injectable()
 export class ProductsService {
@@ -108,8 +115,14 @@ export class ProductsService {
     );
   }
 
-  public async findUserProducts(user_id: string): Promise<ProductEntity[]> {
-    return await this.productsRepository.findByUserId(user_id);
+  public async findUserProducts(
+    user_id: string,
+    paginationParams: PaginationParamsDto,
+  ): Promise<DepartmentProductsDTO> {
+    return await this.productsRepository.findByUserId(
+      user_id,
+      paginationParams,
+    );
   }
 
   public async findById(id: string): Promise<ProductEntity | null> {
