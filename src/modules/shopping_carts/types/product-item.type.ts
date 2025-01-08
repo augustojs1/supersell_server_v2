@@ -5,6 +5,7 @@ export class ProductItem {
   product_price: number;
   subtotal_price: number;
   product_seller_id: string;
+  product_quantity: number;
   product_description: string;
   product_seller_username: string;
   product_thumbnail_image_url: string;

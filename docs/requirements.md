@@ -85,8 +85,9 @@
 - [x] Users should be able to read the products from their shopping cart.
 - [x] Users should be able to edit the shopping cart item quantity.
 - [x] User should be able to checkout from their shopping cart.
-- [ ] User can not add product to shopping cart if quantity surpassess the product quantity ammount.
-- [ ] Product quantity should decrease when successfully checkout.
+- [x] User can not add product to shopping cart if quantity surpassess the product quantity ammount.
+- [x] User can not checkout a product if order quantity surpasses the product quantity ammount.
+- [x] Product quantity should decrease when successfully checkout.
 
 ### #OrderItem
 

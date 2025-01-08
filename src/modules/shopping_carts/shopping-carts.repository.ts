@@ -56,6 +56,7 @@ export class ShoppingCartsRepository {
     return await this.drizzle
       .select({
         shopping_cart: {
+          id: schemas.shopping_carts.id,
           total_price: schemas.shopping_carts.total_price,
         },
         items: sql<JSON>`JSON_ARRAYAGG(
@@ -67,6 +68,7 @@ export class ShoppingCartsRepository {
             'product_seller_username', ${schemas.users.username},
             'product_thumbnail_image_url', ${schemas.products.thumbnail_image_url},
             'product_price', ${schemas.shopping_cart_item.price},
+            'product_quantity', ${schemas.products.quantity},
             'quantity', ${schemas.shopping_cart_item.quantity},
             'subtotal_price', ${schemas.shopping_cart_item.price} * ${schemas.shopping_cart_item.quantity}
           )
@@ -257,16 +259,38 @@ export class ShoppingCartsRepository {
     await this.drizzle.transaction(async (tx) => {
       try {
         // First operation
-        tx.delete(schemas.shopping_cart_item).where(
-          eq(schemas.shopping_cart_item.id, data.shopping_cart_item_id),
-        );
+        await tx
+          .delete(schemas.shopping_cart_item)
+          .where(eq(schemas.shopping_cart_item.id, data.shopping_cart_item_id));
 
         // Second operation
-        tx.update(schemas.shopping_carts)
+        await tx
+          .update(schemas.shopping_carts)
           .set({
             total_price: data.total_price,
           } as ShoppingCartEntity)
           .where(eq(schemas.shopping_carts.user_id, data.user_id));
+      } catch (error) {
+        throw error;
+      }
+    });
+  }
+
+  public async resetShoppingCartTrx(id: string): Promise<void> {
+    await this.drizzle.transaction(async (tx) => {
+      try {
+        // First operation
+        await tx
+          .update(schemas.shopping_carts)
+          .set({
+            total_price: 0,
+          } as ShoppingCartEntity)
+          .where(eq(schemas.shopping_carts.id, id));
+
+        // Second operation
+        await tx
+          .delete(schemas.shopping_cart_item)
+          .where(eq(schemas.shopping_cart_item.shopping_cart_id, id));
       } catch (error) {
         throw error;
       }

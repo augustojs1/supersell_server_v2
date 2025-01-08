@@ -67,6 +67,13 @@ export class ShoppingCartsService {
       );
     }
 
+    if (product.quantity === 0 || !product.is_in_stock) {
+      throw new HttpException(
+        'Product is out of stock!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const shoppingCartItem =
       await this.shoppingCartRepository.findShoppingCartItemByUserIdAndProductId(
         user_id,
@@ -108,6 +115,15 @@ export class ShoppingCartsService {
       throw new HttpException(
         'Product with this id not found on user shopping cart!',
         HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const product = await this.productsService.findByIdElseThrow(product_id);
+
+    if (quantity > product.quantity) {
+      throw new HttpException(
+        'Quantity not available!',
+        HttpStatus.BAD_REQUEST,
       );
     }
 
@@ -159,7 +175,9 @@ export class ShoppingCartsService {
   public async checkout(id: string, data: CheckoutOrderDTO) {
     const shoppingCartItems = await this.findAll(id);
 
-    shoppingCartItems.forEach(async (order) => {
+    const shoppingCartId = shoppingCartItems[0].shopping_cart.id;
+
+    for (const order of shoppingCartItems) {
       const orderTotalPrice = this.getOrderTotalPrice(order.items);
 
       const orderData: CreateOrderData = {
@@ -172,7 +190,21 @@ export class ShoppingCartsService {
 
       const orderId = await this.orderService.create(orderData);
 
-      order.items.forEach(async (item) => {
+      for (const item of order.items) {
+        if (item.quantity > item.product_quantity) {
+          throw new HttpException(
+            'Order ammount surpasses product stock ammount.',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        const updatedQuantity = item.product_quantity - item.quantity;
+
+        await this.productsService.updateQuantity(
+          item.product_id,
+          updatedQuantity,
+        );
+
         await this.orderService.createItem({
           order_id: orderId,
           price: item.product_price,
@@ -180,8 +212,10 @@ export class ShoppingCartsService {
           quantity: item.quantity,
           subtotal_price: item.subtotal_price,
         });
-      });
-    });
+      }
+    }
+
+    await this.shoppingCartRepository.resetShoppingCartTrx(shoppingCartId);
   }
 
   public getOrderTotalPrice(items: ProductItem[]): number {

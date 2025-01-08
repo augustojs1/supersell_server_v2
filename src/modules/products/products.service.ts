@@ -197,4 +197,19 @@ export class ProductsService {
 
     return await this.productsRepository.findByIdWithImages(product_id);
   }
+
+  public async updateQuantity(
+    product_id: string,
+    amount: number,
+  ): Promise<void> {
+    if (amount === 0) {
+      await this.setProductIsInStock(product_id, false);
+    }
+
+    await this.productsRepository.updateQuantity(product_id, amount);
+  }
+
+  public async setProductIsInStock(product_id: string, is_in_stock: boolean) {
+    await this.productsRepository.setProductIsInStock(product_id, is_in_stock);
+  }
 }

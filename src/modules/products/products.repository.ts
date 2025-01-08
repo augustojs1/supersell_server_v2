@@ -376,4 +376,25 @@ export class ProductsRepository {
 
     return products[0] ?? null;
   }
+
+  public async updateQuantity(
+    product_id: string,
+    amount: number,
+  ): Promise<void> {
+    await this.drizzle
+      .update(schema.products)
+      .set({
+        quantity: amount,
+      })
+      .where(eq(schema.products.id, product_id));
+  }
+
+  public async setProductIsInStock(product_id: string, is_in_stock: boolean) {
+    await this.drizzle
+      .update(schema.products)
+      .set({
+        is_in_stock,
+      } as ProductEntity)
+      .where(eq(schema.products.id, product_id));
+  }
 }
