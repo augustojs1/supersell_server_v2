@@ -5,8 +5,6 @@ import { ShoppingCartsRepository } from './shopping-carts.repository';
 import { ProductItem, ShoppingCartEntity } from './types';
 import { CheckoutOrderDTO, ShoppingCartItemsDTO } from './dto';
 import { OrderService } from '../order/order.service';
-import { CreateOrderData } from '../order/types';
-import { OrderStatus } from '../order/enums';
 
 @Injectable()
 export class ShoppingCartsService {
@@ -173,49 +171,30 @@ export class ShoppingCartsService {
   }
 
   public async checkout(id: string, data: CheckoutOrderDTO) {
-    const shoppingCartItems = await this.findAll(id);
+    try {
+      const shoppingCartItems = await this.findAll(id);
 
-    const shoppingCartId = shoppingCartItems[0].shopping_cart.id;
+      const shoppingCartId = shoppingCartItems[0].shopping_cart.id;
 
-    for (const order of shoppingCartItems) {
-      const orderTotalPrice = this.getOrderTotalPrice(order.items);
+      for (const order of shoppingCartItems) {
+        const orderTotalPrice = this.getOrderTotalPrice(order.items);
 
-      const orderData: CreateOrderData = {
-        customer_id: id,
-        seller_id: order.items[0].product_seller_id,
-        delivery_address_id: data.delivery_address_id,
-        status: OrderStatus.PENDING_PAYMENT,
-        total_price: orderTotalPrice,
-      };
-
-      const orderId = await this.orderService.create(orderData);
-
-      for (const item of order.items) {
-        if (item.quantity > item.product_quantity) {
-          throw new HttpException(
-            'Order ammount surpasses product stock ammount.',
-            HttpStatus.BAD_REQUEST,
-          );
-        }
-
-        const updatedQuantity = item.product_quantity - item.quantity;
-
-        await this.productsService.updateQuantity(
-          item.product_id,
-          updatedQuantity,
+        await this.shoppingCartRepository.checkOutFlowTrx(
+          shoppingCartId,
+          id,
+          order,
+          orderTotalPrice,
+          data.delivery_address_id,
         );
-
-        await this.orderService.createItem({
-          order_id: orderId,
-          price: item.product_price,
-          product_id: item.product_id,
-          quantity: item.quantity,
-          subtotal_price: item.subtotal_price,
-        });
       }
-    }
 
-    await this.shoppingCartRepository.resetShoppingCartTrx(shoppingCartId);
+      return {
+        status: HttpStatus.CREATED,
+        message: 'Order created succesfully!',
+      };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   public getOrderTotalPrice(items: ProductItem[]): number {
