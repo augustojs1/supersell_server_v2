@@ -26,6 +26,7 @@ import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
 import { ProductsImagesService } from '../products_images/products_images.service';
 import { ProductImages } from './types/product-images.type';
+import { ProductsTextResultDto } from './dto/response/products-text-result.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -104,7 +105,9 @@ export class ProductsController {
   }
 
   @Get()
-  public async getProductByName(@Query('name') name: string) {
+  public async getProductByName(
+    @Query('name') name: string,
+  ): Promise<ProductsTextResultDto[]> {
     return await this.productsService.findByName(name);
   }
 

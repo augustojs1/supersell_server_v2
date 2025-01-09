@@ -53,7 +53,7 @@
 - [x] Users should be able to update their products.
 - [x] Users should be able to delete their products.
 - [x] Users should be able to read all products in a category and paginate trough the results.
-- [ ] Users should be able to search a product by their name. (MELHORAR PERF.)
+- [x] Users should be able to search a product by their name.
 - [x] User should be able to see the first photo of a product and the product rating when returning a product list.
 - [x] User should be able to read all the product photos and rating when fetching a single product.
 - [x] Users should be able to sort the products by their price by ascending and descending order.
@@ -124,7 +124,7 @@
 
 ### #Payments
 
-- [ ] Users should be able to pay for a order.
+- [ ] Users should be able to pay for an order.
 - [ ] Payment info should be stored in database.
 - [ ] Increment sales ammount after successfully payment for a order.
 

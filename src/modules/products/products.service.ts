@@ -22,6 +22,7 @@ import {
   PaginationParamsDto,
   PaginationParamsSortableDto,
 } from '@/modules/common/dto';
+import { ProductsTextResultDto } from './dto/response/products-text-result.dto';
 
 @Injectable()
 export class ProductsService {
@@ -188,7 +189,7 @@ export class ProductsService {
     return images;
   }
 
-  public async findByName(name: string) {
+  public async findByName(name: string): Promise<ProductsTextResultDto[]> {
     return await this.productsRepository.findAllByName(name);
   }
 

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, count, eq, like, sql } from 'drizzle-orm';
+import { and, count, eq, sql } from 'drizzle-orm';
 import { ulid } from 'ulid';
 
 import * as schema from '@/infra/database/orm/drizzle/schema';
@@ -342,21 +342,34 @@ export class ProductsRepository {
       .where(eq(schema.products.id, product_id));
   }
 
-  public async findAllByName(name: string): Promise<ProductEntity[]> {
-    // SELECT
+  public async findAllByName(name: string): Promise<any> {
+    //   SELECT
     //   *
     // FROM
-    //   products AS p
-    // WHERE
-    //   p.name
-    // LIKE
-    //   '%endi%';
-    //
+    //   products p
+    // WHERE MATCH
+    //   (name)
+    // AGAINST
+    //   ('*pla*' IN BOOLEAN MODE);
 
-    return await this.drizzle
-      .select()
-      .from(schema.products)
-      .where(like(schema.products.name, `%${name}%`));
+    // return await this.drizzle.select().from(schema.products).where(match);
+
+    const query = sql`
+          SELECT
+            p.id,
+            p.name
+          FROM
+            products p
+          WHERE MATCH
+            (name)
+          AGAINST
+            (${`'*${name}*'`} IN BOOLEAN MODE)
+          LIMIT 6;
+          `;
+
+    const result = await this.drizzle.execute(query);
+
+    return result[0];
   }
 
   public async findByIdWithImages(id: string): Promise<any> {
