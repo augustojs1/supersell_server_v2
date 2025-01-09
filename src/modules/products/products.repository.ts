@@ -151,7 +151,12 @@ export class ProductsRepository {
         schema.departments,
         eq(schema.products.department_id, schema.departments.id),
       )
-      .where(eq(schema.departments.parent_department_id, id));
+      .where(
+        and(
+          eq(schema.departments.parent_department_id, id),
+          eq(schema.products.is_in_stock, true),
+        ),
+      );
 
     return this.paginationService.paginateProducts(
       productsCount.productsCount,
@@ -220,7 +225,12 @@ export class ProductsRepository {
         schema.departments,
         eq(schema.products.department_id, schema.departments.id),
       )
-      .where(eq(schema.departments.id, id));
+      .where(
+        and(
+          eq(schema.departments.id, id),
+          eq(schema.products.is_in_stock, true),
+        ),
+      );
 
     return this.paginationService.paginateProducts(
       productsCount.productsCount,
@@ -288,7 +298,12 @@ export class ProductsRepository {
         updated_at: schema.products.updated_at,
       })
       .from(schema.products)
-      .where(eq(schema.products.user_id, user_id));
+      .where(
+        and(
+          eq(schema.products.user_id, user_id),
+          eq(schema.products.is_in_stock, true),
+        ),
+      );
 
     return await this.paginationService.paginate(
       productsCount.productsCount,
