@@ -6,6 +6,7 @@ import {
 } from '@nestjs/platform-fastify';
 
 import { AppModule } from './app.module';
+import { AppExceptionFilter } from '@/infra/filters/exceptions';
 
 async function bootstrap() {
   const PORT = process.env.PORT;
@@ -25,6 +26,9 @@ async function bootstrap() {
       },
     }),
   );
+
+  app.useGlobalFilters(new AppExceptionFilter());
+
   app.setGlobalPrefix('api/v2');
 
   await app.listen(PORT ?? 3000);

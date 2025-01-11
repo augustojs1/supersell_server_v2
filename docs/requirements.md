@@ -27,7 +27,7 @@
 - [ ] Server should use in production AWS SQS as a message broker.
 - [ ] Server should use in production AWS SES as an emailing service.
 - [x] Database trigger to calculate product and user rating.
-- [ ] Should feature a log system.
+- [x] Should feature a log system.
 
 <h3 align="center"> 
 	Functional Requirements
