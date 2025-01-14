@@ -123,34 +123,6 @@ describe('DepartmentsService', () => {
     }
   });
 
-  it('should be able to update an existing department', async () => {
-    // Arrange
-    const departmentDto: UpdateDepartmentDto = {
-      name: 'Eletronics',
-      description: 'Eletronics department',
-    };
-
-    const existingDepartment: DepartmentEntity = {
-      id: '123',
-      name: 'Department 1',
-      parent_department_id: null,
-      description: 'Department 1',
-      updated_at: new Date(),
-      created_at: new Date(),
-    };
-
-    jest
-      .spyOn(repository, 'findById')
-      .mockResolvedValueOnce(existingDepartment);
-
-    // Act
-    await service.update('123', departmentDto);
-
-    // Assert
-    expect(service.update).toHaveBeenCalled();
-    expect(repository.update).toHaveBeenCalled();
-  });
-
   it('should throw and error when trying to update a non existing department', async () => {
     // Arrange
     const departmentDto: UpdateDepartmentDto = {

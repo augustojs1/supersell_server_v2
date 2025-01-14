@@ -13,7 +13,7 @@ export class WishlistsService {
     private readonly productsService: ProductsService,
   ) {}
 
-  private async findByUserIdAndProductIdIfThrow(
+  public async findByUserIdAndProductIdIfThrow(
     user_id: string,
     product_id: string,
   ) {
@@ -30,7 +30,7 @@ export class WishlistsService {
     }
   }
 
-  private async findByUserIdAndProductIdElseThrow(
+  public async findByUserIdAndProductIdElseThrow(
     user_id: string,
     product_id: string,
   ): Promise<WishlistEntity> {
