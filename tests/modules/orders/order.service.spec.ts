@@ -18,8 +18,10 @@ describe('OrderService', () => {
           useValue: {
             findOrderByCustomerId: jest.fn(),
             findOrderBySellerId: jest.fn(),
+            findById: jest.fn(),
             create: jest.fn(),
             createItem: jest.fn(),
+            updateOrderStatus: jest.fn(),
           },
         },
         {
@@ -38,6 +40,52 @@ describe('OrderService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('should not be able to update a non existent order', async () => {
+    const id = '123';
+    const user_id = '321';
+    const status = 'PAID' as any;
+
+    jest.spyOn(repository, 'findById').mockResolvedValueOnce(null);
+
+    try {
+      await service.updateStatus(id, user_id, status);
+    } catch (error) {
+      expect(error.status).toBe(404);
+    }
+  });
+
+  it('should not be able to update a product order from a different user', async () => {
+    const id = '123';
+    const user_id = '321';
+    const status = 'PAID' as any;
+    const order = {
+      seller_id: '111',
+    } as any;
+
+    jest.spyOn(repository, 'findById').mockResolvedValueOnce(order);
+
+    try {
+      await service.updateStatus(id, user_id, status);
+    } catch (error) {
+      expect(error.status).toBe(403);
+    }
+  });
+
+  it('should be able to update an order status', async () => {
+    const id = '123';
+    const user_id = '321';
+    const status = 'PAID' as any;
+    const order = {
+      seller_id: '321',
+    } as any;
+
+    jest.spyOn(repository, 'findById').mockResolvedValueOnce(order);
+
+    await service.updateStatus(id, user_id, status);
+
+    expect(repository.updateOrderStatus).toHaveBeenCalled();
   });
 
   it('should be able to create an order', async () => {
