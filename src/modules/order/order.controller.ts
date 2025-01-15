@@ -1,10 +1,18 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 
 import { OrderService } from './order.service';
 import { AccessTokenGuard } from '../auth/guards';
 import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
-import { OrderSalesDTO, OrdersDTO } from './dto';
+import { OrderSalesDTO, OrdersDTO, UpdateOrderStatusDto } from './dto';
 import { OrderStatus } from './enums';
 
 @Controller('orders')
@@ -27,5 +35,19 @@ export class OrderController {
     @GetCurrentUserDecorator() user: CurrentUser,
   ): Promise<OrderSalesDTO[]> {
     return await this.orderService.findOrderBySellerId(user.sub, status);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch('/:order_id')
+  public async updateStatus(
+    @Param('order_id') order_id: string,
+    @Body() data: UpdateOrderStatusDto,
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ) {
+    return await this.orderService.updateStatus(
+      order_id,
+      user.sub,
+      data.status,
+    );
   }
 }

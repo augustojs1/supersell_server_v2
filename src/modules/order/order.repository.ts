@@ -6,7 +6,7 @@ import { ulid } from 'ulid';
 import * as schemas from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { CreateOrderData, OrderEntity } from './types';
-import { OrderSalesDTO, OrdersDTO } from './dto';
+import { OrderSalesDTO } from './dto';
 import { OrderStatus } from './enums';
 
 @Injectable()
@@ -206,5 +206,17 @@ export class OrderRepository {
           eq(schemas.orders.status, status),
         ),
       );
+  }
+
+  public async updateOrderStatus(
+    id: string,
+    status: OrderStatus,
+  ): Promise<void> {
+    await this.drizzle
+      .update(schemas.orders)
+      .set({
+        status: status,
+      })
+      .where(eq(schemas.orders.id, id));
   }
 }

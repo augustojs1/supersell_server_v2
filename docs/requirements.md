@@ -14,7 +14,7 @@
 - [ ] Should feature a seeder for data.
 - [ ] Docker container for the database.
 - [ ] Docker container for the application.
-- [ ] Docker container for Kafka locally.
+- [ ] Docker container for Kafka as a local message broker.
 - [ ] Create Github documentation.
 - [ ] Create Swagger REST API documentation.
 - [ ] Implement security configuration: SQL Injection, XSS Protection, Security Headers, Rate limiting, HPP & CORS etc.
@@ -100,7 +100,7 @@
 - [x] Users should be able to create an order with a product.
 - [x] Users should be able to read all the products they have an order.
 - [x] Users should be able to read orders for all of their products.
-- [ ] Server admin should be able to change the status of a order.
+- [x] Users should be able to change status of their products orders.
 - [x] Order should have status of: PENDING_PAYMENT, FAILED_PAYMENT, PAID, SENT, ON_DELIVERY, DELIVERED.
 - [x] Users should be able to filter their orders by status.
 - [x] Users should be able to filter their sales by status.
