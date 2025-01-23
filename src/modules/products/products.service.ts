@@ -32,7 +32,6 @@ export class ProductsService {
     private readonly departmentsService: DepartmentsService,
   ) {}
 
-  @UseGuards(AccessTokenGuard)
   public async create(
     user_id: string,
     data: CreateProductDto,
