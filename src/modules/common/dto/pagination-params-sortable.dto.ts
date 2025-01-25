@@ -8,15 +8,15 @@ export class PaginationParamsSortableDto {
   @IsNumber()
   @IsInt()
   @Min(1)
-  page: number;
+  page?: number;
 
   @IsOptional()
   @Type(() => Number)
   @Min(1)
   @IsInt()
-  size: number;
+  size?: number;
 
   @IsOptional()
   @IsEnum(OrderByOptionsEnum)
-  orderBy: string;
+  orderBy?: string;
 }

@@ -1,3 +1,7 @@
+class ImageDto {
+  url: string;
+}
+
 export class ProductDTO {
   id: string;
   user_id: string;
@@ -13,5 +17,5 @@ export class ProductDTO {
   thumbnail_image_url: string | null;
   created_at: Date;
   updated_at: Date;
-  images: { url: string }[];
+  images: ImageDto[];
 }

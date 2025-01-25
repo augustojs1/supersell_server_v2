@@ -7,11 +7,11 @@ export class PaginationParamsDto {
   @IsNumber()
   @IsInt()
   @Min(1)
-  page: number;
+  page?: number;
 
   @IsOptional()
   @Type(() => Number)
   @Min(1)
   @IsInt()
-  size: number;
+  size?: number;
 }

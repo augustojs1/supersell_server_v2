@@ -18,6 +18,14 @@ import {
   FileFieldsInterceptor,
   FilesInterceptor,
 } from '@nest-lab/fastify-multer';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { ProductsService } from './products.service';
 import { CreateProductDto, ProductDTO, UpdateProductDto } from './dto';
@@ -27,7 +35,9 @@ import { CurrentUser } from '../auth/types';
 import { ProductsImagesService } from '../products_images/products_images.service';
 import { ProductImages } from './types/product-images.type';
 import { ProductsTextResultDto } from './dto/response/products-text-result.dto';
+import { FileDto } from '@/modules/common/dto';
 
+@ApiTags('Products')
 @Controller('products')
 export class ProductsController {
   constructor(
@@ -36,6 +46,18 @@ export class ProductsController {
   ) {}
 
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a new product' })
+  @ApiResponse({ status: 201, description: 'Product successfully created!' })
+  @ApiResponse({
+    status: 400,
+    description: `
+      - Product with this name already exists!
+      - Product with this SKU already exists!
+      - Department with this id does not exists!
+      - Product can not be related to a parent department!
+    `,
+  })
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -57,6 +79,32 @@ export class ProductsController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Remove a image from a product' })
+  @ApiParam({
+    name: 'product_image_id',
+    description: 'Id of the image to be removed from the product.',
+    allowEmptyValue: false,
+    required: true,
+    example: '1',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Product image successfully removed!',
+  })
+  @ApiResponse({
+    status: 400,
+    description: `
+      - Product image with this id does not exists!
+      - Product with this SKU already exists!
+      - Department with this id does not exists!
+      - Product can not be related to a parent department!
+    `,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'User can not delete this product image!',
+  })
   @Delete('/product-image/:product_image_id')
   public async deleteProductImage(
     @Param('product_image_id') product_image_id: string,
@@ -66,6 +114,37 @@ export class ProductsController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Add an image to an owned product' })
+  @ApiParam({
+    name: 'product_id',
+    description: 'Id of the image to be removed from the product.',
+    allowEmptyValue: false,
+    required: true,
+    example: '1',
+  })
+  @ApiCreatedResponse({
+    description: 'Product image succesfully created!',
+    type: FileDto,
+    isArray: true,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized!',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Product with this id does not exists!',
+  })
+  @ApiResponse({
+    status: 422,
+    description: `Product image with this id does not exists!
+    `,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'User does not own this product',
+  })
   @Post(':product_id/images')
   @UseInterceptors(FilesInterceptor('image'))
   public async uploadImages(
@@ -77,7 +156,7 @@ export class ProductsController {
       }),
     )
     product_images: File[],
-  ): Promise<File[]> {
+  ): Promise<FileDto[]> {
     return await this.productsService.addImages(
       user.sub,
       product_id,
@@ -86,6 +165,29 @@ export class ProductsController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a product' })
+  @ApiParam({
+    name: 'product_id',
+    description: 'Id of the product to be edited',
+    allowEmptyValue: false,
+    required: true,
+  })
+  @ApiCreatedResponse({
+    description: 'Product succesfully updated!',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized!',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Product with this id does not exists!',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'User does not own this product.',
+  })
   @Patch(':product_id')
   public async updateProduct(
     @Param('product_id') product_id: string,
@@ -96,6 +198,26 @@ export class ProductsController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete a product' })
+  @ApiParam({
+    name: 'product_id',
+    description: 'Id of the product to be deleted',
+    allowEmptyValue: false,
+    required: true,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized!',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Product with this id does not exists!',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'User does not own this product.',
+  })
   @Delete(':product_id')
   public async delete(
     @Param('product_id') product_id: string,
@@ -104,6 +226,13 @@ export class ProductsController {
     return await this.productsService.delete(user.sub, product_id);
   }
 
+  @ApiOperation({ summary: 'Search products by name' })
+  @ApiParam({
+    name: 'name',
+    description: 'Name of product to search',
+    allowEmptyValue: false,
+    required: true,
+  })
   @Get()
   public async getProductByName(
     @Query('name') name: string,
@@ -111,6 +240,17 @@ export class ProductsController {
     return await this.productsService.findByName(name);
   }
 
+  @ApiOperation({ summary: 'Get a product by id' })
+  @ApiParam({
+    name: 'product_id',
+    description: 'Id of the product to returned',
+    allowEmptyValue: false,
+    required: true,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Product with this id does not exists!',
+  })
   @Get(':product_id')
   public async getById(
     @Param('product_id') product_id: string,

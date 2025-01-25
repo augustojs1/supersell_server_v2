@@ -12,6 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor, File } from '@nest-lab/fastify-multer';
+import { ApiParam, ApiQuery } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
 import { GetCurrentUserDecorator } from '../auth/decorators';
@@ -59,6 +60,22 @@ export class UsersController {
   }
 
   @Get(':user_id/products')
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    example: 1,
+    description: 'Result page',
+  })
+  @ApiQuery({
+    name: 'size',
+    required: false,
+    example: 5,
+    description: 'Limit of results per page',
+  })
+  @ApiParam({
+    name: 'user_id',
+    description: 'Id of user owned products',
+  })
   public async findUserProducts(
     @Param('user_id') user_id: string,
     @Query() paginationParams: PaginationParamsDto,

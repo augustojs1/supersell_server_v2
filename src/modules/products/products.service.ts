@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UseGuards,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { File } from '@nest-lab/fastify-multer';
 
 import { ProductsRepository } from './products.repository';
@@ -15,7 +10,6 @@ import {
 } from './dto';
 import { ProductEntity } from './types';
 import { DepartmentsService } from '../departments/departments.service';
-import { AccessTokenGuard } from '../auth/guards';
 import { ProductsImagesService } from '../products_images/products_images.service';
 import { ProductImages } from './types/product-images.type';
 import {
@@ -178,7 +172,7 @@ export class ProductsService {
     user_id: string,
     product_id: string,
     images: File[],
-  ): Promise<File[]> {
+  ): Promise<any> {
     const product = await this.findByIdElseThrow(product_id);
 
     await this.checkProductOwnershipElseThrow(user_id, product.id);
