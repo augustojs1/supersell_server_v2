@@ -12,7 +12,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor, File } from '@nest-lab/fastify-multer';
-import { ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
 import { GetCurrentUserDecorator } from '../auth/decorators';
@@ -31,6 +37,14 @@ export class UsersController {
     private readonly productsService: ProductsService,
   ) {}
 
+  @ApiOperation({
+    summary: 'Update a profile.',
+  })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Succesfully updated profile!',
+  })
   @UseGuards(AccessTokenGuard)
   @Patch('profile')
   public async updateProfile(
@@ -40,6 +54,14 @@ export class UsersController {
     return this.usersService.updateProfile(user.sub, data);
   }
 
+  @ApiOperation({
+    summary: 'Add a avatar to profile',
+  })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Succesfully updated a profile!',
+  })
   @UseGuards(AccessTokenGuard)
   @Patch('profile/avatar')
   @UseInterceptors(FileInterceptor('avatar'))
@@ -59,7 +81,9 @@ export class UsersController {
     return this.usersService.updateAvatar(user.sub, avatar_file);
   }
 
-  @Get(':user_id/products')
+  @ApiOperation({
+    summary: 'Read all products from a user.',
+  })
   @ApiQuery({
     name: 'page',
     required: false,
@@ -76,6 +100,15 @@ export class UsersController {
     name: 'user_id',
     description: 'Id of user owned products',
   })
+  @ApiResponse({
+    status: 200,
+    description: 'Succesfully read all products from user!',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User with this id does no exists!',
+  })
+  @Get(':user_id/products')
   public async findUserProducts(
     @Param('user_id') user_id: string,
     @Query() paginationParams: PaginationParamsDto,
@@ -88,6 +121,20 @@ export class UsersController {
     );
   }
 
+  @ApiOperation({
+    summary: 'Read a user profile by Id',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Id of user profile',
+    allowEmptyValue: false,
+    required: true,
+    example: '1',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Succesfully read a user profile!',
+  })
   @Get(':user_id/profile')
   public async getProfile(
     @Param('user_id') user_id: string,

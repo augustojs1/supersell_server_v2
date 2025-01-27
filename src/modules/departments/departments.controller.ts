@@ -139,7 +139,7 @@ export class DepartmentsController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Succesfully updated a delete!',
+    description: 'Succesfully deleted a department',
   })
   @ApiResponse({
     status: 404,
