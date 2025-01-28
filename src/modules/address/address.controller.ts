@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 import { AddressService } from './address.service';
 import { AddressDTO, CreateAddressDto, UpdateAddressDto } from './dto';
@@ -19,6 +20,10 @@ import { CurrentUser } from '../auth/types';
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
+  @ApiOperation({
+    summary: 'Create a new address.',
+  })
+  @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @Post()
   public async create(
@@ -28,6 +33,10 @@ export class AddressController {
     return await this.addressService.create(createAddressDto, user.sub);
   }
 
+  @ApiOperation({
+    summary: 'Read all user address.',
+  })
+  @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @Get()
   public async findAll(
@@ -36,6 +45,10 @@ export class AddressController {
     return await this.addressService.findAll(user.sub);
   }
 
+  @ApiOperation({
+    summary: 'Edit an existent product.',
+  })
+  @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @Patch(':id')
   public async update(
@@ -46,6 +59,10 @@ export class AddressController {
     await this.addressService.update(id, user.sub, updateAddressDto);
   }
 
+  @ApiOperation({
+    summary: 'Delete an existent product.',
+  })
+  @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @Delete(':id')
   public async remove(
