@@ -58,6 +58,8 @@ export class AuthService {
       password: hashedPassword,
     });
 
+    await this.usersService.createProfile(newUser.id);
+
     const token = await this.getToken(newUser.id, newUser.email);
 
     return token;

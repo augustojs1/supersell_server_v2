@@ -28,6 +28,10 @@ export class UsersService {
     return createdUser;
   }
 
+  public async createProfile(id: string): Promise<void> {
+    await this.usersRepository.createProfile(id);
+  }
+
   public async findUserByEmail(email: string): Promise<UserEntity | null> {
     const user = await this.usersRepository.findUserByEmail(email);
 

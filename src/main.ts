@@ -45,7 +45,7 @@ async function bootstrap() {
 
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(PORT ?? 3000);
+  await app.listen(PORT ?? 3000, '0.0.0.0');
 
   console.log(`Server running in ${NODE_ENV} mode on port ${PORT}! 🚀`);
 }
