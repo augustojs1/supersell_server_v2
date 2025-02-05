@@ -171,4 +171,9 @@ export class ShoppingCartsController {
   ) {
     return await this.shoppingCartsService.checkout(user.sub, dto);
   }
+
+  @Post('/payment')
+  public async payment() {
+    return await this.shoppingCartsService.payment();
+  }
 }

@@ -5,6 +5,7 @@ import { ShoppingCartsRepository } from './shopping-carts.repository';
 import { ProductItem, ShoppingCartEntity } from './types';
 import { CheckoutOrderDTO, ShoppingCartItemsDTO } from './dto';
 import { OrderService } from '../order/order.service';
+import { PaymentBrokerService } from '@/infra/messaging/brokers/';
 
 @Injectable()
 export class ShoppingCartsService {
@@ -12,6 +13,7 @@ export class ShoppingCartsService {
     private readonly shoppingCartRepository: ShoppingCartsRepository,
     private readonly productsService: ProductsService,
     private readonly orderService: OrderService,
+    private readonly paymentBrokerService: PaymentBrokerService,
   ) {}
 
   public async findByUserIdIfThrow(user_id: string) {
@@ -201,5 +203,9 @@ export class ShoppingCartsService {
     return items.reduce((acc, item) => {
       return acc + item.subtotal_price;
     }, 0);
+  }
+
+  public async payment() {
+    return this.paymentBrokerService.sendOrderPaymentMessage();
   }
 }
