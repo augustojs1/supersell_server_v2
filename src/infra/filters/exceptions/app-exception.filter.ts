@@ -11,8 +11,6 @@ export class AppExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(AppExceptionFilter.name);
 
   catch(exception: any, host: ArgumentsHost) {
-    console.log(exception);
-
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();

@@ -54,7 +54,7 @@ export class AddressService {
     return await this.addressRepository.findAllByUserId(user_id);
   }
 
-  private async findByIdElseThrow(id: string): Promise<AddressEntity> {
+  public async findByIdElseThrow(id: string): Promise<AddressEntity> {
     const address = await this.addressRepository.findById(id);
 
     if (!address) {
@@ -67,7 +67,7 @@ export class AddressService {
     return address;
   }
 
-  private checkUserIsOwnerElseThrow(
+  public checkUserIsOwnerElseThrow(
     address_user_id: string,
     user_id: string,
   ): void {

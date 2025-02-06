@@ -10,5 +10,6 @@ import { AuthModule } from '../auth/auth.module';
   controllers: [AddressController],
   imports: [AuthModule],
   providers: [AddressService, CountriesRepository, AddressRepository],
+  exports: [AddressService],
 })
 export class AddressModule {}

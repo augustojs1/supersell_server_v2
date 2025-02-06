@@ -2,18 +2,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { ProductsService } from '../products/products.service';
 import { ShoppingCartsRepository } from './shopping-carts.repository';
-import { ProductItem, ShoppingCartEntity } from './types';
-import { CheckoutOrderDTO, ShoppingCartItemsDTO } from './dto';
-import { OrderService } from '../order/order.service';
-import { PaymentBrokerService } from '@/infra/messaging/brokers/';
+import { ShoppingCartEntity } from './types';
+import { ShoppingCartItemsDTO } from './dto';
 
 @Injectable()
 export class ShoppingCartsService {
   constructor(
     private readonly shoppingCartRepository: ShoppingCartsRepository,
     private readonly productsService: ProductsService,
-    private readonly orderService: OrderService,
-    private readonly paymentBrokerService: PaymentBrokerService,
   ) {}
 
   public async findByUserIdIfThrow(user_id: string) {
@@ -170,42 +166,5 @@ export class ShoppingCartsService {
       user_id,
       total_price: updatedTotalPrice,
     });
-  }
-
-  public async checkout(id: string, data: CheckoutOrderDTO) {
-    try {
-      const shoppingCartItems = await this.findAll(id);
-
-      const shoppingCartId = shoppingCartItems[0].shopping_cart.id;
-
-      for (const order of shoppingCartItems) {
-        const orderTotalPrice = this.getOrderTotalPrice(order.items);
-
-        await this.shoppingCartRepository.checkOutFlowTrx(
-          shoppingCartId,
-          id,
-          order,
-          orderTotalPrice,
-          data.delivery_address_id,
-        );
-      }
-
-      return {
-        status: HttpStatus.CREATED,
-        message: 'Order created succesfully!',
-      };
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  public getOrderTotalPrice(items: ProductItem[]): number {
-    return items.reduce((acc, item) => {
-      return acc + item.subtotal_price;
-    }, 0);
-  }
-
-  public async payment() {
-    return this.paymentBrokerService.sendOrderPaymentMessage();
   }
 }

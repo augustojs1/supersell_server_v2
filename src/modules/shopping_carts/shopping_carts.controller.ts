@@ -21,7 +21,6 @@ import { AccessTokenGuard } from '../auth/guards';
 import { GetCurrentUserDecorator } from '../auth/decorators';
 import { CurrentUser } from '../auth/types';
 import {
-  CheckoutOrderDTO,
   CreateShoppingCartItemDto,
   ShoppingCartItemsDTO,
   UpdateItemQuantityDTO,
@@ -143,37 +142,5 @@ export class ShoppingCartsController {
     @GetCurrentUserDecorator() user: CurrentUser,
   ) {
     return await this.shoppingCartsService.remove(user.sub, product_id);
-  }
-
-  @UseGuards(AccessTokenGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create order with items from shopping cart.' })
-  @ApiParam({
-    name: 'product_id',
-    description: 'Id of product to remove from shopping cart.',
-    allowEmptyValue: false,
-    required: true,
-    example: 1,
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Succesfully created orders from shopping cart items',
-  })
-  @ApiResponse({
-    status: 400,
-    description:
-      'An error occured when trying to create order from shopping cart item',
-  })
-  @Post('/checkout')
-  public async checkout(
-    @GetCurrentUserDecorator() user: CurrentUser,
-    @Body() dto: CheckoutOrderDTO,
-  ) {
-    return await this.shoppingCartsService.checkout(user.sub, dto);
-  }
-
-  @Post('/payment')
-  public async payment() {
-    return await this.shoppingCartsService.payment();
   }
 }
