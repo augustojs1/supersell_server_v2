@@ -2,14 +2,18 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 import { PaymentBrokerService } from './brokers/payment-broker.service';
+import { configuration } from '../config/configuration';
 
 @Module({
   imports: [
     ClientsModule.register([
       {
-        name: 'CORE',
+        name: 'EXTERNAL_SERVICE_MICROSERVICE',
         transport: Transport.TCP,
-        options: { port: 8080, host: '127.0.0.1' },
+        options: {
+          port: configuration().supersell_external_service.port,
+          host: configuration().supersell_external_service.host,
+        },
       },
     ]),
   ],

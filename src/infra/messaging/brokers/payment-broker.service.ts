@@ -6,7 +6,8 @@ import { MessagingTopics } from '../enum';
 @Injectable()
 export class PaymentBrokerService {
   constructor(
-    @Inject('CORE') private readonly paymentMessagingClient: ClientProxy,
+    @Inject('EXTERNAL_SERVICE_MICROSERVICE')
+    private readonly paymentMessagingClient: ClientProxy,
   ) {}
 
   public sendOrderPaymentMessage() {
