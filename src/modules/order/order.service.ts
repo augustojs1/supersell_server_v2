@@ -13,6 +13,8 @@ import { OrderStatus } from './enums';
 import { ProductItem } from '../shopping_carts/types';
 import { ShoppingCartsService } from '../shopping_carts/shopping_carts.service';
 import { AddressService } from '../address/address.service';
+import { OrderPaymentDto } from './dto/request/order-payment.dto';
+import { PaymentBrokerService } from '@/infra/messaging/brokers';
 
 @Injectable()
 export class OrderService {
@@ -21,6 +23,7 @@ export class OrderService {
     private readonly orderItemRepository: OrderItemRepository,
     private readonly shoppingCartService: ShoppingCartsService,
     private readonly addressService: AddressService,
+    private readonly paymentBrokerService: PaymentBrokerService,
   ) {}
 
   public async create(data: CreateOrderData): Promise<string> {
@@ -110,5 +113,36 @@ export class OrderService {
     return items.reduce((acc, item) => {
       return acc + item.subtotal_price;
     }, 0);
+  }
+
+  public async payOrder(
+    user_id: string,
+    order_id: string,
+    dto: OrderPaymentDto,
+  ) {
+    const order = await this.findByIdElseThrow(order_id);
+
+    if (order.customer_id !== user_id) {
+      throw new ForbiddenException(
+        'Only order customers can pay for an order!!',
+      );
+    }
+
+    if (
+      order.status !== OrderStatus.PENDING_PAYMENT &&
+      order.status !== OrderStatus.FAILED_PAYMENT
+    ) {
+      throw new ForbiddenException(
+        `Only orders with ${OrderStatus.PENDING_PAYMENT} or ${OrderStatus.FAILED_PAYMENT} status can be paid!`,
+      );
+    }
+
+    this.paymentBrokerService.sendOrderPaymentMessage({
+      order: {
+        id: order.id,
+        total_price: order.total_price,
+      },
+      ...dto,
+    });
   }
 }

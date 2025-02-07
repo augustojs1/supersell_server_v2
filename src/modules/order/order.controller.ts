@@ -26,6 +26,7 @@ import {
   UpdateOrderStatusDto,
 } from './dto';
 import { OrderStatus } from './enums';
+import { OrderPaymentDto } from './dto/request/order-payment.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -109,5 +110,15 @@ export class OrderController {
     @GetCurrentUserDecorator() user: CurrentUser,
   ) {
     return await this.orderService.checkout(user.sub, data);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('/:order_id/pay')
+  public async payOrder(
+    @Body() dto: OrderPaymentDto,
+    @Param('order_id') order_id: string,
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ) {
+    return await this.orderService.payOrder(user.sub, order_id, dto);
   }
 }
