@@ -1,4 +1,4 @@
-import { Controller, Body, Post, UseGuards, Get } from '@nestjs/common';
+import { Controller, Body, Post, UseGuards, Get, Patch } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { SignUpDto, SignInDto, SignInSuccesDto, UserProfileDto } from './dto';
@@ -61,5 +61,13 @@ export class AuthController {
     @GetCurrentUserDecorator() user: CurrentUser,
   ): Promise<UserProfileDto> {
     return await this.authService.getMe(user.sub);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch('/request-password-reset')
+  public async requestPasswordReset(
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ) {
+    await this.authService.requestPasswordReset(user.sub);
   }
 }

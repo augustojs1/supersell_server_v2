@@ -124,9 +124,9 @@
 
 ### #Payments
 
-- [ ] Users should be able to pay for an order.
-- [ ] Payment info should be stored in database.
-- [ ] Increment sales ammount after successfully payment for a order.
+- [x] Users should be able to pay for an order.
+- [x] Payment info should be stored in database.
+- [ ] Increment sales ammount after an order payment is successfull.
 
 ### #Emails
 

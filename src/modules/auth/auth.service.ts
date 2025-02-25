@@ -7,6 +7,7 @@ import { HashProvider } from './providers/hash.providers';
 import { Token } from './types/token.type';
 import { SignInDto, SignUpDto } from './dto';
 import { UserProfileDto } from './dto';
+import { EmailBrokerService } from '@/infra/messaging/brokers/email-broker.service';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +16,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
     private readonly hashProvider: HashProvider,
+    private readonly emailBrokerService: EmailBrokerService,
   ) {}
 
   public async hashData(data: string): Promise<string> {
@@ -94,5 +96,15 @@ export class AuthService {
 
   public async getMe(userId: string): Promise<UserProfileDto> {
     return await this.usersService.findUserProfile(userId);
+  }
+
+  public async requestPasswordReset(id: string) {
+    const user = await this.usersService.findById(id);
+
+    this.emailBrokerService.emitEmailPasswordResetMessage({
+      id: user.id,
+      first_name: user.first_name,
+      email: user.email,
+    });
   }
 }

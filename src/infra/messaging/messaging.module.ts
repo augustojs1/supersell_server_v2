@@ -3,6 +3,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 
 import { PaymentBrokerService } from './brokers/payment-broker.service';
 import { configuration } from '../config/configuration';
+import { EmailBrokerService } from './brokers/email-broker.service';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { configuration } from '../config/configuration';
       },
     ]),
   ],
-  providers: [PaymentBrokerService],
-  exports: [ClientsModule, PaymentBrokerService],
+  providers: [PaymentBrokerService, EmailBrokerService],
+  exports: [ClientsModule, PaymentBrokerService, EmailBrokerService],
 })
 export class MessagingModule {}

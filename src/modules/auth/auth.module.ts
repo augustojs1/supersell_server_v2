@@ -9,6 +9,7 @@ import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { configuration } from '@/infra/config/configuration';
 import { AccessTokenGuard, AdminGuard } from './guards';
 import { ShoppingCartsModule } from '../shopping_carts/shopping_carts.module';
+import { MessagingModule } from '@/infra/messaging/messaging.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ShoppingCartsModule } from '../shopping_carts/shopping_carts.module';
     }),
     forwardRef(() => UsersModule),
     forwardRef(() => ShoppingCartsModule),
+    MessagingModule,
   ],
   providers: [
     AccessTokenGuard,
