@@ -130,7 +130,8 @@ export class OrderService {
 
     if (
       order.status !== OrderStatus.PENDING_PAYMENT &&
-      order.status !== OrderStatus.FAILED_PAYMENT
+      order.status !== OrderStatus.FAILED_PAYMENT &&
+      order.status !== OrderStatus.PAID
     ) {
       throw new ForbiddenException(
         `Only orders with ${OrderStatus.PENDING_PAYMENT} or ${OrderStatus.FAILED_PAYMENT} status can be paid!`,

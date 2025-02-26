@@ -383,66 +383,65 @@ ON
   products (name);
 
 -- Database triggers
--- TRIGGERS !!
 -- CREATE PRODUCT RATING TRIGGER!!
---DELIMITER $$
---
---CREATE TRIGGER calc_product_rating
---AFTER INSERT ON reviews
---FOR EACH ROW
---BEGIN
---    UPDATE products
---    SET average_rating = (
---        SELECT ROUND(SUM(r.rating) / COUNT(*), 2)
---        FROM reviews r
---        WHERE r.product_id = NEW.product_id
---    )
---    WHERE id = NEW.product_id;
---END$$
+DELIMITER $$
+
+CREATE TRIGGER calc_product_rating
+AFTER INSERT ON reviews
+FOR EACH ROW
+BEGIN
+   UPDATE products
+   SET average_rating = (
+       SELECT ROUND(SUM(r.rating) / COUNT(*), 2)
+       FROM reviews r
+       WHERE r.product_id = NEW.product_id
+   )
+   WHERE id = NEW.product_id;
+END$$
 
 --CREATE USER RATING PRODUCT TRIGGER!!
---DELIMITER ;
---CREATE TRIGGER calc_user_rating
---AFTER INSERT ON reviews
---FOR EACH ROW
---BEGIN
---    UPDATE 
---        profiles AS pf
---     SET
---         pf.average_rating = (
---             SELECT 
---                 ROUND(SUM(r.rating) / COUNT(*), 2) 
---             FROM
---                 reviews AS r
---             INNER JOIN
---                 products AS pr
---             ON
---                 pr.id = r.product_id
---            INNER JOIN
---                 users AS u
---             ON
---                 u.id = pr.user_id
---             WHERE
---                 pr.user_id = (
---                    SELECT
---                        u.id
---                    FROM
---                        products AS p
---                     INNER JOIN
---                         users AS u
---                     ON
---                         u.id = p.user_id
---                     WHERE
---                         p.id = NEW.product_id
---                 )				
---         )
---     WHERE
---         pf.user_id = (
---             SELECT 
---                 pr.user_id
---             FROM
---                 products AS pr
---             WHERE
---                 pr.id = NEW.product_id
---         );
---END;
+DELIMITER ;
+CREATE TRIGGER calc_user_rating
+AFTER INSERT ON reviews
+FOR EACH ROW
+BEGIN
+   UPDATE 
+       profiles AS pf
+    SET
+        pf.average_rating = (
+            SELECT 
+                ROUND(SUM(r.rating) / COUNT(*), 2) 
+            FROM
+                reviews AS r
+            INNER JOIN
+                products AS pr
+            ON
+                pr.id = r.product_id
+           INNER JOIN
+                users AS u
+            ON
+                u.id = pr.user_id
+            WHERE
+                pr.user_id = (
+                   SELECT
+                       u.id
+                   FROM
+                       products AS p
+                    INNER JOIN
+                        users AS u
+                    ON
+                        u.id = p.user_id
+                    WHERE
+                        p.id = NEW.product_id
+                )				
+        )
+    WHERE
+        pf.user_id = (
+            SELECT 
+                pr.user_id
+            FROM
+                products AS pr
+            WHERE
+                pr.id = NEW.product_id
+        );
+END;
