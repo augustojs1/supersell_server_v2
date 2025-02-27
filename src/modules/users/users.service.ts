@@ -77,4 +77,8 @@ export class UsersService {
 
     return await this.findUserByEmail(user.email);
   }
+
+  public async updateUserPassword(id: string, password: string): Promise<void> {
+    await this.usersRepository.updateUserPaswordById(id, password);
+  }
 }

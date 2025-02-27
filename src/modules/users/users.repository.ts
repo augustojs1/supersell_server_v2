@@ -119,4 +119,16 @@ export class UsersRepository {
       }
     });
   }
+
+  public async updateUserPaswordById(
+    id: string,
+    password: string,
+  ): Promise<void> {
+    await this.drizzle
+      .update(schema.users)
+      .set({
+        password: password,
+      } as UserEntity)
+      .where(eq(schema.users.id, id));
+  }
 }

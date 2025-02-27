@@ -1,11 +1,17 @@
 import { Controller, Body, Post, UseGuards, Get, Patch } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
-import { SignUpDto, SignInDto, SignInSuccesDto, UserProfileDto } from './dto';
+import {
+  SignUpDto,
+  SignInDto,
+  SignInSuccesDto,
+  UserProfileDto,
+  ResetPasswordDto,
+} from './dto';
 import { AccessTokenGuard } from './guards';
 import { GetCurrentUserDecorator } from './decorators';
 import { CurrentUser } from './types';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -69,5 +75,10 @@ export class AuthController {
     @GetCurrentUserDecorator() user: CurrentUser,
   ) {
     await this.authService.requestPasswordReset(user.sub);
+  }
+
+  @Post('/reset-password')
+  public async resetPassword(@Body() dto: ResetPasswordDto): Promise<void> {
+    await this.authService.resetPassword(dto);
   }
 }
