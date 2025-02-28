@@ -37,7 +37,7 @@
 
 - [x] Users should be able to sign up.
 - [x] Users should be able to sign in.
-- [ ] Users should be able to reset their password trough email.
+- [x] Users should be able to reset their password trough email.
 
 ### #Departments
 
@@ -126,9 +126,10 @@
 
 - [x] Users should be able to pay for an order.
 - [x] Payment info should be stored in database.
-- [ ] Increment sales ammount after an order payment is successfull.
+- [x] Increment sales ammount after an order payment is successfull.
 
 ### #Emails
 
-- [ ] Users should reset their password trough email.
+- [x] Users should reset their password trough email.
+- [ ] Users should be able to receive email confirmation after an order is successfull.
 - [ ] Users should receive email for every status their order get.
