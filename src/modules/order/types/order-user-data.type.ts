@@ -3,5 +3,6 @@ export class OrderUserData {
   status: string;
   customer_id: string;
   customer_name: string;
+  customer_email: string;
   seller_id: string;
 }

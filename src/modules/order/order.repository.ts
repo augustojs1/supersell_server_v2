@@ -60,6 +60,7 @@ export class OrderRepository {
         status: schemas.orders.status,
         customer_id: schemas.orders.id,
         customer_name: schemas.users.first_name,
+        customer_email: schemas.users.email,
         seller_id: schemas.orders.seller_id,
       })
       .from(schemas.orders)
