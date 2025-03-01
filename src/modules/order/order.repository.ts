@@ -5,7 +5,7 @@ import { ulid } from 'ulid';
 
 import * as schemas from '@/infra/database/orm/drizzle/schema';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
-import { CreateOrderData, OrderEntity } from './types';
+import { CreateOrderData, OrderEntity, OrderUserData } from './types';
 import { OrderSalesDTO } from './dto';
 import { OrderStatus } from './enums';
 import { ShoppingCartItemsDTO } from '../shopping_carts/dto';
@@ -35,6 +35,38 @@ export class OrderRepository {
     const result = await this.drizzle
       .select()
       .from(schemas.orders)
+      .where(eq(schemas.orders.id, id));
+
+    return result[0] ?? null;
+  }
+
+  public async findOrderCustomerByOrderId(
+    id: string,
+  ): Promise<OrderUserData | null> {
+    // SELECT
+    //   *
+    // FROM
+    //   orders o
+    // INNER JOIN
+    //   users u
+    // ON
+    //   o.customer_id = u.id
+    // WHERE
+    //   o.id = '';
+
+    const result = await this.drizzle
+      .select({
+        order_id: schemas.orders.id,
+        status: schemas.orders.status,
+        customer_id: schemas.orders.id,
+        customer_name: schemas.users.first_name,
+        seller_id: schemas.orders.seller_id,
+      })
+      .from(schemas.orders)
+      .innerJoin(
+        schemas.users,
+        eq(schemas.orders.customer_id, schemas.users.id),
+      )
       .where(eq(schemas.orders.id, id));
 
     return result[0] ?? null;

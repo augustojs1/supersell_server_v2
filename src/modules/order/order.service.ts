@@ -15,6 +15,7 @@ import { ShoppingCartsService } from '../shopping_carts/shopping_carts.service';
 import { AddressService } from '../address/address.service';
 import { OrderPaymentDto } from './dto/request/order-payment.dto';
 import { PaymentBrokerService } from '@/infra/messaging/brokers';
+import { EmailBrokerService } from '@/infra/messaging/brokers/email-broker.service';
 
 @Injectable()
 export class OrderService {
@@ -24,6 +25,7 @@ export class OrderService {
     private readonly shoppingCartService: ShoppingCartsService,
     private readonly addressService: AddressService,
     private readonly paymentBrokerService: PaymentBrokerService,
+    private readonly emailBrokerService: EmailBrokerService,
   ) {}
 
   public async create(data: CreateOrderData): Promise<string> {
@@ -69,13 +71,20 @@ export class OrderService {
     user_id: string,
     status: OrderStatus,
   ): Promise<void> {
-    const order = await this.findByIdElseThrow(id);
+    try {
+      const orderUser =
+        await this.orderRepository.findOrderCustomerByOrderId(id);
 
-    if (order.seller_id !== user_id) {
-      throw new ForbiddenException();
+      if (orderUser.seller_id !== user_id) {
+        throw new ForbiddenException();
+      }
+
+      await this.orderRepository.updateOrderStatus(orderUser.order_id, status);
+
+      this.emailBrokerService.emitEmailOrderStatusChangeMessage(orderUser);
+    } catch (error) {
+      throw error;
     }
-
-    return await this.orderRepository.updateOrderStatus(order.id, status);
   }
 
   public async checkout(id: string, data: CreateOrderDto) {
