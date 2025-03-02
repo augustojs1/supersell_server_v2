@@ -8,10 +8,6 @@ import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { CreateOrderData, OrderEntity, OrderUserData } from './types';
 import { OrderSalesDTO } from './dto';
 import { OrderStatus } from './enums';
-import { ShoppingCartItemsDTO } from '../shopping_carts/dto';
-import { ProductEntity } from '../products/types';
-import { OrderItemEntity } from './types/order-item-entity.type';
-import { ShoppingCartEntity } from '../shopping_carts/types';
 
 @Injectable()
 export class OrderRepository {
@@ -255,87 +251,5 @@ export class OrderRepository {
         status: status,
       })
       .where(eq(schemas.orders.id, id));
-  }
-
-  public async checkOutFlowTrx(
-    id: string,
-    user_id: string,
-    order: ShoppingCartItemsDTO,
-    orderTotalPrice: number,
-    deliveryAddressId: string,
-  ): Promise<void> {
-    await this.drizzle.transaction(async (tx) => {
-      try {
-        // Create order object
-        const orderData: CreateOrderData = {
-          customer_id: user_id,
-          seller_id: order.items[0].product_seller_id,
-          delivery_address_id: deliveryAddressId,
-          status: OrderStatus.PENDING_PAYMENT,
-          total_price: orderTotalPrice,
-        };
-
-        // Create order
-        const orderId = ulid();
-
-        await tx.insert(schemas.orders).values({
-          id: orderId,
-          ...orderData,
-        });
-
-        // Iterate trough shopping cart items
-        for (const item of order.items) {
-          if (item.quantity > item.product_quantity) {
-            throw new Error('Order ammount surpasses product stock ammount.');
-          }
-
-          // Update product quantity
-          const updatedQuantity = item.product_quantity - item.quantity;
-
-          // Delist product if update quantity is 0
-          if (updatedQuantity === 0) {
-            await tx
-              .update(schemas.products)
-              .set({
-                is_in_stock: false,
-              } as ProductEntity)
-              .where(eq(schemas.products.id, item.product_id));
-          }
-
-          await tx
-            .update(schemas.products)
-            .set({
-              quantity: updatedQuantity,
-            })
-            .where(eq(schemas.products.id, item.product_id));
-
-          // Create order item
-          await tx.insert(schemas.order_items).values({
-            id: ulid(),
-            order_id: orderId,
-            product_id: item.product_id,
-            price: item.product_price,
-            quantity: item.quantity,
-            subtotal_price: item.subtotal_price,
-          } as OrderItemEntity);
-        }
-
-        // Reset user shopping cart
-        // Set shopping cart total price to 0
-        await tx
-          .update(schemas.shopping_carts)
-          .set({
-            total_price: 0,
-          } as ShoppingCartEntity)
-          .where(eq(schemas.shopping_carts.id, id));
-
-        // Delete all shopping cart items associated to shopping cart
-        await tx
-          .delete(schemas.shopping_cart_item)
-          .where(eq(schemas.shopping_cart_item.shopping_cart_id, id));
-      } catch (error) {
-        throw error;
-      }
-    });
   }
 }

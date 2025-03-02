@@ -2,24 +2,36 @@ import {
   ForbiddenException,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
+import { MySql2Database } from 'drizzle-orm/mysql2';
 
+import * as schemas from '@/infra/database/orm/drizzle/schema';
 import { CreateOrderData, CreateOrderItemData, OrderEntity } from './types';
 import { OrderRepository } from './order.repository';
 import { OrderItemRepository } from './order-item.repository';
 import { CreateOrderDto, OrderSalesDTO, OrdersDTO } from './dto';
 import { OrderStatus } from './enums';
-import { ProductItem } from '../shopping_carts/types';
+import { ProductItem, ShoppingCartEntity } from '../shopping_carts/types';
 import { ShoppingCartsService } from '../shopping_carts/shopping_carts.service';
 import { AddressService } from '../address/address.service';
 import { OrderPaymentDto } from './dto/request/order-payment.dto';
 import { PaymentBrokerService } from '@/infra/messaging/brokers';
 import { EmailBrokerService } from '@/infra/messaging/brokers/email-broker.service';
+import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
+import { ulid } from 'ulid';
+import { ShoppingCartItemsDTO } from '../shopping_carts/dto';
+import { ProductEntity } from '../products/types';
+import { eq } from 'drizzle-orm';
+import { OrderItemEntity } from './types/order-item-entity.type';
 
 @Injectable()
 export class OrderService {
   constructor(
+    @Inject(DATABASE_TAG)
+    private readonly trxManager: MySql2Database<typeof schemas>,
     private readonly orderRepository: OrderRepository,
     private readonly orderItemRepository: OrderItemRepository,
     private readonly shoppingCartService: ShoppingCartsService,
@@ -101,7 +113,7 @@ export class OrderService {
       for (const order of shoppingCartItems) {
         const orderTotalPrice = this.getOrderTotalPrice(order.items);
 
-        await this.orderRepository.checkOutFlowTrx(
+        await this.checkOutFlowTrx(
           shoppingCartId,
           id,
           order,
@@ -109,6 +121,7 @@ export class OrderService {
           data.delivery_address_id,
         );
       }
+
       return {
         status: HttpStatus.CREATED,
         message: 'Order created succesfully!',
@@ -116,6 +129,88 @@ export class OrderService {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  public async checkOutFlowTrx(
+    id: string,
+    user_id: string,
+    order: ShoppingCartItemsDTO,
+    orderTotalPrice: number,
+    deliveryAddressId: string,
+  ): Promise<void> {
+    await this.trxManager.transaction(async (tx) => {
+      try {
+        // Create order object
+        const orderData: CreateOrderData = {
+          customer_id: user_id,
+          seller_id: order.items[0].product_seller_id,
+          delivery_address_id: deliveryAddressId,
+          status: OrderStatus.PENDING_PAYMENT,
+          total_price: orderTotalPrice,
+        };
+
+        // Create order
+        const orderId = ulid();
+
+        await tx.insert(schemas.orders).values({
+          id: orderId,
+          ...orderData,
+        });
+
+        // Iterate trough shopping cart items
+        for (const item of order.items) {
+          if (item.quantity > item.product_quantity) {
+            throw new Error('Order ammount surpasses product stock ammount.');
+          }
+
+          // Update product quantity
+          const updatedQuantity = item.product_quantity - item.quantity;
+
+          // Delist product if update quantity is 0
+          if (updatedQuantity === 0) {
+            await tx
+              .update(schemas.products)
+              .set({
+                is_in_stock: false,
+              } as ProductEntity)
+              .where(eq(schemas.products.id, item.product_id));
+          }
+
+          await tx
+            .update(schemas.products)
+            .set({
+              quantity: updatedQuantity,
+            })
+            .where(eq(schemas.products.id, item.product_id));
+
+          // Create order item
+          await tx.insert(schemas.order_items).values({
+            id: ulid(),
+            order_id: orderId,
+            product_id: item.product_id,
+            price: item.product_price,
+            quantity: item.quantity,
+            subtotal_price: item.subtotal_price,
+          } as OrderItemEntity);
+        }
+
+        // Reset user shopping cart
+        // Set shopping cart total price to 0
+        await tx
+          .update(schemas.shopping_carts)
+          .set({
+            total_price: 0,
+          } as ShoppingCartEntity)
+          .where(eq(schemas.shopping_carts.id, id));
+
+        // Delete all shopping cart items associated to shopping cart
+        await tx
+          .delete(schemas.shopping_cart_item)
+          .where(eq(schemas.shopping_cart_item.shopping_cart_id, id));
+      } catch (error) {
+        throw new InternalServerErrorException(error);
+      }
+    });
   }
 
   public getOrderTotalPrice(items: ProductItem[]): number {
@@ -133,7 +228,7 @@ export class OrderService {
 
     if (order.customer_id !== user_id) {
       throw new ForbiddenException(
-        'Only order customers can pay for an order!!',
+        'Only order customer can pay for an order!!',
       );
     }
 
