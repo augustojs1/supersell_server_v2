@@ -6,7 +6,7 @@ import { ulid } from 'ulid';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import * as schema from '@/infra/database/orm/drizzle/schema';
 import { CreateAddressDto, UpdateAddressDto } from './dto';
-import { AddressEntity } from './types';
+import { AddressEntity, UserAddress } from './types';
 import { AddressType } from './enums';
 
 @Injectable()
@@ -48,6 +48,22 @@ export class AddressRepository {
     const result = await this.drizzle
       .select()
       .from(schema.address)
+      .where(eq(schema.address.id, id));
+
+    return result[0] ?? null;
+  }
+
+  public async findUserAddressById(id: string): Promise<UserAddress | null> {
+    const result = await this.drizzle
+      .select({
+        address: schema.address,
+        user: {
+          first_name: schema.users.first_name,
+          email: schema.users.email,
+        },
+      })
+      .from(schema.address)
+      .innerJoin(schema.users, eq(schema.users.id, schema.address.user_id))
       .where(eq(schema.address.id, id));
 
     return result[0] ?? null;

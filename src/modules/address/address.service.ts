@@ -67,6 +67,19 @@ export class AddressService {
     return address;
   }
 
+  public async findByUserAddressIdElseThrow(id: string) {
+    const address = await this.addressRepository.findUserAddressById(id);
+
+    if (!address) {
+      throw new HttpException(
+        'Address with this id does not exists!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return address;
+  }
+
   public checkUserIsOwnerElseThrow(
     address_user_id: string,
     user_id: string,

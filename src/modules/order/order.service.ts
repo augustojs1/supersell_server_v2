@@ -1,11 +1,14 @@
 import {
+  BadRequestException,
   ForbiddenException,
   HttpException,
   HttpStatus,
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
+import { eq } from 'drizzle-orm';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 
 import * as schemas from '@/infra/database/orm/drizzle/schema';
@@ -24,11 +27,12 @@ import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { ulid } from 'ulid';
 import { ShoppingCartItemsDTO } from '../shopping_carts/dto';
 import { ProductEntity } from '../products/types';
-import { eq } from 'drizzle-orm';
 import { OrderItemEntity } from './types/order-item-entity.type';
 
 @Injectable()
 export class OrderService {
+  private readonly logger = new Logger(OrderService.name);
+
   constructor(
     @Inject(DATABASE_TAG)
     private readonly trxManager: MySql2Database<typeof schemas>,
@@ -100,26 +104,43 @@ export class OrderService {
   }
 
   public async checkout(id: string, data: CreateOrderDto) {
-    const deliveryAddress = await this.addressService.findByIdElseThrow(
-      data.delivery_address_id,
-    );
+    const deliveryAddress =
+      await this.addressService.findByUserAddressIdElseThrow(
+        data.delivery_address_id,
+      );
 
-    this.addressService.checkUserIsOwnerElseThrow(deliveryAddress.user_id, id);
+    this.addressService.checkUserIsOwnerElseThrow(
+      deliveryAddress.address.user_id,
+      id,
+    );
 
     try {
       const shoppingCartItems = await this.shoppingCartService.findAll(id);
       const shoppingCartId = shoppingCartItems[0].shopping_cart.id;
 
+      if (shoppingCartItems[0].items.length === 0) {
+        throw new BadRequestException('Shopping cart is empty!');
+      }
+
       for (const order of shoppingCartItems) {
         const orderTotalPrice = this.getOrderTotalPrice(order.items);
 
-        await this.checkOutFlowTrx(
+        const orderId = await this.checkOutFlowTrx(
           shoppingCartId,
           id,
           order,
           orderTotalPrice,
           data.delivery_address_id,
         );
+
+        this.emailBrokerService.emitEmailOrderReceiptMessage({
+          user: deliveryAddress.user,
+          order_id: orderId,
+          order_items: order.items,
+          order_total_price: orderTotalPrice,
+          order_created_at: new Date().toISOString(),
+          delivery_address: deliveryAddress.address,
+        });
       }
 
       return {
@@ -127,6 +148,10 @@ export class OrderService {
         message: 'Order created succesfully!',
       };
     } catch (error) {
+      this.logger.error(
+        `FAILED creating order for shopping cart id ${id}`,
+        error,
+      );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -137,8 +162,8 @@ export class OrderService {
     order: ShoppingCartItemsDTO,
     orderTotalPrice: number,
     deliveryAddressId: string,
-  ): Promise<void> {
-    await this.trxManager.transaction(async (tx) => {
+  ): Promise<string> {
+    return await this.trxManager.transaction(async (tx) => {
       try {
         // Create order object
         const orderData: CreateOrderData = {
@@ -207,7 +232,14 @@ export class OrderService {
         await tx
           .delete(schemas.shopping_cart_item)
           .where(eq(schemas.shopping_cart_item.shopping_cart_id, id));
+
+        this.logger.log(
+          `SUCCESS creating order #${orderId} for shopping cart id #${id}.`,
+        );
+
+        return orderId;
       } catch (error) {
+        this.logger.error(`FAIL creating order for shopping cart #${id}.`);
         throw new InternalServerErrorException(error);
       }
     });
@@ -224,6 +256,10 @@ export class OrderService {
     order_id: string,
     dto: OrderPaymentDto,
   ) {
+    this.logger.log(
+      `Received new order payment request for order #${order_id}`,
+    );
+
     const order = await this.findByIdElseThrow(order_id);
 
     if (order.customer_id !== user_id) {

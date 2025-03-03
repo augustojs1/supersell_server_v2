@@ -131,5 +131,5 @@
 ### #Emails
 
 - [x] Users should reset their password trough email.
-- [ ] Users should be able to receive email confirmation after an order is successfull.
-- [ ] Users should receive email for every status their order get.
+- [x] Users should be able to receive email confirmation after an order is successfull.
+- [x] Users should receive email for every status their order get.
