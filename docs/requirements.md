@@ -104,6 +104,7 @@
 - [x] Order should have status of: PENDING_PAYMENT, FAILED_PAYMENT, PAID, SENT, ON_DELIVERY, DELIVERED.
 - [x] Users should be able to filter their orders by status.
 - [x] Users should be able to filter their sales by status.
+- [x] Users should be able to cancel their orders.
 
 ### #Address
 

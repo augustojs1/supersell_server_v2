@@ -8,6 +8,7 @@ import { OrderItemRepository } from './order-item.repository';
 import { ShoppingCartsModule } from '../shopping_carts/shopping_carts.module';
 import { MessagingModule } from '@/infra/messaging/messaging.module';
 import { AddressModule } from '../address/address.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   controllers: [OrderController],
@@ -17,6 +18,7 @@ import { AddressModule } from '../address/address.module';
     ShoppingCartsModule,
     AddressModule,
     MessagingModule,
+    UsersModule,
   ],
   exports: [OrderService],
 })

@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 import { MessagingTopics } from '../enum';
+import { EmailOrderStatusChangeDto } from './dto';
 
 @Injectable()
 export class EmailBrokerService {
@@ -19,7 +20,9 @@ export class EmailBrokerService {
     );
   }
 
-  public emitEmailOrderStatusChangeMessage(payload: any): void {
+  public emitEmailOrderStatusChangeMessage(
+    payload: EmailOrderStatusChangeDto,
+  ): void {
     this.messagingClient.emit(
       MessagingTopics.EMAIL_ORDER_STATUS_CHANGE,
       payload,

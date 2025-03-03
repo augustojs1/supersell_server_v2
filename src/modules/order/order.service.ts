@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { MySql2Database } from 'drizzle-orm/mysql2';
+import { ulid } from 'ulid';
 
 import * as schemas from '@/infra/database/orm/drizzle/schema';
 import { CreateOrderData, CreateOrderItemData, OrderEntity } from './types';
@@ -24,10 +25,10 @@ import { OrderPaymentDto } from './dto/request/order-payment.dto';
 import { PaymentBrokerService } from '@/infra/messaging/brokers';
 import { EmailBrokerService } from '@/infra/messaging/brokers/email-broker.service';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
-import { ulid } from 'ulid';
 import { ShoppingCartItemsDTO } from '../shopping_carts/dto';
 import { ProductEntity } from '../products/types';
 import { OrderItemEntity } from './types/order-item-entity.type';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class OrderService {
@@ -42,6 +43,7 @@ export class OrderService {
     private readonly addressService: AddressService,
     private readonly paymentBrokerService: PaymentBrokerService,
     private readonly emailBrokerService: EmailBrokerService,
+    private readonly usersService: UsersService,
   ) {}
 
   public async create(data: CreateOrderData): Promise<string> {
@@ -285,5 +287,76 @@ export class OrderService {
       },
       ...dto,
     });
+  }
+
+  public async cancel(user_id: string, order_id: string) {
+    // get order
+    const order = await this.findByIdElseThrow(order_id);
+
+    // check if order is owned by the user
+    if (order.customer_id !== user_id) {
+      throw new ForbiddenException('Only customer user can cancel an order!');
+    }
+
+    // check if order status is pending_payment
+    if (
+      order.status !== OrderStatus.PENDING_PAYMENT &&
+      order.status !== OrderStatus.FAILED_PAYMENT
+    ) {
+      throw new ForbiddenException(
+        `Order can only be cancelled when in status ${OrderStatus.PENDING_PAYMENT} or ${OrderStatus.FAILED_PAYMENT}`,
+      );
+    }
+
+    try {
+      // return product quantity to original value
+      const orderItems = await this.orderRepository.findOrderByCustomerId(
+        user_id,
+        undefined,
+      );
+
+      for (const item of orderItems) {
+        await this.trxManager.transaction(async (tx) => {
+          try {
+            for (const ordered_item of item.order) {
+              await tx
+                .update(schemas.products)
+                .set({
+                  quantity:
+                    ordered_item.product_quantity + ordered_item.quantity,
+                })
+                .where(eq(schemas.products.id, ordered_item.product_id));
+
+              // set order status to CANCELLED
+              await tx
+                .update(schemas.orders)
+                .set({
+                  status: OrderStatus.CANCELLED,
+                })
+                .where(eq(schemas.orders.id, order_id));
+            }
+
+            const customer = await this.usersService.findById(user_id);
+
+            this.logger.log(`SUCCESS cancelling order #${order.id}`);
+
+            // send email to user
+            this.emailBrokerService.emitEmailOrderStatusChangeMessage({
+              order_id: order_id,
+              seller_id: order.seller_id,
+              customer_id: customer.id,
+              customer_email: customer.email,
+              customer_name: customer.first_name,
+              status: OrderStatus.CANCELLED,
+            });
+          } catch (error) {
+            throw error;
+          }
+        });
+      }
+    } catch (error) {
+      this.logger.error(`FAIL cancelling order #${order.id}:`, error);
+      throw new InternalServerErrorException(error);
+    }
   }
 }

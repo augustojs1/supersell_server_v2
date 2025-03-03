@@ -121,4 +121,13 @@ export class OrderController {
   ) {
     return await this.orderService.payOrder(user.sub, order_id, dto);
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch('/:order_id/cancel')
+  public async cancel(
+    @Param('order_id') order_id: string,
+    @GetCurrentUserDecorator() user: CurrentUser,
+  ): Promise<void> {
+    return await this.orderService.cancel(user.sub, order_id);
+  }
 }

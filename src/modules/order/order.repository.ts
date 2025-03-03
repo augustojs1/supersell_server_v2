@@ -105,6 +105,8 @@ export class OrderRepository {
             'description', ${schemas.products.description},
             'thumbnail_image_url', ${schemas.products.thumbnail_image_url},
             'quantity', ${schemas.order_items.quantity},
+            'product_id', ${schemas.products.id},
+            'product_quantity', ${schemas.products.quantity},
             'price', ${schemas.order_items.price},
             'subtotal_price', ${schemas.order_items.subtotal_price},
             'order_status', ${schemas.orders.status},
