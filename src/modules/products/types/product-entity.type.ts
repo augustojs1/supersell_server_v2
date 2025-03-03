@@ -7,6 +7,7 @@ export class ProductEntity {
   price: number;
   quantity: number;
   is_in_stock: boolean;
+  slug: string;
   average_rating: number;
   is_used: boolean;
   sales: number;

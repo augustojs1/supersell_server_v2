@@ -24,6 +24,7 @@ export const products = mysqlTable('products', {
   name: varchar({ length: 50 }).unique().notNull(),
   description: text().notNull(),
   sku: varchar({ length: 50 }).notNull(),
+  slug: varchar({ length: 255 }).notNull(),
   price: double({ precision: 13, scale: 2 }).notNull(),
   sales: int().$default(() => 0),
   thumbnail_image_url: text().notNull(),

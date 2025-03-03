@@ -9,6 +9,7 @@ import { DepartmentsModule } from '../departments/departments.module';
 import { DiskStorageService } from '@/infra/storage/disk-storage.service';
 import { ProductsImagesModule } from '../products_images/products_images.module';
 import { CommonModule } from '@/modules/common/common.module';
+import { SlugProvider } from './providers/slug.provider';
 
 const DISK_STORAGE_PATH = './.temp/uploads/products';
 
@@ -23,7 +24,7 @@ const DISK_STORAGE_PATH = './.temp/uploads/products';
     forwardRef(() => ProductsImagesModule),
     CommonModule,
   ],
-  providers: [ProductsService, ProductsRepository],
+  providers: [ProductsService, ProductsRepository, SlugProvider],
   exports: [ProductsService, ProductsRepository],
 })
 export class ProductsModule {}

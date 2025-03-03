@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { File } from '@nest-lab/fastify-multer';
 
 import { ProductsRepository } from './products.repository';
@@ -17,13 +17,17 @@ import {
   PaginationParamsSortableDto,
 } from '@/modules/common/dto';
 import { ProductsTextResultDto } from './dto/response/products-text-result.dto';
+import { SlugProvider } from './providers/slug.provider';
 
 @Injectable()
 export class ProductsService {
+  private readonly logger = new Logger(ProductsService.name);
+
   constructor(
     private readonly productsRepository: ProductsRepository,
     private readonly productImagesService: ProductsImagesService,
     private readonly departmentsService: DepartmentsService,
+    private readonly slugService: SlugProvider,
   ) {}
 
   public async create(
@@ -70,6 +74,10 @@ export class ProductsService {
       );
     }
 
+    const productSlug = this.slugService.slugify(data.name);
+
+    data.slug = productSlug;
+
     const createdProduct = await this.productsRepository.create(
       user_id,
       data,
@@ -80,6 +88,8 @@ export class ProductsService {
       createdProduct.id,
       product_images.images,
     );
+
+    this.logger.log(`SUCCESS created new product #${createdProduct.id}`);
 
     return createdProduct;
   }

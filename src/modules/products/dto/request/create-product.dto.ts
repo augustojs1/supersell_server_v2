@@ -25,6 +25,8 @@ export class CreateProductDto {
   @IsString()
   description: string;
 
+  slug?: string;
+
   @IsNotEmpty()
   @IsString()
   @MinLength(6)

@@ -48,6 +48,7 @@ export class WishlistsRepository {
         price: schema.products.price,
         quantity: schema.products.quantity,
         is_in_stock: schema.products.is_in_stock,
+        slug: schema.products.slug,
         sales: schema.products.sales,
         thumbnail_image_url: schema.products.thumbnail_image_url,
         average_rating: schema.products.average_rating,

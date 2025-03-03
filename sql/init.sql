@@ -47,6 +47,7 @@ CREATE TABLE products (
   description TEXT NOT NULL,
   price DECIMAL(13,2) NOT NULL,
   quantity INT NOT NULL,
+  slug VARCHAR(255) NOT NULL,
 	sales INT DEFAULT 0,
 	thumbnail_image_url TEXT NOT NULL,
   is_in_stock BOOLEAN DEFAULT 1,

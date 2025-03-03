@@ -14,6 +14,7 @@ export class ProductDTO {
   average_rating: number;
   is_used: boolean;
   sales: number;
+  slug: string;
   thumbnail_image_url: string | null;
   created_at: Date;
   updated_at: Date;

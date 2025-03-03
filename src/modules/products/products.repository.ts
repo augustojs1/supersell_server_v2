@@ -39,6 +39,7 @@ export class ProductsRepository {
       name: data.name,
       description: data.description,
       sku: data.sku,
+      slug: data.slug,
       thumbnail_image_url: thumbnail_image_url,
       price: parseFloat(data.price),
       is_used: data.is_used === 'true' ? true : false,
