@@ -11,6 +11,7 @@ services:
       MYSQL_ROOT_PASSWORD: '13371337'
     volumes:
       - ./sql:/docker-entrypoint-initdb.d
+
   # supersell_server_v2:
   #   build: .
   #   container_name: supersell_server
@@ -24,6 +25,18 @@ services:
   #   volumes:
   #     - .:/usr/app
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbit-mq-broker
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
 networks:
   supersell_network:
     driver: bridge
+
+volumes:
+  rabbitmq_data:

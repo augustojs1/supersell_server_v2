@@ -10,13 +10,37 @@ import { EmailBrokerService } from './brokers/email-broker.service';
     ClientsModule.register([
       {
         name: 'EXTERNAL_SERVICE_MICROSERVICE',
-        transport: Transport.TCP,
+        transport: Transport.RMQ,
         options: {
-          port: configuration().supersell_external_service.port,
-          host: configuration().supersell_external_service.host,
+          urls: ['amqp://localhost:5672'],
+          queue: 'email',
+          queueOptions: {
+            durable: true,
+          },
+        },
+      },
+      {
+        name: 'EXTERNAL_SERVICE_MICROSERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://localhost:5672'],
+          queue: 'payment',
+          queueOptions: {
+            durable: true,
+          },
         },
       },
     ]),
+    // ClientsModule.register([
+    //   {
+    //     name: 'EXTERNAL_SERVICE_MICROSERVICE',
+    //     transport: Transport.TCP,
+    //     options: {
+    //       port: configuration().supersell_external_service.port,
+    //       host: configuration().supersell_external_service.host,
+    //     },
+    //   },
+    // ]),
   ],
   providers: [PaymentBrokerService, EmailBrokerService],
   exports: [ClientsModule, PaymentBrokerService, EmailBrokerService],
