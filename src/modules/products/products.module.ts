@@ -6,7 +6,7 @@ import { ProductsController } from './products.controller';
 import { ProductsRepository } from './products.repository';
 import { AuthModule } from '../auth/auth.module';
 import { DepartmentsModule } from '../departments/departments.module';
-import { DiskStorageService } from '@/infra/storage/disk-storage.service';
+import { DiskStorageService } from '@/infra/storage/impl/disk-storage.service';
 import { ProductsImagesModule } from '../products_images/products_images.module';
 import { CommonModule } from '@/modules/common/common.module';
 import { SlugProvider } from './providers/slug.provider';

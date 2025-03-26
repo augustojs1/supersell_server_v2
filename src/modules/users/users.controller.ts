@@ -69,8 +69,9 @@ export class UsersController {
     @GetCurrentUserDecorator() user: CurrentUser,
     @UploadedFile(
       new ParseFilePipeBuilder()
+        .addFileTypeValidator({ fileType: /^image/ })
         .addMaxSizeValidator({
-          maxSize: 50000,
+          maxSize: 3_000_000, // 3 MB
         })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,

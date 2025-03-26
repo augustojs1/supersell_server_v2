@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { File } from '@nest-lab/fastify-multer';
 
 import { UsersRepository } from './users.repository';
@@ -6,10 +6,16 @@ import { CreateUserDto } from './dto/request/create-user.dto';
 import { UserEntity } from './types';
 import { UserProfileDto } from '../auth/dto';
 import { UpdateUserProfileDto } from './dto';
+import { AwsS3StorageService } from '@/infra/storage/impl/aws-s3-storage.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  private readonly logger = new Logger(UsersService.name);
+
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly awsS3StorageService: AwsS3StorageService,
+  ) {}
 
   public async create(createUserDto: CreateUserDto): Promise<any> {
     const user = await this.findUserByEmail(createUserDto.email);
@@ -56,7 +62,16 @@ export class UsersService {
   }
 
   public async updateAvatar(id: string, avatar_file: File): Promise<void> {
-    return this.usersRepository.updateAvatar(id, avatar_file.path);
+    this.logger.log(`Init update user ${id} avatar!`);
+
+    const path: string = `user_${id}/avatar`;
+
+    const uploadResponse = await this.awsS3StorageService.upload(
+      avatar_file,
+      path,
+    );
+
+    return this.usersRepository.updateAvatar(id, uploadResponse.Location);
   }
 
   public async findUserByIdElseThrow(user_id: string): Promise<void> {
