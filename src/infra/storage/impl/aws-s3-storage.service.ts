@@ -4,9 +4,9 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
-import * as AWS from 'aws-sdk';
 import { File } from '@nest-lab/fastify-multer';
+import S3 from 'aws-sdk/clients/s3';
+
 import { s3UploadResponse } from '../types';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class AwsS3StorageService {
   private readonly logger = new Logger(AwsS3StorageService.name);
 
   constructor(private readonly configService: ConfigService) {
-    this.s3Client = new AWS.S3({
+    this.s3Client = new S3({
       accessKeyId: this.AWS_ACCESS_KEY,
       secretAccessKey: this.AWS_SECRET_ACCESS_KEY,
     });
@@ -51,8 +51,9 @@ export class AwsS3StorageService {
       this.logger.log(
         `An error has occured while trying to upload to S3:: ${error}`,
       );
+      this.logger.log(error);
       throw new InternalServerErrorException(
-        'An error has occured while trying to upload an image ',
+        'An error has occured while trying to upload an image',
       );
     }
   }

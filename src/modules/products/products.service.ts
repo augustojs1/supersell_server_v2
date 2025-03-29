@@ -1,6 +1,17 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { File } from '@nest-lab/fastify-multer';
+import { ulid } from 'ulid';
+import { eq, sql } from 'drizzle-orm';
+import { MySql2Database } from 'drizzle-orm/mysql2';
 
+import * as schemas from '@/infra/database/orm/drizzle/schema';
 import { ProductsRepository } from './products.repository';
 import {
   CreateProductDto,
@@ -18,23 +29,30 @@ import {
 } from '@/modules/common/dto';
 import { ProductsTextResultDto } from './dto/response/products-text-result.dto';
 import { SlugProvider } from './providers/slug.provider';
+import { AwsS3StorageService } from '@/infra/storage/impl/aws-s3-storage.service';
+import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 
 @Injectable()
 export class ProductsService {
   private readonly logger = new Logger(ProductsService.name);
 
   constructor(
+    @Inject(DATABASE_TAG)
+    private readonly trxManager: MySql2Database<typeof schemas>,
     private readonly productsRepository: ProductsRepository,
     private readonly productImagesService: ProductsImagesService,
     private readonly departmentsService: DepartmentsService,
     private readonly slugService: SlugProvider,
+    private readonly storageService: AwsS3StorageService,
   ) {}
 
   public async create(
     user_id: string,
     data: CreateProductDto,
     product_images: ProductImages,
-  ): Promise<ProductEntity> {
+  ): Promise<any> {
+    this.logger.log(`Creating produt ${data.name} for user ${user_id}`);
+
     const product = await this.productsRepository.findByName(data.name);
 
     if (product) {
@@ -78,20 +96,96 @@ export class ProductsService {
 
     data.slug = productSlug;
 
-    const createdProduct = await this.productsRepository.create(
+    return await this.createProductAndSetImagesFlowTrx(
       user_id,
       data,
-      product_images.thumbnail_image[0].path,
+      product_images,
     );
+  }
 
-    await this.productImagesService.create(
-      createdProduct.id,
-      product_images.images,
-    );
+  private async createProductAndSetImagesFlowTrx(
+    user_id: string,
+    data: CreateProductDto,
+    product_images: ProductImages,
+  ) {
+    this.logger.log(`Init creating product transaction flow:: ${data}`);
 
-    this.logger.log(`SUCCESS created new product #${createdProduct.id}`);
+    return await this.trxManager.transaction(async (tx) => {
+      try {
+        const productId = ulid();
 
-    return createdProduct;
+        const thumbnailUrl = await this.storageService.upload(
+          product_images.thumbnail_image[0],
+          `user_${user_id}/products/product_${productId}`,
+        );
+
+        await tx.insert(schemas.products).values({
+          id: productId,
+          department_id: data.department_id,
+          user_id: user_id,
+          name: data.name,
+          description: data.description,
+          sku: data.sku,
+          slug: data.slug,
+          thumbnail_image_url: thumbnailUrl.Location,
+          price: parseFloat(data.price),
+          is_used: data.is_used,
+          quantity: parseInt(data.quantity),
+        });
+
+        this.logger.log(
+          'Uploading image to S3 and inserting into product_images table',
+        );
+        for (const image of product_images.images) {
+          const s3Response = await this.storageService.upload(
+            image,
+            `user_${user_id}/products/product_${productId}/images`,
+          );
+
+          await tx.insert(schemas.products_images).values({
+            id: ulid(),
+            product_id: productId,
+            url: s3Response.Location,
+          });
+        }
+
+        this.logger.log!(`Succesfully created product ${JSON.stringify(data)}`);
+
+        return tx
+          .select({
+            id: schemas.products.id,
+            user_id: schemas.products.user_id,
+            department_id: schemas.products.department_id,
+            name: schemas.products.name,
+            description: schemas.products.description,
+            price: schemas.products.price,
+            quantity: schemas.products.quantity,
+            is_in_stock: schemas.products.is_in_stock,
+            average_rating: schemas.products.average_rating,
+            is_used: schemas.products.is_used,
+            sales: schemas.products.sales,
+            thumbnail_image_url: schemas.products.thumbnail_image_url,
+            created_at: schemas.products.created_at,
+            updated_at: schemas.products.updated_at,
+            images:
+              sql<JSON>`JSON_ARRAYAGG(JSON_OBJECT('url', ${schemas.products_images.url}, 'id', ${schemas.products_images.id}))`.as(
+                'images',
+              ),
+          })
+          .from(schemas.products)
+          .leftJoin(
+            schemas.products_images,
+            eq(schemas.products_images.product_id, schemas.products.id),
+          )
+          .where(eq(schemas.products.id, productId))
+          .groupBy(schemas.products.id);
+      } catch (error) {
+        this.logger.error(
+          `ERROR while creating product:: ${JSON.stringify(error)}`,
+        );
+        throw new InternalServerErrorException(error);
+      }
+    });
   }
 
   public async findByDepartmentId(
@@ -187,7 +281,7 @@ export class ProductsService {
 
     await this.checkProductOwnershipElseThrow(user_id, product.id);
 
-    await this.productImagesService.create(product_id, images);
+    await this.productImagesService.create(user_id, product_id, images);
 
     return images;
   }

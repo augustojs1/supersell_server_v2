@@ -68,11 +68,7 @@ export class ProductsController {
   public async create(
     @Body() data: CreateProductDto,
     @GetCurrentUserDecorator() user: CurrentUser,
-    @UploadedFiles(
-      new ParseFilePipeBuilder().build({
-        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-      }),
-    )
+    @UploadedFiles()
     files: ProductImages,
   ): Promise<any> {
     return await this.productsService.create(user.sub, data, files);

@@ -42,7 +42,7 @@ export class ProductsRepository {
       slug: data.slug,
       thumbnail_image_url: thumbnail_image_url,
       price: parseFloat(data.price),
-      is_used: data.is_used === 'true' ? true : false,
+      is_used: data.is_used,
       quantity: parseInt(data.quantity),
     });
 
@@ -391,7 +391,7 @@ export class ProductsRepository {
         created_at: schema.products.created_at,
         updated_at: schema.products.updated_at,
         images:
-          sql<JSON>`JSON_ARRAYAGG(JSON_OBJECT('url', ${schema.products_images.url}))`.as(
+          sql<JSON>`JSON_ARRAYAGG(JSON_OBJECT('url', ${schema.products_images.url}, 'id', ${schema.products_images.id}))`.as(
             'images',
           ),
       })

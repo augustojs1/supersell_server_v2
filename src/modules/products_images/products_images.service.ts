@@ -11,6 +11,7 @@ import { ulid } from 'ulid';
 import { ProductImagesRepository } from './product-images.repository';
 import { ProductImagesEntity } from './types/product-images-entity.type';
 import { ProductsService } from '../products/products.service';
+import { AwsS3StorageService } from '@/infra/storage/impl/aws-s3-storage.service';
 
 @Injectable()
 export class ProductsImagesService {
@@ -18,16 +19,24 @@ export class ProductsImagesService {
     private readonly productImagesRepository: ProductImagesRepository,
     @Inject(forwardRef(() => ProductsService))
     private readonly productsService: ProductsService,
+    private readonly storageService: AwsS3StorageService,
   ) {}
 
-  public async create(product_id: string, images: File[]) {
-    const productImages: ProductImagesEntity[] = images.map((image) => {
-      return {
+  public async create(user_id: string, product_id: string, images: File[]) {
+    const productImages: ProductImagesEntity[] = [];
+
+    for (const image of images) {
+      const s3Data = await this.storageService.upload(
+        image,
+        `user_${user_id}/product_${product_id}/images`,
+      );
+
+      productImages.push({
         id: ulid(),
         product_id: product_id,
-        url: image.path,
-      };
-    });
+        url: s3Data.Location,
+      });
+    }
 
     const createdProductImages =
       await this.productImagesRepository.create(productImages);

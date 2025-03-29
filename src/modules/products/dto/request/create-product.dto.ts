@@ -48,7 +48,7 @@ export class CreateProductDto {
   @IsNotEmpty()
   @Transform(({ value }) => value === 'true')
   @IsBoolean()
-  is_used: string;
+  is_used: boolean;
 
   images?: any;
 
