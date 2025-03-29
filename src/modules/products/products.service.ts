@@ -281,9 +281,13 @@ export class ProductsService {
 
     await this.checkProductOwnershipElseThrow(user_id, product.id);
 
-    await this.productImagesService.create(user_id, product_id, images);
+    const productImages = await this.productImagesService.create(
+      user_id,
+      product_id,
+      images,
+    );
 
-    return images;
+    return productImages;
   }
 
   public async findByName(name: string): Promise<ProductsTextResultDto[]> {

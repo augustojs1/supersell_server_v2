@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Inject,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { File } from '@nest-lab/fastify-multer';
 import { ulid } from 'ulid';
@@ -15,6 +16,8 @@ import { AwsS3StorageService } from '@/infra/storage/impl/aws-s3-storage.service
 
 @Injectable()
 export class ProductsImagesService {
+  private logger: Logger = new Logger(ProductsImagesService.name);
+
   constructor(
     private readonly productImagesRepository: ProductImagesRepository,
     @Inject(forwardRef(() => ProductsService))
@@ -23,12 +26,14 @@ export class ProductsImagesService {
   ) {}
 
   public async create(user_id: string, product_id: string, images: File[]) {
+    this.logger.log(`Init uploading images to product ${product_id}`);
+
     const productImages: ProductImagesEntity[] = [];
 
     for (const image of images) {
       const s3Data = await this.storageService.upload(
         image,
-        `user_${user_id}/product_${product_id}/images`,
+        `user_${user_id}/products/product_${product_id}/images`,
       );
 
       productImages.push({
@@ -38,10 +43,11 @@ export class ProductsImagesService {
       });
     }
 
-    const createdProductImages =
-      await this.productImagesRepository.create(productImages);
+    await this.productImagesRepository.create(productImages);
 
-    return createdProductImages;
+    this.logger.log(`SUCCESS uploading images to product ${product_id}`);
+
+    return productImages;
   }
 
   public async delete(
