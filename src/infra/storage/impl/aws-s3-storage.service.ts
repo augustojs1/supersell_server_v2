@@ -57,4 +57,27 @@ export class AwsS3StorageService {
       );
     }
   }
+
+  async remove(key: string): Promise<void> {
+    this.logger.log(`Init S3 object remove for key ${key}`);
+
+    const params = {
+      Bucket: this.AWS_S3_BUCKET,
+      Key: key,
+    };
+
+    try {
+      await this.s3Client.deleteObject(params).promise();
+
+      this.logger.log(`SUCCESS remove object ${key} from s3`);
+    } catch (error) {
+      this.logger.log(
+        `An error has occured while trying to remove object from S3:: ${error}`,
+      );
+      this.logger.log(error);
+      throw new InternalServerErrorException(
+        `An error has occured while trying to remove object key ${key}`,
+      );
+    }
+  }
 }

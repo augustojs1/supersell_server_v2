@@ -64,6 +64,14 @@ export class UsersService {
   public async updateAvatar(id: string, avatar_file: File): Promise<void> {
     this.logger.log(`Init update user ${id} avatar!`);
 
+    const userProfile = await this.usersRepository.findUserWithProfile(id);
+
+    if (userProfile.avatar_url) {
+      const avatarKey = userProfile.avatar_url.split('.com/')[1];
+
+      await this.awsS3StorageService.remove(avatarKey);
+    }
+
     const path: string = `user_${id}/avatar`;
 
     const uploadResponse = await this.awsS3StorageService.upload(
