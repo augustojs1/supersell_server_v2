@@ -75,6 +75,10 @@ export class ProductsImagesService {
       );
     }
 
-    await this.productImagesRepository.delete(product_image_id);
+    const avatarKey = productImage.url.split('.com/')[1];
+
+    await this.storageService.remove(avatarKey);
+
+    return await this.productImagesRepository.delete(product_image_id);
   }
 }
