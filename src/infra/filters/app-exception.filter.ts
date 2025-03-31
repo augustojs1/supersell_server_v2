@@ -12,28 +12,30 @@ export class AppExceptionFilter implements ExceptionFilter {
 
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
-    const request = ctx.getRequest();
+    const response = ctx?.getResponse() ?? {};
+    const request = ctx?.getRequest() ?? {};
 
     if (exception instanceof HttpException) {
       this.logger.error({
         type: 'HttpException',
-        statusCode: exception.getStatus(),
-        error: exception.getResponse(),
+        statusCode: exception?.getStatus() ?? 500,
+        error: exception?.getResponse() ?? {},
+        stack: exception?.stack,
         timestamp: new Date().toISOString(),
         path: request.url,
       });
 
-      return response.status(exception.getStatus()).send({
-        statusCode: exception.getStatus(),
-        error: exception.getResponse(),
+      return response.status(exception?.getStatus() ?? 500).send({
+        statusCode: exception?.getStatus() ?? 500,
+        error: exception?.getResponse() ?? {},
       });
     }
 
     if (exception?.code && exception?.sqlMessage) {
       this.logger.error({
         type: 'Database error',
-        sqlMessage: exception.sqlMessage,
+        sqlMessage: exception?.sqlMessage ?? 'SQL Error',
+        stack: exception?.stack ?? {},
         timestamp: new Date().toISOString(),
         path: request.url,
       });
@@ -46,8 +48,9 @@ export class AppExceptionFilter implements ExceptionFilter {
 
     this.logger.error({
       type: 'Unhandled Exception',
-      statusCode: exception.getStatus(),
-      error: exception.getResponse(),
+      statusCode: exception?.getStatus() ?? 500,
+      error: exception?.getResponse() ?? 'Unhandled Exception',
+      stack: exception?.stack ?? {},
     });
 
     return response.status(500).send({

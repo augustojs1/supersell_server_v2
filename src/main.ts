@@ -7,7 +7,7 @@ import {
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
-import { AppExceptionFilter } from '@/infra/filters/exceptions';
+import { AppExceptionFilter } from '@/infra/filters';
 
 async function bootstrap() {
   const PORT = process.env.PORT;
