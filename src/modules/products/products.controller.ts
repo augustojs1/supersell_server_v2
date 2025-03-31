@@ -3,9 +3,7 @@ import {
   Controller,
   Delete,
   Get,
-  HttpStatus,
   Param,
-  ParseFilePipeBuilder,
   Patch,
   Post,
   Query,
@@ -13,11 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import {
-  File,
-  FileFieldsInterceptor,
-  FilesInterceptor,
-} from '@nest-lab/fastify-multer';
+import { File, FileFieldsInterceptor } from '@nest-lab/fastify-multer';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -144,15 +138,14 @@ export class ProductsController {
     description: 'User does not own this product',
   })
   @Post(':product_id/images')
-  @UseInterceptors(FilesInterceptor('image'))
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'image', maxCount: 6 }]),
+    new ImageFieldsValidatorInterceptor(['image']),
+  )
   public async uploadImages(
     @Param('product_id') product_id: string,
     @GetCurrentUserDecorator() user: CurrentUser,
-    @UploadedFiles(
-      new ParseFilePipeBuilder().build({
-        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-      }),
-    )
+    @UploadedFiles()
     product_images: File[],
   ): Promise<FileDto[]> {
     return await this.productsService.addImages(
