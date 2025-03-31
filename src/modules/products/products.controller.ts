@@ -36,6 +36,7 @@ import { ProductsImagesService } from '../products_images/products_images.servic
 import { ProductImages } from './types/product-images.type';
 import { ProductsTextResultDto } from './dto/response/products-text-result.dto';
 import { FileDto } from '@/modules/common/dto';
+import { ImageFieldsValidatorInterceptor } from '@/infra/interceptors';
 
 @ApiTags('Products')
 @Controller('products')
@@ -64,6 +65,7 @@ export class ProductsController {
       { name: 'thumbnail_image', maxCount: 1 },
       { name: 'images', maxCount: 8 },
     ]),
+    new ImageFieldsValidatorInterceptor(['thumbnail_image', 'images']),
   )
   public async create(
     @Body() data: CreateProductDto,
