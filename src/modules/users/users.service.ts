@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/request/create-user.dto';
 import { UserEntity } from './types';
 import { UserProfileDto } from '../auth/dto';
 import { UpdateUserProfileDto } from './dto';
-import { AwsS3StorageService } from '@/infra/storage/impl/aws-s3-storage.service';
+import { IStorageService } from '@/infra/storage/istorage.service.interface';
 
 @Injectable()
 export class UsersService {
@@ -14,7 +14,7 @@ export class UsersService {
 
   constructor(
     private readonly usersRepository: UsersRepository,
-    private readonly awsS3StorageService: AwsS3StorageService,
+    private readonly storageService: IStorageService,
   ) {}
 
   public async create(createUserDto: CreateUserDto): Promise<any> {
@@ -69,15 +69,16 @@ export class UsersService {
     if (userProfile.avatar_url) {
       const avatarKey = userProfile.avatar_url.split('.com/')[1];
 
-      await this.awsS3StorageService.remove(avatarKey);
+      if (!avatarKey) {
+        await this.storageService.remove(userProfile.avatar_url);
+      } else {
+        await this.storageService.remove(avatarKey);
+      }
     }
 
     const path: string = `user_${id}/avatar`;
 
-    const uploadResponse = await this.awsS3StorageService.upload(
-      avatar_file,
-      path,
-    );
+    const uploadResponse = await this.storageService.upload(avatar_file, path);
 
     return this.usersRepository.updateAvatar(id, uploadResponse.Location);
   }

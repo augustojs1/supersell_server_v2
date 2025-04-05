@@ -1,40 +1,53 @@
 import * as fs from 'fs';
-import { join } from 'path';
-import { Readable } from 'stream';
-import { StorageEngine } from '@nest-lab/fastify-multer';
+import * as path from 'path';
+import { Logger } from '@nestjs/common';
+import { File } from '@nest-lab/fastify-multer';
 
-export class DiskStorageService implements StorageEngine {
-  constructor(private uploadPath: string) {}
+import { s3UploadResponse } from '../types';
+import { IStorageService } from '../istorage.service.interface';
 
-  _handleFile(
-    req: any,
-    file: any,
-    cb: (
-      error?: any,
-      info?: Partial<import('@nest-lab/fastify-multer').File>,
-    ) => void,
-  ): void {
-    const filename = `${Date.now()}-${file.originalname}`;
-    const filePath = join(this.uploadPath, filename);
+export class DiskStorageService implements IStorageService {
+  private readonly logger: Logger = new Logger(DiskStorageService.name);
 
-    fs.mkdirSync(this.uploadPath, { recursive: true });
+  async upload(file: File, dir: string): Promise<s3UploadResponse> {
+    const rootPath = path.resolve('./');
+    const fullpath = path.join(rootPath, './.temp', dir);
 
-    const outStream = fs.createWriteStream(filePath);
+    this.logger.log(`Init writing file to path ${fullpath}`);
 
-    if (file.stream instanceof Readable) {
-      file.stream.pipe(outStream);
-    } else {
-      cb(new Error('File stream is not readable'));
-      return;
+    if (!fs.existsSync(fullpath)) {
+      fs.mkdirSync(fullpath, { recursive: true });
     }
 
-    outStream.on('error', cb);
-    outStream.on('finish', () => {
-      cb(null, { path: filePath, size: outStream.bytesWritten });
-    });
+    const filePath = `${fullpath}/${file.originalname}`;
+
+    try {
+      fs.writeFileSync(filePath, file.buffer);
+
+      this.logger.log(`SUCCESS writing file ${filePath}`);
+
+      return {
+        Bucket: '',
+        ETag: '',
+        Key: filePath,
+        key: filePath,
+        Location: filePath,
+        ServerSideEncryption: '',
+      };
+    } catch (error) {
+      this.logger.log(`ERROR writing file ${filePath}:: ${error}`);
+      console.log('Error writing file', error);
+    }
   }
 
-  _removeFile(req: any, file: any, cb: (error?: any) => void): void {
-    fs.unlink(file.path, cb);
+  public async remove(dir: string): Promise<void> {
+    try {
+      fs.unlinkSync(dir);
+
+      this.logger.log(`SUCCESS removing file ${dir}`);
+    } catch (error) {
+      this.logger.log(`ERROR removing file ${dir}:: ${error}`);
+      console.log('Error removing file', error);
+    }
   }
 }

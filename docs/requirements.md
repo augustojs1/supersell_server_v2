@@ -9,12 +9,12 @@
 - [ ] SuperSell Server should be developed using the following technologies: Node.js, Nest.js, TypeScript, MySQL, Drizzle and Docker.
 - [ ] Supersell External Services should be a microservice responsible for dealing with emailing, payment and delivery logistics.
 - [ ] Supersell Server should comunicate with Supersell External Services via Event Driven Architecture pattern.
-- [ ] Supersell Server should use Kafka localy as message broker.
+- [ ] Supersell Server should use RabbitMQ localy as message broker.
 - [x] REST API should use prefix: '/api/v1/'
 - [ ] Should feature a seeder for data.
 - [ ] Docker container for the database.
 - [ ] Docker container for the application.
-- [ ] Docker container for Kafka as a local message broker.
+- [ ] Docker container for RabbitMQ as a local message broker.
 - [ ] Create Github documentation.
 - [ ] Create Swagger REST API documentation.
 - [ ] Implement security configuration: SQL Injection, XSS Protection, Security Headers, Rate limiting, HPP & CORS etc.
@@ -64,7 +64,6 @@
 - [x] Create role based permission for admins and user.
 - [x] User should be able to update their profile info.
 - [x] User should be able to update their profile avatar.
-- [ ] User should be able to update their profile avatar to AWS.
 - [x] Users should be able to read all their published product.
 - [x] User should be able to read all published products from another user.
 - [x] Users should be able to see other users profile.

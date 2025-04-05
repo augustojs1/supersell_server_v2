@@ -8,23 +8,22 @@ import { File } from '@nest-lab/fastify-multer';
 import S3 from 'aws-sdk/clients/s3';
 
 import { s3UploadResponse } from '../types';
+import { IStorageService } from '../istorage.service.interface';
 
 @Injectable()
-export class AwsS3StorageService {
-  private AWS_S3_BUCKET: string =
-    this.configService.get<string>('aws.s3_bucket');
-  private AWS_ACCESS_KEY: string =
-    this.configService.get<string>('aws.access_key');
-  private AWS_SECRET_ACCESS_KEY: string = this.configService.get<string>(
-    'aws.secret_access_key',
-  );
-  private s3Client: any;
+export class AwsS3StorageService implements IStorageService {
+  private readonly AWS_CREDENTIALS = {
+    S3_BUCKET: this.configService.get<string>('aws.s3_bucket'),
+    ACCESS_KEY: this.configService.get<string>('aws.access_key'),
+    SECRET_ACCESS_KEY: this.configService.get<string>('aws.secret_access_key'),
+  };
+  private readonly s3Client: any;
   private readonly logger = new Logger(AwsS3StorageService.name);
 
   constructor(private readonly configService: ConfigService) {
     this.s3Client = new S3({
-      accessKeyId: this.AWS_ACCESS_KEY,
-      secretAccessKey: this.AWS_SECRET_ACCESS_KEY,
+      accessKeyId: this.AWS_CREDENTIALS.ACCESS_KEY,
+      secretAccessKey: this.AWS_CREDENTIALS.SECRET_ACCESS_KEY,
     });
   }
 
@@ -32,7 +31,7 @@ export class AwsS3StorageService {
     this.logger.log(`Init S3 upload to path ${path}`);
 
     const params = {
-      Bucket: this.AWS_S3_BUCKET,
+      Bucket: this.AWS_CREDENTIALS.S3_BUCKET,
       Key: `${path}/${file.originalname}`,
       Body: file.buffer,
       ContentType: file.mimetype,
@@ -62,7 +61,7 @@ export class AwsS3StorageService {
     this.logger.log(`Init S3 object remove for key ${key}`);
 
     const params = {
-      Bucket: this.AWS_S3_BUCKET,
+      Bucket: this.AWS_CREDENTIALS.S3_BUCKET,
       Key: key,
     };
 
