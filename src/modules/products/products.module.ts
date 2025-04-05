@@ -11,6 +11,9 @@ import { ProductsImagesModule } from '../products_images/products_images.module'
 import { CommonModule } from '@/modules/common/common.module';
 import { SlugProvider } from './providers/slug.provider';
 import { AwsS3StorageService } from '@/infra/storage/impl/aws-s3-storage.service';
+import { IStorageService } from '@/infra/storage/istorage.service.interface';
+import { configuration } from '@/infra/config/configuration';
+import { DiskStorageService } from '@/infra/storage/impl/disk-storage.service';
 
 @Module({
   controllers: [ProductsController],
@@ -27,7 +30,13 @@ import { AwsS3StorageService } from '@/infra/storage/impl/aws-s3-storage.service
     ProductsService,
     ProductsRepository,
     SlugProvider,
-    AwsS3StorageService,
+    {
+      provide: IStorageService,
+      useClass:
+        configuration().NODE_ENV === 'dev'
+          ? DiskStorageService
+          : AwsS3StorageService,
+    },
   ],
   exports: [ProductsService, ProductsRepository],
 })

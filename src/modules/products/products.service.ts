@@ -29,8 +29,8 @@ import {
 } from '@/modules/common/dto';
 import { ProductsTextResultDto } from './dto/response/products-text-result.dto';
 import { SlugProvider } from './providers/slug.provider';
-import { AwsS3StorageService } from '@/infra/storage/impl/aws-s3-storage.service';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
+import { IStorageService } from '@/infra/storage/istorage.service.interface';
 
 @Injectable()
 export class ProductsService {
@@ -43,7 +43,7 @@ export class ProductsService {
     private readonly productImagesService: ProductsImagesService,
     private readonly departmentsService: DepartmentsService,
     private readonly slugService: SlugProvider,
-    private readonly storageService: AwsS3StorageService,
+    private readonly storageService: IStorageService,
   ) {}
 
   public async create(

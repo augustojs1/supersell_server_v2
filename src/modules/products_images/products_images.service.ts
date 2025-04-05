@@ -12,7 +12,7 @@ import { ulid } from 'ulid';
 import { ProductImagesRepository } from './product-images.repository';
 import { ProductImagesEntity } from './types/product-images-entity.type';
 import { ProductsService } from '../products/products.service';
-import { AwsS3StorageService } from '@/infra/storage/impl/aws-s3-storage.service';
+import { IStorageService } from '@/infra/storage/istorage.service.interface';
 
 @Injectable()
 export class ProductsImagesService {
@@ -22,15 +22,14 @@ export class ProductsImagesService {
     private readonly productImagesRepository: ProductImagesRepository,
     @Inject(forwardRef(() => ProductsService))
     private readonly productsService: ProductsService,
-    private readonly storageService: AwsS3StorageService,
+    private readonly storageService: IStorageService,
   ) {}
 
-  public async create(user_id: string, product_id: string, images: File[]) {
+  public async create(user_id: string, product_id: string, images: any) {
     this.logger.log(`Init uploading images to product ${product_id}`);
-
     const productImages: ProductImagesEntity[] = [];
 
-    for (const image of images) {
+    for (const image of images.image) {
       const s3Data = await this.storageService.upload(
         image,
         `user_${user_id}/products/product_${product_id}/images`,
@@ -77,7 +76,12 @@ export class ProductsImagesService {
 
     const avatarKey = productImage.url.split('.com/')[1];
 
-    await this.storageService.remove(avatarKey);
+    if (avatarKey) {
+      await this.storageService.remove(avatarKey);
+      return await this.productImagesRepository.delete(product_image_id);
+    }
+
+    await this.storageService.remove(productImage.url);
 
     return await this.productImagesRepository.delete(product_image_id);
   }
