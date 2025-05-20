@@ -78,9 +78,9 @@ export class UsersService {
 
     const path: string = `user_${id}/avatar`;
 
-    const uploadResponse = await this.storageService.upload(avatar_file, path);
+    const url = await this.storageService.upload(avatar_file, path);
 
-    return this.usersRepository.updateAvatar(id, uploadResponse.Location);
+    return this.usersRepository.updateAvatar(id, url);
   }
 
   public async findUserByIdElseThrow(user_id: string): Promise<void> {

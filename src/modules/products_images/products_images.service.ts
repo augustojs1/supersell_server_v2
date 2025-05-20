@@ -27,10 +27,11 @@ export class ProductsImagesService {
 
   public async create(user_id: string, product_id: string, images: any) {
     this.logger.log(`Init uploading images to product ${product_id}`);
+
     const productImages: ProductImagesEntity[] = [];
 
     for (const image of images.image) {
-      const s3Data = await this.storageService.upload(
+      const url = await this.storageService.upload(
         image,
         `user_${user_id}/products/product_${product_id}/images`,
       );
@@ -38,7 +39,7 @@ export class ProductsImagesService {
       productImages.push({
         id: ulid(),
         product_id: product_id,
-        url: s3Data.Location,
+        url: url,
       });
     }
 

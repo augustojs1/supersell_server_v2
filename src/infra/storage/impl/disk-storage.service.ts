@@ -3,13 +3,12 @@ import * as path from 'path';
 import { Logger } from '@nestjs/common';
 import { File } from '@nest-lab/fastify-multer';
 
-import { s3UploadResponse } from '../types';
 import { IStorageService } from '../istorage.service.interface';
 
 export class DiskStorageService implements IStorageService {
   private readonly logger: Logger = new Logger(DiskStorageService.name);
 
-  async upload(file: File, dir: string): Promise<s3UploadResponse> {
+  async upload(file: File, dir: string): Promise<string> {
     const rootPath = path.resolve('./');
     const fullpath = path.join(rootPath, './.temp', dir);
 
@@ -26,14 +25,7 @@ export class DiskStorageService implements IStorageService {
 
       this.logger.log(`SUCCESS writing file ${filePath}`);
 
-      return {
-        Bucket: '',
-        ETag: '',
-        Key: filePath,
-        key: filePath,
-        Location: filePath,
-        ServerSideEncryption: '',
-      };
+      return filePath;
     } catch (error) {
       this.logger.log(`ERROR writing file ${filePath}:: ${error}`);
       console.log('Error writing file', error);

@@ -127,7 +127,7 @@ export class ProductsService {
           description: data.description,
           sku: data.sku,
           slug: data.slug,
-          thumbnail_image_url: thumbnailUrl.Location,
+          thumbnail_image_url: thumbnailUrl,
           price: parseFloat(data.price),
           is_used: data.is_used,
           quantity: parseInt(data.quantity),
@@ -137,7 +137,7 @@ export class ProductsService {
           'Uploading image to S3 and inserting into product_images table',
         );
         for (const image of product_images.images) {
-          const s3Response = await this.storageService.upload(
+          const url = await this.storageService.upload(
             image,
             `user_${user_id}/products/product_${productId}/images`,
           );
@@ -145,7 +145,7 @@ export class ProductsService {
           await tx.insert(schemas.products_images).values({
             id: ulid(),
             product_id: productId,
-            url: s3Response.Location,
+            url: url,
           });
         }
 

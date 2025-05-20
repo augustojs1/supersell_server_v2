@@ -1,11 +1,14 @@
-FROM node:18.20.2-alpine
+FROM public.ecr.aws/docker/library/node:20-alpine AS development
+ENV NODE_ENV=development
 
-WORKDIR /usr/app
+WORKDIR /app
 
-COPY package*.json ./
+COPY package.json .
+RUN npm install --legacy-peer-deps
+RUN mkdir node_modules/.cache && chmod -R 777 node_modules/.cache
 
 COPY . .
 
-EXPOSE 8000
+EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD [ "npm", "start" ]
