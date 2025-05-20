@@ -22,13 +22,13 @@ import { ProductItem, ShoppingCartEntity } from '../shopping_carts/types';
 import { ShoppingCartsService } from '../shopping_carts/shopping_carts.service';
 import { AddressService } from '../address/address.service';
 import { OrderPaymentDto } from './dto/request/order-payment.dto';
-import { PaymentBrokerService } from '@/infra/messaging/brokers';
-import { EmailBrokerService } from '@/infra/messaging/brokers/email-broker.service';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { ShoppingCartItemsDTO } from '../shopping_carts/dto';
 import { ProductEntity } from '../products/types';
 import { OrderItemEntity } from './types/order-item-entity.type';
 import { UsersService } from '../users/users.service';
+import { IPaymentEventsPublisher } from '@/infra/events/publishers/payment/ipayment-events-publisher.interface';
+import { IEmailEventsPublisher } from '@/infra/events/publishers/emails/iemail-events-publisher.interface';
 
 @Injectable()
 export class OrderService {
@@ -41,8 +41,8 @@ export class OrderService {
     private readonly orderItemRepository: OrderItemRepository,
     private readonly shoppingCartService: ShoppingCartsService,
     private readonly addressService: AddressService,
-    private readonly paymentBrokerService: PaymentBrokerService,
-    private readonly emailBrokerService: EmailBrokerService,
+    private readonly paymentEventsPublisher: IPaymentEventsPublisher,
+    private readonly emailEventsPublisher: IEmailEventsPublisher,
     private readonly usersService: UsersService,
   ) {}
 
@@ -99,7 +99,7 @@ export class OrderService {
 
       await this.orderRepository.updateOrderStatus(orderUser.order_id, status);
 
-      this.emailBrokerService.emitEmailOrderStatusChangeMessage(orderUser);
+      this.emailEventsPublisher.emitEmailOrderStatusChangeMessage(orderUser);
     } catch (error) {
       throw error;
     }
@@ -135,7 +135,7 @@ export class OrderService {
           data.delivery_address_id,
         );
 
-        this.emailBrokerService.emitEmailOrderReceiptMessage({
+        this.emailEventsPublisher.emitEmailOrderReceiptMessage({
           user: deliveryAddress.user,
           order_id: orderId,
           order_items: order.items,
@@ -280,7 +280,7 @@ export class OrderService {
       );
     }
 
-    this.paymentBrokerService.sendOrderPaymentMessage({
+    this.paymentEventsPublisher.sendOrderPaymentMessage({
       order: {
         id: order.id,
         total_price: order.total_price,
@@ -341,7 +341,7 @@ export class OrderService {
             this.logger.log(`SUCCESS cancelling order #${order.id}`);
 
             // send email to user
-            this.emailBrokerService.emitEmailOrderStatusChangeMessage({
+            this.emailEventsPublisher.emitEmailOrderStatusChangeMessage({
               order_id: order_id,
               seller_id: order.seller_id,
               customer_id: customer.id,

@@ -1,15 +1,15 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
-import { MessagingTopics } from '../enum';
-import { PaymentMessagePayload } from '../types/payment-message-payload.type';
+import { MessagingTopics } from '../../../enum';
+import { PaymentMessagePayload } from '../dto';
 
 @Injectable()
-export class PaymentBrokerService {
-  private readonly logger = new Logger(PaymentBrokerService.name);
+export class PaymentEventsRabbitMqPublisher {
+  private readonly logger = new Logger(PaymentEventsRabbitMqPublisher.name);
 
   constructor(
-    @Inject('EXTERNAL_SERVICE_MICROSERVICE')
+    @Inject('PAYMENT_MICROSERVICE')
     private readonly paymentMessagingClient: ClientProxy,
   ) {}
 

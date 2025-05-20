@@ -1,15 +1,16 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
-import { MessagingTopics } from '../enum';
-import { EmailOrderStatusChangeDto } from './dto';
+import { MessagingTopics } from '../../../enum';
+import { EmailOrderStatusChangeDto } from '../dto';
+import { IEmailEventsPublisher } from '../iemail-events-publisher.interface';
 
 @Injectable()
-export class EmailBrokerService {
-  private readonly logger = new Logger(EmailBrokerService.name);
+export class EmailEventsRabbitMqPublisher implements IEmailEventsPublisher {
+  private readonly logger = new Logger(EmailEventsRabbitMqPublisher.name);
 
   constructor(
-    @Inject('EXTERNAL_SERVICE_MICROSERVICE')
+    @Inject('EMAIL_MICROSERVICE')
     private readonly messagingClient: ClientProxy,
   ) {}
 

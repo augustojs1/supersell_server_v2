@@ -10,9 +10,8 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { HashProvider } from './providers/hash.providers';
 import { Token } from './types/token.type';
-import { ResetPasswordDto, SignInDto, SignUpDto } from './dto';
-import { UserProfileDto } from './dto';
-import { EmailBrokerService } from '@/infra/messaging/brokers/email-broker.service';
+import { ResetPasswordDto, SignInDto, SignUpDto, UserProfileDto } from './dto';
+import { IEmailEventsPublisher } from '@/infra/events/publishers/emails/iemail-events-publisher.interface';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +20,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
     private readonly hashProvider: HashProvider,
-    private readonly emailBrokerService: EmailBrokerService,
+    private readonly emailEventsPublisher: IEmailEventsPublisher,
   ) {}
 
   public async hashData(data: string): Promise<string> {
@@ -116,7 +115,7 @@ export class AuthService {
       },
     );
 
-    this.emailBrokerService.emitEmailPasswordResetMessage({
+    this.emailEventsPublisher.emitEmailPasswordResetMessage({
       first_name: user.first_name,
       email: user.email,
       reset_token: token,

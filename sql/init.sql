@@ -383,6 +383,11 @@ CREATE INDEX
 ON
   products (name);
 
+CREATE INDEX
+  idx_products_sku
+ON
+  products (sku);
+
 -- Database triggers
 -- CREATE PRODUCT RATING TRIGGER!!
 DELIMITER $$
