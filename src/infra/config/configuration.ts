@@ -1,6 +1,6 @@
 export const configuration = () => ({
   NODE_ENV: process.env.NODE_ENV,
-  port: parseInt(process.env.PORT, 10) || 3001,
+  port: parseInt(process.env.PORT, 10) || 8080,
   database: {
     tag: process.env.DB_TAG,
     host: process.env.DB_HOST,
@@ -22,5 +22,12 @@ export const configuration = () => ({
     secret_access_key: process.env.AWS_SECRET_ACCESS_KEY,
     region: process.env.AWS_REGION,
     s3_bucket: process.env.AWS_S3_BUCKET,
+    sns_topics: {
+      order_payment: process.env.AWS_SNS_ORDER_PAYMENT,
+      email_order_password_reset: process.env.AWS_SNS_EMAIL_PASSWORD_RESET,
+      email_order_status_change: process.env.AWS_SNS_EMAIL_ORDER_STATUS_CHANGE,
+      email_order_created: process.env.AWS_SNS_EMAIL_ORDER_CREATED,
+      email_order_invoice: process.env.AWS_SNS_EMAIL_ORDER_INVOICE,
+    },
   },
 });
