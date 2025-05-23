@@ -9,6 +9,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 import { DepartmentsService } from './departments.service';
 import { GetCurrentUserDecorator } from '../auth/decorators';
@@ -22,12 +28,6 @@ import { AccessTokenGuard, AdminGuard } from '../auth/guards';
 import { ProductsService } from '../products/products.service';
 import { PaginationParamsSortableDto } from '@/modules/common/dto';
 import { DepartmentProductsDTO } from '../products/dto';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-} from '@nestjs/swagger';
 
 @Controller('departments')
 export class DepartmentsController {

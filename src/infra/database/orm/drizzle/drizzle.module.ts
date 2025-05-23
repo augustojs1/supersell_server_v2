@@ -8,7 +8,7 @@ dotenv.config({
   path: `${process.cwd()}/src/infra/config/env/${process.env.NODE_ENV}.env`,
 });
 
-export const DATABASE_TAG = process.env.DB_TAG;
+export const DATABASE_TAG = 'DB_DEV';
 
 @Module({
   imports: [
