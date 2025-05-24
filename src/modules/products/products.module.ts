@@ -33,7 +33,7 @@ import { DiskStorageService } from '@/infra/storage/impl/disk-storage.service';
     {
       provide: IStorageService,
       useClass:
-        configuration().NODE_ENV === 'dev'
+        configuration().NODE_ENV === 'development'
           ? DiskStorageService
           : AwsS3StorageService,
     },

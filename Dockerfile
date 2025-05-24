@@ -17,7 +17,7 @@ WORKDIR /app
 
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/src/infra/config/env/development.env ./src/infra/config/env/development.env
+COPY --from=build /app/src/infra/config/env/production.env ./src/infra/config/env/production.env
 COPY --from=build /app/package.json ./
 
 EXPOSE 8080

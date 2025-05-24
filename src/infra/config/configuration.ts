@@ -24,7 +24,7 @@ export const configuration = () => ({
     s3_bucket: process.env.AWS_S3_BUCKET,
     sns_topics: {
       order_payment: process.env.AWS_SNS_ORDER_PAYMENT,
-      email_order_password_reset: process.env.AWS_SNS_EMAIL_PASSWORD_RESET,
+      email_password_reset: process.env.AWS_SNS_EMAIL_PASSWORD_RESET,
       email_order_status_change: process.env.AWS_SNS_EMAIL_ORDER_STATUS_CHANGE,
       email_order_created: process.env.AWS_SNS_EMAIL_ORDER_CREATED,
       email_order_invoice: process.env.AWS_SNS_EMAIL_ORDER_INVOICE,

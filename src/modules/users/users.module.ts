@@ -31,7 +31,7 @@ import { configuration } from '@/infra/config/configuration';
     {
       provide: IStorageService,
       useClass:
-        configuration().NODE_ENV === 'dev'
+        configuration().NODE_ENV === 'development'
           ? DiskStorageService
           : AwsS3StorageService,
     },
