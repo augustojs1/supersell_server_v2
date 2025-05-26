@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
+import { MessagingTopics } from '@/infra/events/enum';
 import { JsonLogger, LoggerFactory } from 'json-logger-service';
 
 import { IEmailEventsPublisher } from '../iemail-events-publisher.interface';
@@ -41,13 +42,21 @@ export class EmailEventsSnsPublisher implements IEmailEventsPublisher {
       region: this.AWS_CREDENTIALS.REGION,
     });
 
-    this.logger.info('Init EmailEventsSnsPublisher');
+    this.logger.info(
+      {
+        success: true,
+      },
+      'Init SNS topics publisher class EmailEventsSnsPublisher',
+    );
   }
 
   public async emitEmailPasswordResetMessage(payload: any): Promise<void> {
-    this.logger.info(`emitEmailPasswordResetMessage payload.: ${payload}`);
     this.logger.info(
-      `TopicArn.: ${this.AWS_SNS_TOPICS_ARN.EMAIL_PASSWORD_RESET}`,
+      {
+        body: payload,
+        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_PASSWORD_RESET,
+      },
+      'emitEmailPasswordResetMessage',
     );
 
     const response = await this.snsClient.send(
@@ -57,34 +66,54 @@ export class EmailEventsSnsPublisher implements IEmailEventsPublisher {
       }),
     );
 
-    this.logger.info(`SNS Response.: ${response}`);
-
     this.logger.info(
-      `Publish message on topic ${this.AWS_SNS_TOPICS_ARN.EMAIL_PASSWORD_RESET}`,
+      {
+        body: payload,
+        snsResponse: response,
+        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_PASSWORD_RESET,
+        TopicName: MessagingTopics.EMAIL_PASSWORD_RESET,
+      },
+      `Publish message on topic  ${MessagingTopics.EMAIL_PASSWORD_RESET}`,
     );
   }
 
   public async emitEmailOrderStatusChangeMessage(
     payload: EmailOrderStatusChangeDto,
   ): Promise<void> {
-    console.log('emitEmailOrderStatusChangeMessage payload.:', payload);
+    this.logger.info(
+      {
+        body: payload,
+        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_ORDER_STATUS_CHANGE,
+      },
+      'emitEmailOrderStatusChangeMessage',
+    );
 
     const response = await this.snsClient.send(
       new PublishCommand({
         Message: JSON.stringify(payload),
-        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_PASSWORD_RESET,
+        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_ORDER_STATUS_CHANGE,
       }),
     );
 
-    console.log('SNS response.:', response);
-
     this.logger.info(
-      `Publish message on topic ${this.AWS_SNS_TOPICS_ARN.EMAIL_ORDER_STATUS_CHANGE}`,
+      {
+        body: payload,
+        snsResponse: response,
+        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_ORDER_STATUS_CHANGE,
+        TopicName: MessagingTopics.EMAIL_ORDER_STATUS_CHANGE,
+      },
+      `Publish message on topic  ${MessagingTopics.EMAIL_ORDER_STATUS_CHANGE}`,
     );
   }
 
   public emitEmailOrderCreatedChangeMessage(payload: any): void {
-    console.log('emitEmailOrderCreatedChangeMessage payload.:', payload);
+    this.logger.info(
+      {
+        body: payload,
+        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_ORDER_CREATED,
+      },
+      'emitEmailOrderCreatedChangeMessage',
+    );
 
     const response = this.snsClient.send(
       new PublishCommand({
@@ -93,15 +122,25 @@ export class EmailEventsSnsPublisher implements IEmailEventsPublisher {
       }),
     );
 
-    console.log('SNS response.:', response);
-
     this.logger.info(
-      `Publish message on topic ${this.AWS_SNS_TOPICS_ARN.EMAIL_ORDER_CREATED}`,
+      {
+        body: payload,
+        snsResponse: response,
+        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_PASSWORD_RESET,
+        TopicName: MessagingTopics.EMAIL_ORDER_CREATED,
+      },
+      `Publish message on topic  ${MessagingTopics.EMAIL_ORDER_CREATED}`,
     );
   }
 
   public emitEmailOrderInvoiceMessage(payload: any): void {
-    console.log('emitEmailOrderInvoiceMessage payload.:', payload);
+    this.logger.info(
+      {
+        body: payload,
+        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_ORDER_INVOICE,
+      },
+      'emitEmailOrderInvoiceMessage',
+    );
 
     const response = this.snsClient.send(
       new PublishCommand({
@@ -110,15 +149,25 @@ export class EmailEventsSnsPublisher implements IEmailEventsPublisher {
       }),
     );
 
-    console.log('SNS response.:', response);
-
     this.logger.info(
-      `Publish message on topic ${this.AWS_SNS_TOPICS_ARN.EMAIL_ORDER_INVOICE}`,
+      {
+        body: payload,
+        snsResponse: response,
+        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_PASSWORD_RESET,
+        TopicName: MessagingTopics.EMAIL_ORDER_INVOICE,
+      },
+      `Publish message on topic ${MessagingTopics.EMAIL_ORDER_INVOICE}`,
     );
   }
 
   public emitEmailOrderReceiptMessage(payload: any): void {
-    console.log('emitEmailOrderReceiptMessage payload.:', payload);
+    this.logger.info(
+      {
+        body: payload,
+        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_PASSWORD_RESET,
+      },
+      'emitEmailOrderReceiptMessage',
+    );
 
     const response = this.snsClient.send(
       new PublishCommand({
@@ -127,10 +176,14 @@ export class EmailEventsSnsPublisher implements IEmailEventsPublisher {
       }),
     );
 
-    console.log('SNS response.:', response);
-
     this.logger.info(
-      `Publish message on topic ${this.AWS_SNS_TOPICS_ARN.ORDER_PAYMENT}`,
+      {
+        body: payload,
+        snsResponse: response,
+        TopicName: MessagingTopics.ORDER_PAYMENT,
+        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_PASSWORD_RESET,
+      },
+      `Publish message on topic ${MessagingTopics.ORDER_PAYMENT}`,
     );
   }
 }
