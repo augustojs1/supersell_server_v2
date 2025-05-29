@@ -14,7 +14,7 @@ export class EmailEventsRabbitMqPublisher implements IEmailEventsPublisher {
     private readonly messagingClient: ClientProxy,
   ) {}
 
-  public emitEmailPasswordResetMessage(payload: any): void {
+  public async emitEmailPasswordResetMessage(payload: any): Promise<void> {
     this.messagingClient.emit(MessagingTopics.EMAIL_PASSWORD_RESET, payload);
     this.logger.log(
       `Publish message on topic ${MessagingTopics.EMAIL_PASSWORD_RESET}`,
@@ -47,7 +47,7 @@ export class EmailEventsRabbitMqPublisher implements IEmailEventsPublisher {
     );
   }
 
-  public emitEmailOrderReceiptMessage(payload: any): void {
+  public async emitEmailOrderReceiptMessage(payload: any): Promise<void> {
     this.messagingClient.emit(MessagingTopics.EMAIL_ORDER_CREATED, payload);
     this.logger.log(
       `Publish message on topic ${MessagingTopics.EMAIL_ORDER_CREATED}`,

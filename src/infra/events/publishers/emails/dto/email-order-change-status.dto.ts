@@ -1,8 +1,11 @@
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 import { OrderStatus } from '@/modules/order/enums';
+import { MessagingTopics } from '@/infra/events/enum';
 
 export class EmailOrderStatusChangeDto {
+  topic_name?: MessagingTopics.EMAIL_ORDER_STATUS_CHANGE;
+
   @IsNotEmpty()
   @IsString()
   order_id: string;

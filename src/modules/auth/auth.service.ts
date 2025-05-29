@@ -102,7 +102,7 @@ export class AuthService {
     return await this.usersService.findUserProfile(userId);
   }
 
-  public async requestPasswordReset(id: string) {
+  public async requestPasswordReset(id: string): Promise<void> {
     const user = await this.usersService.findById(id);
 
     const token = await this.jwtService.signAsync(
@@ -115,7 +115,7 @@ export class AuthService {
       },
     );
 
-    this.emailEventsPublisher.emitEmailPasswordResetMessage({
+    await this.emailEventsPublisher.emitEmailPasswordResetMessage({
       first_name: user.first_name,
       email: user.email,
       reset_token: token,
