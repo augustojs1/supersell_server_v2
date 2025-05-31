@@ -11,6 +11,7 @@ import {
 import { eq } from 'drizzle-orm';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { ulid } from 'ulid';
+import { JsonLogger, LoggerFactory } from 'json-logger-service';
 
 import * as schemas from '@/infra/database/orm/drizzle/schema';
 import { CreateOrderData, CreateOrderItemData, OrderEntity } from './types';
@@ -33,6 +34,9 @@ import { IEmailEventsPublisher } from '@/infra/events/publishers/emails/iemail-e
 @Injectable()
 export class OrderService {
   private readonly logger = new Logger(OrderService.name);
+  private readonly jsonLogger: JsonLogger = LoggerFactory.createLogger(
+    OrderService.name,
+  );
 
   constructor(
     @Inject(DATABASE_TAG)
@@ -89,6 +93,14 @@ export class OrderService {
     user_id: string,
     status: OrderStatus,
   ): Promise<void> {
+    this.jsonLogger.info(
+      {
+        id,
+        status,
+      },
+      `Received request for order ${id} to change status to ${status}`,
+    );
+
     try {
       const orderUser =
         await this.orderRepository.findOrderCustomerByOrderId(id);

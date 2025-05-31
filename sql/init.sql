@@ -453,3 +453,1498 @@ BEGIN
                 pr.id = NEW.product_id
         );
 END;
+
+-- EMAIL_TEMPLATES
+CREATE TABLE email_templates (
+	type ENUM(
+			'ORDER_RECEIPT',
+			'ORDER_STATUS_CANCELLED',
+			'ORDER_STATUS_DELIVERED',
+			'ORDER_STATUS_FAILED_PAYMENT',
+			'ORDER_STATUS_ON_DELIVERY',
+			'ORDER_STATUS_PAID',
+			'ORDER_STATUS_PENDING_PAYMENT',
+			'ORDER_STATUS_SENT',
+			'PASSWORD_RECOVERY') UNIQUE NOT NULL,
+	html TEXT NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- PASSWORD_RECOVERY
+INSERT INTO
+	email_templates (type, html)
+VALUES
+	(
+	'ORDER_RECEIPT',
+	'<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Supersell</title>
+    <style>
+      @media screen and (max-width: 600px) {
+        .content {
+          width: 100% !important;
+          display: block !important;
+          padding: 10px !important;
+        }
+
+        .header,
+        .body,
+        .footer {
+          font-family: 'Geologica', Arial, sans-serif;
+          padding: 20px !important;
+        }
+      }
+    </style>
+  </head>
+  <body style="font-family: 'Geologica', Arial, sans-serif">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center" style="padding: 20px">
+          <table
+            class="content"
+            width="600"
+            border="0"
+            cellspacing="0"
+            cellpadding="0"
+            style="border-collapse: collapse; border: 1px solid #cccccc"
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                class="header"
+                style="
+                  background-color: #403dfe;
+                  text-align: center;
+                  color: white;
+                  font-size: 24px;
+                  font-weight: 400;
+                  letter-spacing: 3px;
+                  padding-top: 22px;
+                "
+              >
+                <h3>Supersell</h3>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td
+                class="body"
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Hello, <%= first_name %>! <br />
+                Click the button below to start your password recovery request.
+              </td>
+            </tr>
+
+            <tr style="margin-bottom: 15px">
+              <td
+                style="
+                  padding: 0px 20px 0px 20px;
+                  text-align: center;
+                  margin-bottom: 15px;
+                  padding-bottom: 55px;
+                "
+              >
+                <table cellspacing="0" cellpadding="0" style="margin: auto">
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        background-color: #403dfe;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                      "
+                    >
+                      <a
+                        href="#"
+                        style="
+                          color: #ffffff;
+                          text-decoration: none;
+                          font-weight: bold;
+                        "
+                        >Redirect</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                class="footer"
+                style="
+                  background-color: #545454;
+                  padding: 20px;
+                  text-align: center;
+                  color: white;
+                  font-size: 14px;
+                "
+              >
+                <p>Supersell &copy; 2025 | by Augusto Souza</p>
+                <a
+                  href="https://github.com/augustojs1"
+                  style="color: white; font-size: 12px"
+                  >https://github.com/augustojs1</a
+                >
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>'
+	);
+
+-- ORDER_RECEIPT
+INSERT INTO
+	email_templates (type, html)
+VALUES
+	(
+	'ORDER_RECEIPT',
+	'<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Supersell</title>
+    <style>
+      @media screen and (max-width: 600px) {
+        .content {
+          width: 100% !important;
+          display: block !important;
+          padding: 10px !important;
+        }
+
+        .header,
+        .body,
+        .footer {
+          font-family: "Geologica", Arial, sans-serif;
+          padding: 20px !important;
+        }
+      }
+    </style>
+  </head>
+  <body style="font-family: 'Geologica', Arial, sans-serif">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center" style="padding: 20px">
+          <table
+            class="content"
+            width="600"
+            border="0"
+            cellspacing="0"
+            cellpadding="0"
+            style="border-collapse: collapse; border: 1px solid #cccccc"
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                class="header"
+                style="
+                  background-color: #403dfe;
+                  text-align: center;
+                  color: white;
+                  font-size: 24px;
+                  font-weight: 400;
+                  letter-spacing: 3px;
+                  padding-top: 22px;
+                "
+              >
+                <h3>Supersell</h3>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td
+                class="body"
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                <p>Hello, <%= user.first_name %>! 👋</p>
+                <p>
+                  Thank you for your purchase! Here’s a summary of your order:
+                </p>
+                <br />
+                <h2>🛒 Order Details</h2>
+                <p><strong>Order Number:</strong> #<%= order_id %></p>
+                <p><strong>Order Date:</strong> <%= order_created_at %></p>
+                <hr />
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                class="body"
+                style="
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                  padding: 0px 20px;
+                "
+              >
+                <h2>📦 Items Ordered:</h2>
+                <ul>
+                  <% order_items.forEach(item => { %>
+                  <li>
+                    <strong><%= item.product_name %></strong> (x<%=
+                    item.quantity %>) – $ <%= item.subtotal_price %> <br />🛍
+                    **Store:** <%= item.product_seller_username %>
+                  </li>
+                  <% }) %>
+                </ul>
+                <p><strong>💰 Total:</strong> $ <%= order_total_price %></p>
+                <hr />
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                class="body"
+                style="
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                  padding: 0px 20px;
+                "
+              >
+                <h2>🚚 Shipping Information</h2>
+                <p><strong>Recipient:</strong> <%= user.first_name %></p>
+                <p><strong>Delivery Address:</strong></p>
+                <p>
+                  <%= delivery_address.street %>, <%= delivery_address.number
+                  %><br />
+                  <%= delivery_address.city %>, <%= delivery_address.district %>
+                  - <%= delivery_address.postalcode %><br />
+                  <%= delivery_address.country_code %>
+                </p>
+
+                <p>
+                  You’ll receive an update once your payment is confirmed and
+                  your order is shipped.
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Best regards,
+                <br />
+                <b>Supersell Team</b>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                class="footer"
+                style="
+                  background-color: #545454;
+                  padding: 20px;
+                  text-align: center;
+                  color: white;
+                  font-size: 14px;
+                "
+              >
+                <p>Supersell &copy; 2025 | by Augusto Souza</p>
+                <a
+                  href="https://github.com/augustojs1"
+                  style="color: white; font-size: 12px"
+                  >https://github.com/augustojs1</a
+                >
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>'
+	);
+	
+-- ORDER_STATUS_CANCELLED
+INSERT INTO
+	email_templates (type, html)
+VALUES
+	(
+	'ORDER_STATUS_CANCELLED',
+	'<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Supersell</title>
+    <style>
+      @media screen and (max-width: 600px) {
+        .content {
+          width: 100% !important;
+          display: block !important;
+          padding: 10px !important;
+        }
+
+        .header,
+        .body,
+        .footer {
+          font-family: ''Geologica'', Arial, sans-serif;
+          padding: 20px !important;
+        }
+      }
+    </style>
+  </head>
+  <body style="font-family: ''Geologica'', Arial, sans-serif">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center" style="padding: 20px">
+          <table
+            class="content"
+            width="600"
+            border="0"
+            cellspacing="0"
+            cellpadding="0"
+            style="border-collapse: collapse; border: 1px solid #cccccc"
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                class="header"
+                style="
+                  background-color: #403dfe;
+                  text-align: center;
+                  color: white;
+                  font-size: 24px;
+                  font-weight: 400;
+                  letter-spacing: 3px;
+                  padding-top: 22px;
+                "
+              >
+                <h3>Supersell</h3>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td
+                class="body"
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Hello, <%= customer_name %>! <br />
+                <br />
+                Your order #<%= order_id %> has been cancelled.
+                <br />
+                If this was not intentional or if you need assistance, please
+                contact our support team. If a payment was made, you will
+                receive a refund according to our policy.
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 0px 20px 0px 20px;
+                  text-align: center;
+                  padding-bottom: 25px;
+                "
+              >
+                <table cellspacing="0" cellpadding="0" style="margin: auto">
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        background-color: #403dfe;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                      "
+                    >
+                      <a
+                        href="#"
+                        style="
+                          color: #ffffff;
+                          text-decoration: none;
+                          font-weight: bold;
+                        "
+                        >Contact Support</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                We’re here to help!
+                <br />
+                <br />
+                Best regards,
+                <br />
+                <b>Supersell Team</b>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                class="footer"
+                style="
+                  background-color: #545454;
+                  padding: 20px;
+                  text-align: center;
+                  color: white;
+                  font-size: 14px;
+                "
+              >
+                <p>Supersell &copy; 2025 | by Augusto Souza</p>
+                <a
+                  href="https://github.com/augustojs1"
+                  style="color: white; font-size: 12px"
+                  >https://github.com/augustojs1</a
+                >
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>'
+	);
+	
+-- ORDER_STATUS_DELIVERED
+INSERT INTO
+	email_templates (type, html)
+VALUES
+	(
+	'ORDER_STATUS_DELIVERED',
+	'<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Supersell</title>
+    <style>
+      @media screen and (max-width: 600px) {
+        .content {
+          width: 100% !important;
+          display: block !important;
+          padding: 10px !important;
+        }
+
+        .header,
+        .body,
+        .footer {
+          font-family: ''Geologica'', Arial, sans-serif;
+          padding: 20px !important;
+        }
+      }
+    </style>
+  </head>
+  <body style="font-family: ''Geologica'', Arial, sans-serif">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center" style="padding: 20px">
+          <table
+            class="content"
+            width="600"
+            border="0"
+            cellspacing="0"
+            cellpadding="0"
+            style="border-collapse: collapse; border: 1px solid #cccccc"
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                class="header"
+                style="
+                  background-color: #403dfe;
+                  text-align: center;
+                  color: white;
+                  font-size: 24px;
+                  font-weight: 400;
+                  letter-spacing: 3px;
+                  padding-top: 22px;
+                "
+              >
+                <h3>Supersell</h3>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td
+                class="body"
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Hello, <%= customer_name %>! <br />
+                <br />
+                Your order #<%= order_id %> has been successfully delivered!
+                <br />
+                <br />
+                🎉 We hope you love your purchase. If you have any issues,
+                please reach out to our support team.
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 0px 20px 0px 20px;
+                  text-align: center;
+                  padding-bottom: 25px;
+                "
+              >
+                <table cellspacing="0" cellpadding="0" style="margin: auto">
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        background-color: #403dfe;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                      "
+                    >
+                      <a
+                        href="#"
+                        style="
+                          color: #ffffff;
+                          text-decoration: none;
+                          font-weight: bold;
+                        "
+                        >Leave a Review</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Thank you for choosing Supersell!
+                <br />
+                <br />
+                Best regards,
+                <br />
+                <b>Supersell Team</b>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                class="footer"
+                style="
+                  background-color: #545454;
+                  padding: 20px;
+                  text-align: center;
+                  color: white;
+                  font-size: 14px;
+                "
+              >
+                <p>Supersell &copy; 2025 | by Augusto Souza</p>
+                <a
+                  href="https://github.com/augustojs1"
+                  style="color: white; font-size: 12px"
+                  >https://github.com/augustojs1</a
+                >
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>'
+	);
+	
+-- ORDER_STATUS_FAILED_PAYMENT
+INSERT INTO
+	email_templates (type, html)
+VALUES
+	(
+	'ORDER_STATUS_FAILED_PAYMENT',
+	'<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Supersell</title>
+    <style>
+      @media screen and (max-width: 600px) {
+        .content {
+          width: 100% !important;
+          display: block !important;
+          padding: 10px !important;
+        }
+
+        .header,
+        .body,
+        .footer {
+          font-family: ''Geologica'', Arial, sans-serif;
+          padding: 20px !important;
+        }
+      }
+    </style>
+  </head>
+  <body style="font-family: ''Geologica'', Arial, sans-serif">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center" style="padding: 20px">
+          <table
+            class="content"
+            width="600"
+            border="0"
+            cellspacing="0"
+            cellpadding="0"
+            style="border-collapse: collapse; border: 1px solid #cccccc"
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                class="header"
+                style="
+                  background-color: #403dfe;
+                  text-align: center;
+                  color: white;
+                  font-size: 24px;
+                  font-weight: 400;
+                  letter-spacing: 3px;
+                  padding-top: 22px;
+                "
+              >
+                <h3>Supersell</h3>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td
+                class="body"
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Hello, <%= customer_name %>! <br />
+                <br />
+                Unfortunately, the payment for your order #<%= order_id %> was
+                unsuccessful. This could be due to an issue with your payment
+                method or insufficient funds.
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 0px 20px 0px 20px;
+                  text-align: center;
+                  padding-bottom: 25px;
+                "
+              >
+                <table cellspacing="0" cellpadding="0" style="margin: auto">
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        background-color: #403dfe;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                      "
+                    >
+                      <a
+                        href="#"
+                        style="
+                          color: #ffffff;
+                          text-decoration: none;
+                          font-weight: bold;
+                        "
+                        >Try Again</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                If you need help resolving this issue, feel free to contact our
+                support team.
+                <br />
+                <br />
+                Best regards,
+                <br />
+                <b>Supersell Team</b>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                class="footer"
+                style="
+                  background-color: #545454;
+                  padding: 20px;
+                  text-align: center;
+                  color: white;
+                  font-size: 14px;
+                "
+              >
+                <p>Supersell &copy; 2025 | by Augusto Souza</p>
+                <a
+                  href="https://github.com/augustojs1"
+                  style="color: white; font-size: 12px"
+                  >https://github.com/augustojs1</a
+                >
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>'
+	);
+	
+-- ORDER_STATUS_ON_DELIVERY
+INSERT INTO
+	email_templates (type, html)
+VALUES
+	(
+	'ORDER_STATUS_ON_DELIVERY',
+	'<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Supersell</title>
+    <style>
+      @media screen and (max-width: 600px) {
+        .content {
+          width: 100% !important;
+          display: block !important;
+          padding: 10px !important;
+        }
+
+        .header,
+        .body,
+        .footer {
+          font-family: ''Geologica'', Arial, sans-serif;
+          padding: 20px !important;
+        }
+      }
+    </style>
+  </head>
+  <body style="font-family: ''Geologica'', Arial, sans-serif">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center" style="padding: 20px">
+          <table
+            class="content"
+            width="600"
+            border="0"
+            cellspacing="0"
+            cellpadding="0"
+            style="border-collapse: collapse; border: 1px solid #cccccc"
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                class="header"
+                style="
+                  background-color: #403dfe;
+                  text-align: center;
+                  color: white;
+                  font-size: 24px;
+                  font-weight: 400;
+                  letter-spacing: 3px;
+                  padding-top: 22px;
+                "
+              >
+                <h3>Supersell</h3>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td
+                class="body"
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Hello, <%= customer_name %>! <br />
+                <br />
+                Your order #<%= order_id %> is almost there! Our delivery
+                partner is currently bringing it to you.
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 0px 20px 0px 20px;
+                  text-align: center;
+                  padding-bottom: 25px;
+                "
+              >
+                <table cellspacing="0" cellpadding="0" style="margin: auto">
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        background-color: #403dfe;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                      "
+                    >
+                      <a
+                        href="#"
+                        style="
+                          color: #ffffff;
+                          text-decoration: none;
+                          font-weight: bold;
+                        "
+                        >Track Your Delivery</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Make sure someone is available to receive the package. Enjoy
+                your purchase!
+                <br />
+                <br />
+                Best regards,
+                <br />
+                <b>Supersell Team</b>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                class="footer"
+                style="
+                  background-color: #545454;
+                  padding: 20px;
+                  text-align: center;
+                  color: white;
+                  font-size: 14px;
+                "
+              >
+                <p>Supersell &copy; 2025 | by Augusto Souza</p>
+                <a
+                  href="https://github.com/augustojs1"
+                  style="color: white; font-size: 12px"
+                  >https://github.com/augustojs1</a
+                >
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>'
+	);
+	
+-- ORDER_STATUS_PAID
+INSERT INTO
+	email_templates (type, html)
+VALUES
+	(
+	'ORDER_STATUS_PAID',
+	'<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Supersell</title>
+    <style>
+      @media screen and (max-width: 600px) {
+        .content {
+          width: 100% !important;
+          display: block !important;
+          padding: 10px !important;
+        }
+
+        .header,
+        .body,
+        .footer {
+          font-family: ''Geologica'', Arial, sans-serif;
+          padding: 20px !important;
+        }
+      }
+    </style>
+  </head>
+  <body style="font-family: ''Geologica'', Arial, sans-serif">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center" style="padding: 20px">
+          <table
+            class="content"
+            width="600"
+            border="0"
+            cellspacing="0"
+            cellpadding="0"
+            style="border-collapse: collapse; border: 1px solid #cccccc"
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                class="header"
+                style="
+                  background-color: #403dfe;
+                  text-align: center;
+                  color: white;
+                  font-size: 24px;
+                  font-weight: 400;
+                  letter-spacing: 3px;
+                  padding-top: 22px;
+                "
+              >
+                <h3>Supersell</h3>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td
+                class="body"
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Hello, <%= customer_name %>! <br />
+                <br />
+                Great news! We have received your payment for order #<%=
+                order_id %>, and it is now being prepared for shipment.
+                <br />
+                <br />
+                You’ll receive another update once your order has been shipped.
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 0px 20px 0px 20px;
+                  text-align: center;
+                  padding-bottom: 25px;
+                "
+              >
+                <table cellspacing="0" cellpadding="0" style="margin: auto">
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        background-color: #403dfe;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                      "
+                    >
+                      <a
+                        href="#"
+                        style="
+                          color: #ffffff;
+                          text-decoration: none;
+                          font-weight: bold;
+                        "
+                        >Track Your Order</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Thank you for shopping with us!
+                <br />
+                <br />
+                Best regards,
+                <br />
+                <b>Supersell Team</b>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                class="footer"
+                style="
+                  background-color: #545454;
+                  padding: 20px;
+                  text-align: center;
+                  color: white;
+                  font-size: 14px;
+                "
+              >
+                <p>Supersell &copy; 2025 | by Augusto Souza</p>
+                <a
+                  href="https://github.com/augustojs1"
+                  style="color: white; font-size: 12px"
+                  >https://github.com/augustojs1</a
+                >
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>'
+	);
+	
+-- ORDER_STATUS_PENDING_PAYMENT
+INSERT INTO
+	email_templates (type, html)
+VALUES
+	(
+	'ORDER_STATUS_PENDING_PAYMENT',
+	'<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Supersell</title>
+    <style>
+      @media screen and (max-width: 600px) {
+        .content {
+          width: 100% !important;
+          display: block !important;
+          padding: 10px !important;
+        }
+
+        .header,
+        .body,
+        .footer {
+          font-family: ''Geologica'', Arial, sans-serif;
+          padding: 20px !important;
+        }
+      }
+    </style>
+  </head>
+  <body style="font-family: ''Geologica'', Arial, sans-serif">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center" style="padding: 20px">
+          <table
+            class="content"
+            width="600"
+            border="0"
+            cellspacing="0"
+            cellpadding="0"
+            style="border-collapse: collapse; border: 1px solid #cccccc"
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                class="header"
+                style="
+                  background-color: #403dfe;
+                  text-align: center;
+                  color: white;
+                  font-size: 24px;
+                  font-weight: 400;
+                  letter-spacing: 3px;
+                  padding-top: 22px;
+                "
+              >
+                <h3>Supersell</h3>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td
+                class="body"
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Hello, <%= customer_name %>! <br />
+                <br />
+                We noticed that your order #<%= order_id %> is awaiting payment.
+                To proceed with your purchase, please complete the payment as
+                soon as possible.
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 0px 20px 0px 20px;
+                  text-align: center;
+                  padding-bottom: 25px;
+                "
+              >
+                <table cellspacing="0" cellpadding="0" style="margin: auto">
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        background-color: #403dfe;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                      "
+                    >
+                      <a
+                        href="#"
+                        style="
+                          color: #ffffff;
+                          text-decoration: none;
+                          font-weight: bold;
+                        "
+                        >Complete Payment Now</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                If you have already made the payment, please ignore this
+                message. Let us know if you need any assistance!
+                <br />
+                <br />
+                Best regards,
+                <br />
+                <b>Supersell Team</b>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                class="footer"
+                style="
+                  background-color: #545454;
+                  padding: 20px;
+                  text-align: center;
+                  color: white;
+                  font-size: 14px;
+                "
+              >
+                <p>Supersell &copy; 2025 | by Augusto Souza</p>
+                <a
+                  href="https://github.com/augustojs1"
+                  style="color: white; font-size: 12px"
+                  >https://github.com/augustojs1</a
+                >
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>'
+	);
+	
+-- ORDER_STATUS_SENT
+INSERT INTO
+	email_templates (type, html)
+VALUES
+	(
+	'ORDER_STATUS_SENT',
+	'<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Supersell</title>
+    <style>
+      @media screen and (max-width: 600px) {
+        .content {
+          width: 100% !important;
+          display: block !important;
+          padding: 10px !important;
+        }
+
+        .header,
+        .body,
+        .footer {
+          font-family: ''Geologica'', Arial, sans-serif;
+          padding: 20px !important;
+        }
+      }
+    </style>
+  </head>
+  <body style="font-family: ''Geologica'', Arial, sans-serif">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center" style="padding: 20px">
+          <table
+            class="content"
+            width="600"
+            border="0"
+            cellspacing="0"
+            cellpadding="0"
+            style="border-collapse: collapse; border: 1px solid #cccccc"
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                class="header"
+                style="
+                  background-color: #403dfe;
+                  text-align: center;
+                  color: white;
+                  font-size: 24px;
+                  font-weight: 400;
+                  letter-spacing: 3px;
+                  padding-top: 22px;
+                "
+              >
+                <h3>Supersell</h3>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td
+                class="body"
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Hello, <%= customer_name %>! <br />
+                <br />
+                Great news! We have received your payment for order #<%=
+                order_id %>, and it is now being prepared for shipment.
+                <br />
+                <br />
+                You’ll receive another update once your order has been shipped.
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 0px 20px 0px 20px;
+                  text-align: center;
+                  padding-bottom: 25px;
+                "
+              >
+                <table cellspacing="0" cellpadding="0" style="margin: auto">
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        background-color: #403dfe;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                      "
+                    >
+                      <a
+                        href="#"
+                        style="
+                          color: #ffffff;
+                          text-decoration: none;
+                          font-weight: bold;
+                        "
+                        >Track Your Order</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding: 20px;
+                  text-align: left;
+                  font-size: 16px;
+                  line-height: 1.6;
+                "
+              >
+                Thank you for shopping with us!
+                <br />
+                <br />
+                Best regards,
+                <br />
+                <b>Supersell Team</b>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                class="footer"
+                style="
+                  background-color: #545454;
+                  padding: 20px;
+                  text-align: center;
+                  color: white;
+                  font-size: 14px;
+                "
+              >
+                <p>Supersell &copy; 2025 | by Augusto Souza</p>
+                <a
+                  href="https://github.com/augustojs1"
+                  style="color: white; font-size: 12px"
+                  >https://github.com/augustojs1</a
+                >
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>'
+	);

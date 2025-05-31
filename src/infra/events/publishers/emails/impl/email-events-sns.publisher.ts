@@ -127,10 +127,15 @@ export class EmailEventsSnsPublisher implements IEmailEventsPublisher {
       'emitEmailOrderCreatedChangeMessage',
     );
 
+    console.log(
+      'TopicArn AWS_SNS_EMAIL_ORDER_CREATED in emitEmailOrderCreatedChangeMessage.:',
+      process.env.AWS_SNS_EMAIL_ORDER_CREATED,
+    );
+
     const response = await this.snsClient.send(
       new PublishCommand({
         Message: JSON.stringify(payload),
-        TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_ORDER_CREATED,
+        TopicArn: process.env.AWS_SNS_EMAIL_ORDER_CREATED,
       }),
     );
 
@@ -188,10 +193,15 @@ export class EmailEventsSnsPublisher implements IEmailEventsPublisher {
       ...payload,
     };
 
+    console.log(
+      'TopicArn AWS_SNS_EMAIL_ORDER_CREATED in emitEmailOrderCreatedChangeMessage.:',
+      process.env.AWS_SNS_EMAIL_ORDER_CREATED,
+    );
+
     const response = await this.snsClient.send(
       new PublishCommand({
         Message: JSON.stringify(formatedPayload),
-        TopicArn: this.AWS_SNS_TOPICS_ARN.AWS_SNS_EMAIL_ORDER_CREATED,
+        TopicArn: process.env.AWS_SNS_EMAIL_ORDER_CREATED,
       }),
     );
 
