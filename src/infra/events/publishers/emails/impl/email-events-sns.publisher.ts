@@ -20,7 +20,7 @@ export class EmailEventsSnsPublisher implements IEmailEventsPublisher {
   private readonly AWS_CREDENTIALS;
   private readonly AWS_SNS_TOPICS_ARN;
 
-  constructor(private configService: ConfigService) {
+  constructor(private readonly configService: ConfigService) {
     this.AWS_CREDENTIALS = {
       ACCESS_KEY: this.configService.get<string>('aws.access_key'),
       SECRET_ACCESS_KEY: this.configService.get<string>(
@@ -127,11 +127,6 @@ export class EmailEventsSnsPublisher implements IEmailEventsPublisher {
       'emitEmailOrderCreatedChangeMessage',
     );
 
-    console.log(
-      'TopicArn AWS_SNS_EMAIL_ORDER_CREATED in emitEmailOrderCreatedChangeMessage.:',
-      process.env.AWS_SNS_EMAIL_ORDER_CREATED,
-    );
-
     const response = await this.snsClient.send(
       new PublishCommand({
         Message: JSON.stringify(payload),
@@ -150,7 +145,7 @@ export class EmailEventsSnsPublisher implements IEmailEventsPublisher {
     );
   }
 
-  public emitEmailOrderInvoiceMessage(payload: any): void {
+  public async emitEmailOrderInvoiceMessage(payload: any): Promise<void> {
     this.logger.info(
       {
         body: payload,
@@ -159,7 +154,7 @@ export class EmailEventsSnsPublisher implements IEmailEventsPublisher {
       'emitEmailOrderInvoiceMessage',
     );
 
-    const response = this.snsClient.send(
+    const response = await this.snsClient.send(
       new PublishCommand({
         Message: JSON.stringify(payload),
         TopicArn: this.AWS_SNS_TOPICS_ARN.EMAIL_ORDER_INVOICE,
@@ -192,11 +187,6 @@ export class EmailEventsSnsPublisher implements IEmailEventsPublisher {
       topic_name: MessagingTopics.EMAIL_ORDER_CREATED,
       ...payload,
     };
-
-    console.log(
-      'TopicArn AWS_SNS_EMAIL_ORDER_CREATED in emitEmailOrderCreatedChangeMessage.:',
-      process.env.AWS_SNS_EMAIL_ORDER_CREATED,
-    );
 
     const response = await this.snsClient.send(
       new PublishCommand({

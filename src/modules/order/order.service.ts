@@ -270,9 +270,7 @@ export class OrderService {
     order_id: string,
     dto: OrderPaymentDto,
   ) {
-    this.logger.log(
-      `Received new order payment request for order #${order_id}`,
-    );
+    this.logger.log(`Received new order payment request for order ${order_id}`);
 
     const order = await this.findByIdElseThrow(order_id);
 
@@ -302,15 +300,12 @@ export class OrderService {
   }
 
   public async cancel(user_id: string, order_id: string) {
-    // get order
     const order = await this.findByIdElseThrow(order_id);
 
-    // check if order is owned by the user
     if (order.customer_id !== user_id) {
       throw new ForbiddenException('Only customer user can cancel an order!');
     }
 
-    // check if order status is pending_payment
     if (
       order.status !== OrderStatus.PENDING_PAYMENT &&
       order.status !== OrderStatus.FAILED_PAYMENT
@@ -321,7 +316,6 @@ export class OrderService {
     }
 
     try {
-      // return product quantity to original value
       const orderItems = await this.orderRepository.findOrderByCustomerId(
         user_id,
         undefined,
@@ -339,7 +333,6 @@ export class OrderService {
                 })
                 .where(eq(schemas.products.id, ordered_item.product_id));
 
-              // set order status to CANCELLED
               await tx
                 .update(schemas.orders)
                 .set({
@@ -352,7 +345,6 @@ export class OrderService {
 
             this.logger.log(`SUCCESS cancelling order #${order.id}`);
 
-            // send email to user
             this.emailEventsPublisher.emitEmailOrderStatusChangeMessage({
               order_id: order_id,
               seller_id: order.seller_id,
