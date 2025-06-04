@@ -9,6 +9,7 @@ import { ShoppingCartsModule } from '../shopping_carts/shopping_carts.module';
 import { EventsModule } from '@/infra/events/events.module';
 import { AddressModule } from '../address/address.module';
 import { UsersModule } from '../users/users.module';
+import { PaymentGatewayModule } from '@/infra/payment-gateway/payment-gateway.module';
 
 @Module({
   controllers: [OrderController],
@@ -19,6 +20,7 @@ import { UsersModule } from '../users/users.module';
     AddressModule,
     EventsModule,
     UsersModule,
+    PaymentGatewayModule,
   ],
   exports: [OrderService],
 })

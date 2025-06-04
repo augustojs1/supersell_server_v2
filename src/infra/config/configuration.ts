@@ -30,4 +30,8 @@ export const configuration = () => ({
       email_order_invoice: process.env.AWS_SNS_EMAIL_ORDER_INVOICE,
     },
   },
+  stripe: {
+    publishable_key: process.env.STRIPE_PUBLISHABLE_KEY,
+    secret_key: process.env.STRIPE_SECRET_KEY,
+  },
 });

@@ -118,7 +118,7 @@ export class OrderController {
     @Body() dto: OrderPaymentDto,
     @Param('order_id') order_id: string,
     @GetCurrentUserDecorator() user: CurrentUser,
-  ) {
+  ): Promise<{ url: string }> {
     return await this.orderService.payOrder(user.sub, order_id, dto);
   }
 

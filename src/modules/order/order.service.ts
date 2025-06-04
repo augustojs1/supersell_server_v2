@@ -28,8 +28,8 @@ import { ShoppingCartItemsDTO } from '../shopping_carts/dto';
 import { ProductEntity } from '../products/types';
 import { OrderItemEntity } from './types/order-item-entity.type';
 import { UsersService } from '../users/users.service';
-import { IPaymentEventsPublisher } from '@/infra/events/publishers/payment/ipayment-events-publisher.interface';
 import { IEmailEventsPublisher } from '@/infra/events/publishers/emails/iemail-events-publisher.interface';
+import { IPaymentGateway } from '@/infra/payment-gateway/ipayment-gateway.interface';
 
 @Injectable()
 export class OrderService {
@@ -45,9 +45,9 @@ export class OrderService {
     private readonly orderItemRepository: OrderItemRepository,
     private readonly shoppingCartService: ShoppingCartsService,
     private readonly addressService: AddressService,
-    private readonly paymentEventsPublisher: IPaymentEventsPublisher,
     private readonly emailEventsPublisher: IEmailEventsPublisher,
     private readonly usersService: UsersService,
+    private readonly paymentGateway: IPaymentGateway,
   ) {}
 
   public async create(data: CreateOrderData): Promise<string> {
@@ -269,7 +269,7 @@ export class OrderService {
     user_id: string,
     order_id: string,
     dto: OrderPaymentDto,
-  ) {
+  ): Promise<{ url: string }> {
     this.logger.log(`Received new order payment request for order ${order_id}`);
 
     const order = await this.findByIdElseThrow(order_id);
@@ -290,13 +290,15 @@ export class OrderService {
       );
     }
 
-    this.paymentEventsPublisher.sendOrderPaymentMessage({
-      order: {
-        id: order.id,
-        total_price: order.total_price,
-      },
+    const paymentUrl = (await this.paymentGateway.process({
+      order_id: order.id,
+      amount: order.total_price,
       ...dto,
-    });
+    })) as string;
+
+    return {
+      url: paymentUrl,
+    };
   }
 
   public async cancel(user_id: string, order_id: string) {
