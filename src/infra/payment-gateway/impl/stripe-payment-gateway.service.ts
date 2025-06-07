@@ -37,14 +37,14 @@ export class StripePaymentGatewayService implements IPaymentGateway {
               product_data: {
                 name: `Order #${data.order_id}`,
               },
-              unit_amount: data.amount * 100,
+              unit_amount: Number(data.amount) * 100,
             },
             quantity: 1,
           },
         ],
         mode: 'payment',
-        success_url: `https://seusite.com/payment/success?orderId=${data.order_id}`,
-        cancel_url: `https://seusite.com/payment/failed?orderId=${data.order_id}`,
+        success_url: `https://supersell.augustojsdev.com.br/payment/success?orderId=${data.order_id}`,
+        cancel_url: `https://supersell.augustojsdev.com.br/payment/failed?orderId=${data.order_id}`,
         metadata: {
           orderId: data.order_id,
         },

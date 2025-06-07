@@ -47,6 +47,7 @@
     "drizzle-orm": "^0.36.0",
     "fastify": "^5.2.1",
     "fastify-multer": "^2.0.3",
+    "fastify-raw-body": "^4.2.1",
     "fastify-swagger": "^5.2.0",
     "json-logger-service": "^9.0.1",
     "multer": "1.4.5-lts.1",

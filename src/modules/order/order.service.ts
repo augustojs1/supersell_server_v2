@@ -30,6 +30,8 @@ import { OrderItemEntity } from './types/order-item-entity.type';
 import { UsersService } from '../users/users.service';
 import { IEmailEventsPublisher } from '@/infra/events/publishers/emails/iemail-events-publisher.interface';
 import { IPaymentGateway } from '@/infra/payment-gateway/ipayment-gateway.interface';
+import { IPaymentEventsPublisher } from '@/infra/events/publishers/payment/ipayment-events-publisher.interface';
+import { MessagingTopics } from '@/infra/events/enum';
 
 @Injectable()
 export class OrderService {
@@ -46,6 +48,7 @@ export class OrderService {
     private readonly shoppingCartService: ShoppingCartsService,
     private readonly addressService: AddressService,
     private readonly emailEventsPublisher: IEmailEventsPublisher,
+    private readonly paymentEventsPublisher: IPaymentEventsPublisher,
     private readonly usersService: UsersService,
     private readonly paymentGateway: IPaymentGateway,
   ) {}
@@ -299,6 +302,18 @@ export class OrderService {
     return {
       url: paymentUrl,
     };
+  }
+
+  public async handleOrderPaymentSuccess(orderId: string): Promise<void> {
+    this.jsonLogger.info(
+      { orderId: orderId },
+      `Successfully processed Stripe payment webhook for order #${orderId}`,
+    );
+
+    await this.paymentEventsPublisher.sendOrderPaymentMessage({
+      topic_name: MessagingTopics.ORDER_PAYMENT,
+      order_id: orderId,
+    });
   }
 
   public async cancel(user_id: string, order_id: string) {

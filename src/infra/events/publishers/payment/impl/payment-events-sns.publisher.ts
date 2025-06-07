@@ -4,8 +4,8 @@ import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { JsonLogger, LoggerFactory } from 'json-logger-service';
 
 import { MessagingTopics } from '../../../enum';
-import { PaymentMessagePayload } from '../dto';
 import { IPaymentEventsPublisher } from '../ipayment-events-publisher.interface';
+import { PaymentMessagePayload } from '../dto';
 
 @Injectable()
 export class PaymentEventsSnsPublisher implements IPaymentEventsPublisher {
