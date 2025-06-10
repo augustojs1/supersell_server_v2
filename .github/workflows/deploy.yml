@@ -28,6 +28,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Create production.env file
+        run: |
+          mkdir -p ./src/infra/config/env
+          echo "${{ secrets.PRODUCTION_ENV_VARIABLES }}" > ./src/infra/config/env/production.env
+
+      - name: Verificar se production.env foi criado corretamente
+        run: ls -l ./src/infra/config/env
+
       - name: Build, tag, and push image to ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
