@@ -1,0 +1,53 @@
+name: Deploy to Amazon ECS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Update ECS service
+        env:
+          CLUSTER_NAME: ${{ secrets.ECS_CLUSTER_NAME }}
+          SERVICE_NAME: ${{ secrets.ECS_SERVICE_NAME }}
+          TASK_DEF_NAME: ${{ secrets.ECS_TASK_DEFINITION }}
+          IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+        run: |
+          TASK_DEF=$(aws ecs describe-task-definition --task-definition $TASK_DEF_NAME)
+          NEW_TASK_DEF=$(echo $TASK_DEF | jq --arg IMAGE "$IMAGE_URI" '.taskDefinition | .containerDefinitions[0].image=$IMAGE | {family, containerDefinitions, executionRoleArn, taskRoleArn, networkMode, requiresCompatibilities, cpu, memory}')
+          echo "$NEW_TASK_DEF" > new-task-def.json
+
+          TASK_REVISION=$(aws ecs register-task-definition --cli-input-json file://new-task-def.json | jq -r '.taskDefinition.taskDefinitionArn')
+
+          aws ecs update-service --cluster $CLUSTER_NAME --service $SERVICE_NAME --task-definition $TASK_REVISION

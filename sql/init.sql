@@ -184,6 +184,20 @@ CREATE TABLE order_items (
 	FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
 );
 
+-- order_payments
+CREATE TABLE order_payments (
+  id VARCHAR(26) PRIMARY KEY,
+  order_id VARCHAR(26),
+  amount DECIMAL(13,2) NOT NULL,
+  code VARCHAR(100) NOT NULL,
+  method VARCHAR(100) NOT NULL,
+  status ENUM('SUCCESS', 'FAIL') NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
+);
+
 -- countries seed
 INSERT INTO countries (name, code) VALUES
 ('Afghanistan', 'AF'),
