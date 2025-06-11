@@ -35,7 +35,7 @@ env:
   ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }} # set this to your Amazon ECR repository name
   ECS_SERVICE: ${{ secrets.ECS_SERVICE_NAME }} # set this to your Amazon ECS service name
   ECS_CLUSTER: ${{ secrets.ECS_CLUSTER_NAME }} # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: task-definition.json
+  ECS_TASK_DEFINITION: ${{ secrets.ECS_TASK_DEFINITION }}
   CONTAINER_NAME: supersell-server-v2
 
 permissions:
