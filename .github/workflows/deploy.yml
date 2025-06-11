@@ -89,7 +89,7 @@ jobs:
             --task-definition ${{ env.ECS_TASK_DEFINITION }} \
             --region ${{ env.AWS_REGION }} \
             --query 'taskDefinition' \
-            -- profile augustocdk \
+            --profile augustocdk \
             > task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
