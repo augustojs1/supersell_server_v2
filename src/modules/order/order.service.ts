@@ -18,11 +18,10 @@ import { CreateOrderData, CreateOrderItemData, OrderEntity } from './types';
 import { OrderRepository } from './order.repository';
 import { OrderItemRepository } from './order-item.repository';
 import { CreateOrderDto, OrderSalesDTO, OrdersDTO } from './dto';
-import { OrderStatus } from './enums';
+import { OrderStatus, PaymentMethods } from './enums';
 import { ProductItem, ShoppingCartEntity } from '../shopping_carts/types';
 import { ShoppingCartsService } from '../shopping_carts/shopping_carts.service';
 import { AddressService } from '../address/address.service';
-import { OrderPaymentDto } from './dto/request/order-payment.dto';
 import { DATABASE_TAG } from '@/infra/database/orm/drizzle/drizzle.module';
 import { ShoppingCartItemsDTO } from '../shopping_carts/dto';
 import { ProductEntity } from '../products/types';
@@ -271,7 +270,6 @@ export class OrderService {
   public async payOrder(
     user_id: string,
     order_id: string,
-    dto: OrderPaymentDto,
   ): Promise<{ url: string }> {
     this.logger.log(`Received new order payment request for order ${order_id}`);
 
@@ -296,7 +294,8 @@ export class OrderService {
     const paymentUrl = (await this.paymentGateway.process({
       order_id: order.id,
       amount: order.total_price,
-      ...dto,
+      method: PaymentMethods.CREDIT_CARD,
+      paymentDetails: {} as any,
     })) as string;
 
     return {

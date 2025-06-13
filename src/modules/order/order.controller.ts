@@ -26,7 +26,6 @@ import {
   UpdateOrderStatusDto,
 } from './dto';
 import { OrderStatus } from './enums';
-import { OrderPaymentDto } from './dto/request/order-payment.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -103,6 +102,18 @@ export class OrderController {
     );
   }
 
+  @ApiOperation({
+    summary: 'Create a order for all products in the shopping cart.',
+  })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 201,
+    description: 'Succesfully created order.',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden!',
+  })
   @UseGuards(AccessTokenGuard)
   @Post()
   public async create(
@@ -112,16 +123,79 @@ export class OrderController {
     return await this.orderService.checkout(user.sub, data);
   }
 
+  @ApiOperation({
+    summary: 'Pay and order by id.',
+  })
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'order_id',
+    description: 'Id of order to be paid.',
+    allowEmptyValue: false,
+    required: true,
+    example: '1',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment request successfully sent!',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden!',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Order can only be cancelled when in PENDING_PAYMENT or FAILED_PAYMENT status',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Only order customer can pay for an order!',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Order with this id not found!',
+  })
   @UseGuards(AccessTokenGuard)
   @Post('/:order_id/pay')
   public async payOrder(
-    @Body() dto: OrderPaymentDto,
     @Param('order_id') order_id: string,
     @GetCurrentUserDecorator() user: CurrentUser,
   ): Promise<{ url: string }> {
-    return await this.orderService.payOrder(user.sub, order_id, dto);
+    return await this.orderService.payOrder(user.sub, order_id);
   }
 
+  @ApiOperation({
+    summary: 'Cancel order.',
+  })
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'order_id',
+    description: 'Id of order to be cancelled',
+    allowEmptyValue: false,
+    required: true,
+    example: '1',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Succesfully cancelled an order.',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden!',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Order can only be cancelled when in PENDING_PAYMENT or FAILED_PAYMENT status',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Only customer user can cancel an order!',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Order with this id not found!',
+  })
   @UseGuards(AccessTokenGuard)
   @Patch('/:order_id/cancel')
   public async cancel(

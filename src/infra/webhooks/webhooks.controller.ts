@@ -2,6 +2,7 @@ import { OrderService } from '@/modules/order/order.service';
 import { Body, Controller, Headers, HttpCode, Post } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -19,6 +20,14 @@ export class WebhooksController {
     );
   }
 
+  @ApiOperation({
+    summary: 'Stripe webhook route.',
+  })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully processed Stripe webhook request',
+  })
   @Post('/stripe')
   @HttpCode(200)
   public async processStripeWebhook(@Headers() headers, @Body() body: any) {
