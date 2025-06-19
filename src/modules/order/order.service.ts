@@ -104,8 +104,11 @@ export class OrderService {
     );
 
     try {
-      const orderUser =
-        await this.orderRepository.findOrderCustomerByOrderId(id);
+      const order = await this.findByIdElseThrow(id);
+
+      const orderUser = await this.orderRepository.findOrderCustomerByOrderId(
+        order.id,
+      );
 
       if (orderUser.seller_id !== user_id) {
         throw new ForbiddenException();

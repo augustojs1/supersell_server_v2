@@ -3,11 +3,23 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OrderRepository } from '@/modules/order/order.repository';
 import { OrderService } from '@/modules/order/order.service';
 import { OrderItemRepository } from '@/modules/order/order-item.repository';
+import { ShoppingCartsService } from '@/modules/shopping_carts/shopping_carts.service';
+import { AddressService } from '@/modules/address/address.service';
+import { IEmailEventsPublisher } from '@/infra/events/publishers/emails/iemail-events-publisher.interface';
+import { IPaymentEventsPublisher } from '@/infra/events/publishers/payment/ipayment-events-publisher.interface';
+import { IPaymentGateway } from '@/infra/payment-gateway/ipayment-gateway.interface';
+import { UsersService } from '@/modules/users/users.service';
 
 describe('OrderService', () => {
   let service: OrderService;
   let orderItemRepository: OrderItemRepository;
   let repository: OrderRepository;
+  let shoppingCartsService: ShoppingCartsService;
+  let addressService: AddressService;
+  let emailEventsPublisher: IEmailEventsPublisher;
+  let paymentEventsPublisher: IPaymentEventsPublisher;
+  let paymenteGateway: IPaymentGateway;
+  let usersService: UsersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -22,6 +34,7 @@ describe('OrderService', () => {
             create: jest.fn(),
             createItem: jest.fn(),
             updateOrderStatus: jest.fn(),
+            findOrderCustomerByOrderId: jest.fn(),
           },
         },
         {
@@ -30,12 +43,82 @@ describe('OrderService', () => {
             create: jest.fn(),
           },
         },
+        {
+          provide: 'DB_DEV',
+          useValue: {
+            transaction: jest.fn((cb) =>
+              cb({
+                insert: jest.fn().mockReturnThis(),
+                update: jest.fn().mockReturnThis(),
+                delete: jest.fn().mockReturnThis(),
+                where: jest.fn().mockReturnThis(),
+                set: jest.fn().mockReturnThis(),
+                values: jest.fn().mockReturnThis(),
+              }),
+            ),
+          },
+        },
+        {
+          provide: ShoppingCartsService,
+          useValue: {
+            findAll: jest.fn(),
+          },
+        },
+        {
+          provide: AddressService,
+          useValue: {
+            findByUserAddressIdElseThrow: jest.fn(),
+            checkUserIsOwnerElseThrow: jest.fn(),
+          },
+        },
+        {
+          provide: IEmailEventsPublisher,
+          useValue: {
+            emitEmailOrderStatusChangeMessage: jest.fn(),
+            emitEmailOrderReceiptMessage: jest.fn(),
+          },
+        },
+        {
+          provide: IPaymentEventsPublisher,
+          useValue: {
+            sendOrderPaymentMessage: jest.fn(),
+          },
+        },
+        {
+          provide: IPaymentEventsPublisher,
+          useValue: {
+            sendOrderPaymentMessage: jest.fn(),
+          },
+        },
+        {
+          provide: IPaymentGateway,
+          useValue: {
+            sendOrderPaymentMessage: jest.fn(),
+          },
+        },
+        {
+          provide: UsersService,
+          useValue: {
+            findById: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<OrderService>(OrderService);
     repository = module.get<OrderRepository>(OrderRepository);
     orderItemRepository = module.get<OrderItemRepository>(OrderItemRepository);
+    shoppingCartsService =
+      module.get<ShoppingCartsService>(ShoppingCartsService);
+    addressService = module.get<AddressService>(AddressService);
+    emailEventsPublisher = module.get<IEmailEventsPublisher>(
+      IEmailEventsPublisher,
+    );
+    paymentEventsPublisher = module.get<IPaymentEventsPublisher>(
+      IPaymentEventsPublisher,
+    );
+    paymenteGateway = module.get<IPaymentGateway>(IPaymentGateway);
+    usersService = module.get<UsersService>(UsersService);
   });
 
   it('should be defined', () => {
@@ -46,6 +129,9 @@ describe('OrderService', () => {
     const id = '123';
     const user_id = '321';
     const status = 'PAID' as any;
+    const order = {
+      id,
+    };
 
     jest.spyOn(repository, 'findById').mockResolvedValueOnce(null);
 
@@ -65,6 +151,9 @@ describe('OrderService', () => {
     } as any;
 
     jest.spyOn(repository, 'findById').mockResolvedValueOnce(order);
+    jest
+      .spyOn(repository, 'findOrderCustomerByOrderId')
+      .mockResolvedValueOnce(order);
 
     try {
       await service.updateStatus(id, user_id, status);
@@ -82,18 +171,35 @@ describe('OrderService', () => {
     } as any;
 
     jest.spyOn(repository, 'findById').mockResolvedValueOnce(order);
+    jest
+      .spyOn(repository, 'findOrderCustomerByOrderId')
+      .mockResolvedValueOnce(order);
 
     await service.updateStatus(id, user_id, status);
 
     expect(repository.updateOrderStatus).toHaveBeenCalled();
   });
 
-  it('should be able to create an order', async () => {
-    const data = {} as any;
+  it('should emit publish event on change email order topic after successfully changed order status', async () => {
+    const id = '123';
+    const user_id = '321';
+    const status = 'PAID' as any;
+    const order = {
+      seller_id: '321',
+    } as any;
 
-    await service.create(data);
+    jest.spyOn(repository, 'findById').mockResolvedValueOnce(order);
+    jest
+      .spyOn(repository, 'findOrderCustomerByOrderId')
+      .mockResolvedValueOnce(order);
 
-    expect(repository.create).toHaveBeenCalled();
+    await service.updateStatus(id, user_id, status);
+
+    expect(repository.updateOrderStatus).toHaveBeenCalled();
+    expect(repository.updateOrderStatus).toHaveBeenCalled();
+    expect(
+      emailEventsPublisher.emitEmailOrderStatusChangeMessage,
+    ).toHaveBeenCalled();
   });
 
   it('should be able to create an order item', async () => {

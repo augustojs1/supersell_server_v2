@@ -5,6 +5,7 @@ import { HashProvider } from '@/modules/auth/providers/hash.providers';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from '@/modules/users/users.service';
+import { IEmailEventsPublisher } from '@/infra/events/publishers/emails/iemail-events-publisher.interface';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -12,6 +13,7 @@ describe('AuthService', () => {
   let configService: ConfigService;
   let hashProvider: HashProvider;
   let usersService: UsersService;
+  let emailEventsPublisher: IEmailEventsPublisher;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -42,6 +44,14 @@ describe('AuthService', () => {
             findUserByEmail: jest.fn(),
             createUserAndShoppingCart: jest.fn(),
             findUserProfile: jest.fn(),
+            createProfile: jest.fn(),
+            findById: jest.fn(),
+          },
+        },
+        {
+          provide: IEmailEventsPublisher,
+          useValue: {
+            emitEmailPasswordResetMessage: jest.fn(),
           },
         },
       ],
@@ -52,6 +62,9 @@ describe('AuthService', () => {
     configService = module.get<ConfigService>(ConfigService);
     hashProvider = module.get<HashProvider>(HashProvider);
     usersService = module.get<UsersService>(UsersService);
+    emailEventsPublisher = module.get<IEmailEventsPublisher>(
+      IEmailEventsPublisher,
+    );
   });
 
   it('should be defined', () => {
@@ -146,5 +159,24 @@ describe('AuthService', () => {
     await service.getMe(userId);
 
     expect(usersService.findUserProfile).toHaveBeenCalled();
+  });
+
+  it('should be able to create request password token and publish email event message', async () => {
+    // Arrange
+    const user = {
+      email: 'user@test.com',
+      first_name: 'User',
+    } as any;
+
+    jest.spyOn(usersService, 'findById').mockResolvedValueOnce(user);
+
+    // Act
+    await service.requestPasswordReset('123');
+
+    // Assert
+    expect(jwtService.signAsync).toHaveBeenCalled();
+    expect(
+      emailEventsPublisher.emitEmailPasswordResetMessage,
+    ).toHaveBeenCalled();
   });
 });

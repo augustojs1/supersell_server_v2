@@ -4,6 +4,7 @@ import { DepartmentsRepository } from '@/modules/departments/departments.reposit
 import { DepartmentsService } from '@/modules/departments/departments.service';
 import { DepartmentEntity } from '@/modules/departments/types';
 import { UpdateDepartmentDto } from '@/modules/departments/dtos';
+
 describe('DepartmentsService', () => {
   let service: DepartmentsService;
   let repository: DepartmentsRepository;
