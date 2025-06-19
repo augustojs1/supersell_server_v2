@@ -18,7 +18,7 @@ describe('OrderService', () => {
   let addressService: AddressService;
   let emailEventsPublisher: IEmailEventsPublisher;
   let paymentEventsPublisher: IPaymentEventsPublisher;
-  let paymenteGateway: IPaymentGateway;
+  let paymentGateway: IPaymentGateway;
   let usersService: UsersService;
 
   beforeEach(async () => {
@@ -93,7 +93,7 @@ describe('OrderService', () => {
         {
           provide: IPaymentGateway,
           useValue: {
-            sendOrderPaymentMessage: jest.fn(),
+            process: jest.fn(),
           },
         },
         {
@@ -117,7 +117,7 @@ describe('OrderService', () => {
     paymentEventsPublisher = module.get<IPaymentEventsPublisher>(
       IPaymentEventsPublisher,
     );
-    paymenteGateway = module.get<IPaymentGateway>(IPaymentGateway);
+    paymentGateway = module.get<IPaymentGateway>(IPaymentGateway);
     usersService = module.get<UsersService>(UsersService);
   });
 
@@ -226,5 +226,27 @@ describe('OrderService', () => {
     await service.findOrderBySellerId(customer_id, status as any);
 
     expect(repository.findOrderBySellerId).toHaveBeenCalled();
+  });
+
+  it('should not process payment for a non existent order', async () => {
+    // Arrange
+    const order = {
+      customer_id: '123',
+      status: 'PENDING_PAYMENT',
+    } as any;
+
+    jest.spyOn(repository, 'findById').mockResolvedValueOnce(order);
+
+    // Act
+    await service.payOrder('123', '321');
+
+    // Assert
+    expect(paymentGateway.process).toHaveBeenCalled();
+  });
+
+  it('should successfully handle payment callback and publish message on payment topic', async () => {
+    await service.handleOrderPaymentSuccess('123');
+
+    expect(paymentEventsPublisher.sendOrderPaymentMessage).toHaveBeenCalled();
   });
 });

@@ -103,7 +103,7 @@ export class ProductsService {
     );
   }
 
-  private async createProductAndSetImagesFlowTrx(
+  public async createProductAndSetImagesFlowTrx(
     user_id: string,
     data: CreateProductDto,
     product_images: ProductImages,
@@ -136,6 +136,7 @@ export class ProductsService {
         this.logger.log(
           'Uploading image to S3 and inserting into product_images table',
         );
+
         for (const image of product_images.images) {
           const url = await this.storageService.upload(
             image,
