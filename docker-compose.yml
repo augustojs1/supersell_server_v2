@@ -1,16 +1,16 @@
 services:
-  # supersell_database_v2:
-  #   image: 'mysql:8.0'
-  #   restart: always
-  #   ports:
-  #     - '3600:3306'
-  #   networks:
-  #     - supersell_network
-  #   environment:
-  #     MYSQL_DATABASE: 'supersell_db'
-  #     MYSQL_ROOT_PASSWORD: '13371337'
-  #   volumes:
-  #     - ./sql:/docker-entrypoint-initdb.d
+  supersell_database_v2:
+    image: 'mysql:8.0'
+    restart: always
+    ports:
+      - '3600:3306'
+    networks:
+      - supersell_network
+    environment:
+      MYSQL_DATABASE: 'supersell_db'
+      MYSQL_ROOT_PASSWORD: '13371337'
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
 
   supersell_server_v2:
     build: .
@@ -25,14 +25,14 @@ services:
     volumes:
       - .:/usr/app
 
-  # rabbitmq:
-  #   image: rabbitmq:3-management
-  #   container_name: rabbit-mq-broker
-  #   ports:
-  #     - '5672:5672'
-  #     - '15672:15672'
-  #   volumes:
-  #     - rabbitmq_data:/var/lib/rabbitmq
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbit-mq-broker
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
 networks:
   supersell_network:

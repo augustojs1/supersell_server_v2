@@ -45,6 +45,12 @@ async function bootstrap() {
 
   SwaggerModule.setup('api', app, document);
 
+  if (process.env.NODE_ENV === 'production') {
+    app.enableCors({
+      origin: process.env.HOST,
+    });
+  }
+
   await app.listen(PORT ?? 3000, '0.0.0.0');
 
   console.log(`Server running in ${NODE_ENV} mode on port ${PORT}! 🚀`);

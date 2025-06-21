@@ -1,8 +1,17 @@
 import { OrderService } from '@/modules/order/order.service';
-import { Body, Controller, Headers, HttpCode, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  HttpCode,
+  Post,
+  RawBody,
+  Req,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { FastifyRequest } from 'fastify/types/request';
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -30,27 +39,33 @@ export class WebhooksController {
   })
   @Post('/stripe')
   @HttpCode(200)
-  public async processStripeWebhook(@Headers() headers, @Body() body: any) {
-    const metadata = body['data'].object.metadata;
-    const paymentStatus = body['data'].object.payment_status;
+  public async processStripeWebhook(
+    @Req() req: FastifyRequest,
+    @RawBody() rawBody: Buffer,
+    @Body() body: any,
+    @Headers('stripe-signature') signature: string,
+  ) {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    if (metadata?.orderId && paymentStatus === 'paid') {
-      await this.orderService.handleOrderPaymentSuccess(metadata.orderId);
+    const event = stripe.webhooks.constructEvent(
+      rawBody,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET,
+    );
+
+    if (event.type === 'checkout.session.completed') {
+      const session = body.data.object;
+
+      const orderId = session.metadata?.orderId;
+      const status = session.payment_status;
+
+      if (status === 'paid') {
+        await this.orderService.handleOrderPaymentSuccess(orderId);
+      }
     }
 
     return {
       status: 'ok',
     };
-
-    // TODO: Verify Stripe Webhook Signature
-    // try {
-    //   event = this.stripeClient.webhooks.constructEvent(
-    //     rawBody,
-    //     headers['stripe-signature'],
-    //     process.env.STRIPE_WEBHOOK_KEY,
-    //   );
-    // } catch (err) {
-    //   console.error('Erro ao verificar webhook Stripe:', err.message);
-    // }
   }
 }

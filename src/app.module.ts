@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 import { UsersModule } from './modules/users/users.module';
 import { DrizzleModule } from './infra/database/orm/drizzle/drizzle.module';
@@ -21,6 +22,13 @@ import { WebhooksModule } from './infra/webhooks/webhooks.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60_000,
+        limit: 60,
+        blockDuration: 5_000,
+      },
+    ]),
     ConfigModule.forRoot({
       envFilePath: `${process.cwd()}/src/infra/config/env/${process.env.NODE_ENV}.env`,
       isGlobal: true,
